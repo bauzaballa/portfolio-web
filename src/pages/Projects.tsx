@@ -12,16 +12,15 @@ interface Skill {
 }
 
 interface Project {
+  id: number
   slug: string
   title: string
-  description: string
+  descriptionShort: string
   type: string
-  company: string
-  stack: string[]
-  participation: number
-  frontend: number
-  backend: number
-  design: number
+  company: string | null
+  participationFrontend: number | null
+  participationBackend: number | null
+  participationDesign: number | null
   skills?: Skill[]
 }
 
@@ -261,13 +260,13 @@ export default function Projects() {
 
 function ProjectRow({ project, index, onClick }: { project: Project; index: number; onClick: () => void }) {
   const [hovered, setHovered] = useState(false)
-  const isSolo = project.participation === 100
+  const isSolo = project.participationFrontend === 100 && project.participationBackend === 100
   const barColor = isSolo ? 'var(--accent-warm)' : 'var(--accent-teal)'
 
   const bars: { label: string; value: number }[] = []
-  if (project.frontend > 0) bars.push({ label: 'frontend', value: project.frontend })
-  if (project.backend > 0) bars.push({ label: 'backend', value: project.backend })
-  if (project.design > 0) bars.push({ label: 'design', value: project.design })
+  if (project.participationFrontend) bars.push({ label: 'frontend', value: project.participationFrontend })
+  if (project.participationBackend) bars.push({ label: 'backend', value: project.participationBackend })
+  if (project.participationDesign) bars.push({ label: 'design', value: project.participationDesign })
 
   return (
     <div
@@ -311,7 +310,7 @@ function ProjectRow({ project, index, onClick }: { project: Project; index: numb
           fontSize: 12, color: 'var(--text-secondary)',
           marginTop: 4, maxWidth: 420,
         }}>
-          {project.description}
+          {project.descriptionShort}
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
           {(project.skills ?? []).map(s => (
@@ -354,4 +353,5 @@ function ProjectRow({ project, index, onClick }: { project: Project; index: numb
       </div>
     </div>
   )
+
 }

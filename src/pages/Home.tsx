@@ -8,13 +8,11 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 interface Project {
   slug: string
   title: string
-  description: string
+  descriptionShort: string
   type: string
-  stack: string[]
-  participation: number
-  frontend: number
-  backend: number
-  design: number
+  participationFrontend: number
+  participationBackend: number
+  participationDesign: number
   skills?: { name: string }[]
 }
 
@@ -327,13 +325,13 @@ export default function Home() {
 
 function ProjectRow({ project, index, onClick }: { project: Project; index: number; onClick: () => void }) {
   const [hovered, setHovered] = useState(false)
-  const isSolo = project.participation === 100
+  const isSolo = project.participationFrontend === 100 && project.participationBackend === 100
   const barColor = isSolo ? 'var(--accent-warm)' : 'var(--accent-teal)'
 
   const bars: { label: string; value: number }[] = []
-  if (project.frontend > 0) bars.push({ label: 'frontend', value: project.frontend })
-  if (project.backend > 0) bars.push({ label: 'backend', value: project.backend })
-  if (project.design > 0) bars.push({ label: 'design', value: project.design })
+  if (project.participationFrontend > 0) bars.push({ label: 'frontend', value: project.participationFrontend })
+  if (project.participationBackend > 0) bars.push({ label: 'backend', value: project.participationBackend })
+  if (project.participationDesign > 0) bars.push({ label: 'design', value: project.participationDesign })
 
   return (
     <div
@@ -379,7 +377,7 @@ function ProjectRow({ project, index, onClick }: { project: Project; index: numb
           fontSize: 12, color: 'var(--text-secondary)',
           marginTop: 4, maxWidth: 420,
         }}>
-          {project.description}
+          {project.descriptionShort}
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
           {(project.skills ?? []).map((s: { name: string }) => (
