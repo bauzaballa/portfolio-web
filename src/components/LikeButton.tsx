@@ -68,7 +68,7 @@ export default function LikeButton() {
           transition={{ duration: 0.15 }}
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 11,
+            fontSize: 12,
             color: liked ? 'var(--accent-warm)' : 'var(--text-secondary)',
           }}
         >

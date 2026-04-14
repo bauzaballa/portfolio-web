@@ -7,7 +7,7 @@ import WaitlistInput from '../components/WaitlistInput'
 
 export default function ComingSoon() {
   const { theme } = useTheme()
-  const [progress] = useState(42)
+  const [progress] = useState(70)
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', position: 'relative' }}>
@@ -28,7 +28,7 @@ export default function ComingSoon() {
           background: 'var(--bg)',
           zIndex: 10,
         }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)', letterSpacing: 2, fontWeight: 600 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)', letterSpacing: 2, fontWeight: 600 }}>
             BZ — {new Date().getFullYear()}
           </span>
           <ThemeToggle />
@@ -41,7 +41,7 @@ export default function ComingSoon() {
           style={{ paddingTop: 80 }}
         >
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600,
+            fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 600,
             color: 'var(--accent-teal)', letterSpacing: 3,
             marginBottom: 20, textTransform: 'uppercase'
           }}>
@@ -88,7 +88,7 @@ export default function ComingSoon() {
             </div>
           </div>
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600,
+            fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600,
             color: 'var(--text-secondary)', letterSpacing: 1
           }}>
             {progress}% — React · Node.js · PostgreSQL · TypeScript

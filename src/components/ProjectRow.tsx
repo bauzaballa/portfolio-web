@@ -54,7 +54,7 @@ export default function ProjectRow({ project, index, onClick }: {
 
       <div>
         <span style={{
-          fontFamily: 'var(--font-mono)', fontSize: 9,
+          fontFamily: 'var(--font-mono)', fontSize: 11,
           color: 'var(--accent-teal)', textTransform: 'uppercase',
           letterSpacing: 1,
         }}>
@@ -67,7 +67,7 @@ export default function ProjectRow({ project, index, onClick }: {
           {project.title}
         </div>
         <div style={{
-          fontSize: 12, color: 'var(--text-secondary)',
+          fontSize: 13, color: 'var(--text-secondary)',
           marginTop: 4, maxWidth: 420,
         }}>
           {project.descriptionShort}
@@ -75,7 +75,7 @@ export default function ProjectRow({ project, index, onClick }: {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
           {(project.skills ?? []).map(s => (
             <span key={s.name} style={{
-              fontFamily: 'var(--font-mono)', fontSize: 9,
+              fontFamily: 'var(--font-mono)', fontSize: 11,
               padding: '2px 6px',
               border: '0.5px solid var(--border)',
               color: 'var(--text-secondary)',
@@ -95,7 +95,7 @@ export default function ProjectRow({ project, index, onClick }: {
         {bars.map(b => (
           <div key={b.label}>
             <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: 9,
+              fontFamily: 'var(--font-mono)', fontSize: 11,
               color: 'var(--text-secondary)', marginBottom: 3,
             }}>
               {b.label} {b.value}%

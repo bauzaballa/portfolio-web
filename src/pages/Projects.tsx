@@ -73,7 +73,7 @@ export default function Projects() {
       }}>
         <div>
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 10,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--text-muted)', letterSpacing: 3,
             marginBottom: 16,
           }}>
@@ -90,7 +90,7 @@ export default function Projects() {
           </h1>
           {!loading && !error && (
             <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: 12,
+              fontFamily: 'var(--font-mono)', fontSize: 13,
               color: 'var(--text-secondary)', marginTop: 8,
             }}>
               {projects.length} projects &middot; 2024&ndash;2025
@@ -106,7 +106,7 @@ export default function Projects() {
                 key={f}
                 onClick={() => { setFilter(f); setAnimKey(k => k + 1) }}
                 style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 10,
+                  fontFamily: 'var(--font-mono)', fontSize: 11,
                   letterSpacing: 1,
                   padding: '4px 12px',
                   borderRadius: 3,
@@ -144,7 +144,7 @@ export default function Projects() {
 
         {error && (
           <p style={{
-            fontFamily: 'var(--font-mono)', fontSize: 12,
+            fontFamily: 'var(--font-mono)', fontSize: 13,
             color: 'var(--text-secondary)', paddingTop: 40,
           }}>
             could not load projects

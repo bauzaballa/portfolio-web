@@ -60,7 +60,7 @@ export default function Experience() {
         borderBottom: '0.5px solid var(--border)',
       }}>
         <div style={{
-          fontFamily: 'var(--font-mono)', fontSize: 10,
+          fontFamily: 'var(--font-mono)', fontSize: 11,
           color: 'var(--text-muted)', letterSpacing: 3,
           marginBottom: 16,
         }}>
@@ -83,7 +83,7 @@ export default function Experience() {
 
         {error && (
           <p style={{
-            fontFamily: 'var(--font-mono)', fontSize: 12,
+            fontFamily: 'var(--font-mono)', fontSize: 13,
             color: 'var(--text-secondary)',
           }}>
             could not load experience
@@ -105,7 +105,7 @@ export default function Experience() {
               {/* Date column */}
               <div style={{
                 textAlign: 'right',
-                fontFamily: 'var(--font-mono)', fontSize: 11,
+                fontFamily: 'var(--font-mono)', fontSize: 12,
                 color: 'var(--text-muted)',
                 lineHeight: 1.8,
                 paddingTop: 4,
@@ -124,7 +124,7 @@ export default function Experience() {
                   {item.company}
                 </div>
                 <div style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 11,
+                  fontFamily: 'var(--font-mono)', fontSize: 12,
                   color: 'var(--accent-teal)', letterSpacing: 1,
                   marginTop: 4,
                 }}>
@@ -141,7 +141,7 @@ export default function Experience() {
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 12 }}>
                     {item.skills.map(s => (
                       <span key={s.name} style={{
-                        fontFamily: 'var(--font-mono)', fontSize: 9,
+                        fontFamily: 'var(--font-mono)', fontSize: 11,
                         padding: '2px 6px',
                         border: '0.5px solid var(--border)',
                         color: 'var(--text-secondary)',
@@ -155,7 +155,7 @@ export default function Experience() {
                 <div
                   onClick={() => navigate('/projects')}
                   style={{
-                    fontFamily: 'var(--font-mono)', fontSize: 10,
+                    fontFamily: 'var(--font-mono)', fontSize: 11,
                     color: 'var(--accent-teal)', marginTop: 16,
                     cursor: 'pointer', letterSpacing: 1,
                   }}
@@ -206,7 +206,7 @@ export default function Experience() {
               {/* Date column */}
               <div style={{
                 textAlign: 'right',
-                fontFamily: 'var(--font-mono)', fontSize: 11,
+                fontFamily: 'var(--font-mono)', fontSize: 12,
                 color: 'var(--text-muted)',
                 lineHeight: 1.8,
                 paddingTop: 4,
@@ -226,7 +226,7 @@ export default function Experience() {
                   {item.institution}
                 </div>
                 <div style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 11,
+                  fontFamily: 'var(--font-mono)', fontSize: 12,
                   color: 'var(--accent-teal)', letterSpacing: 1,
                   marginTop: 4,
                 }}>
@@ -245,7 +245,7 @@ export default function Experience() {
                     display: 'inline-block',
                     background: 'rgba(61,107,98,0.12)',
                     color: 'var(--accent-teal)',
-                    fontFamily: 'var(--font-mono)', fontSize: 9,
+                    fontFamily: 'var(--font-mono)', fontSize: 11,
                     padding: '2px 8px',
                     borderRadius: 2,
                     marginTop: 8,

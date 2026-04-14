@@ -117,7 +117,7 @@ export default function ProjectDetail() {
         <span
           onClick={() => navigate(-1)}
           style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
+            fontFamily: 'var(--font-mono)', fontSize: 12,
             color: 'var(--text-secondary)', cursor: 'pointer',
           }}
         >
@@ -140,7 +140,7 @@ export default function ProjectDetail() {
           transition={{ duration: 0.6 }}
         >
           <span style={{
-            fontFamily: 'var(--font-mono)', fontSize: 9,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--accent-teal)', textTransform: 'uppercase',
             letterSpacing: 2,
           }}>
@@ -167,7 +167,7 @@ export default function ProjectDetail() {
           )}
           {project.githubUrl && (
             <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" style={{
-              display: 'block', fontFamily: 'var(--font-mono)', fontSize: 11,
+              display: 'block', fontFamily: 'var(--font-mono)', fontSize: 12,
               color: 'var(--accent-teal)', marginTop: 24, textDecoration: 'none',
             }}>
               view code &rarr;
@@ -175,7 +175,7 @@ export default function ProjectDetail() {
           )}
           {project.liveUrl && (
             <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" style={{
-              display: 'block', fontFamily: 'var(--font-mono)', fontSize: 11,
+              display: 'block', fontFamily: 'var(--font-mono)', fontSize: 12,
               color: 'var(--accent-warm)', marginTop: 8, textDecoration: 'none',
             }}>
               live demo &rarr;
@@ -199,30 +199,30 @@ export default function ProjectDetail() {
             {/* Info rows */}
             {project.company && (
               <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>company</div>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: 'var(--text-primary)' }}>{project.company}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>company</div>
+                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{project.company}</div>
               </div>
             )}
             {formatPeriod() && (
               <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>period</div>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: 'var(--text-primary)' }}>{formatPeriod()}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>period</div>
+                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{formatPeriod()}</div>
               </div>
             )}
             {project.role && (
               <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>role</div>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: 'var(--text-primary)' }}>{project.role}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>role</div>
+                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{project.role}</div>
               </div>
             )}
             <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>type</div>
-              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: 'var(--text-primary)' }}>{project.type}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>type</div>
+              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{project.type}</div>
             </div>
             <div style={{ padding: '12px 0', borderBottom: bars.length > 0 ? '0.5px solid var(--border)' : 'none' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>visibility</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>visibility</div>
               <span style={{
-                fontFamily: 'var(--font-mono)', fontSize: 10,
+                fontFamily: 'var(--font-mono)', fontSize: 11,
                 color: badge.color,
               }}>
                 {badge.label}
@@ -232,11 +232,11 @@ export default function ProjectDetail() {
             {/* Participation bars */}
             {bars.length > 0 && (
               <div style={{ padding: '12px 0', borderBottom: (project.skills ?? []).length > 0 ? '0.5px solid var(--border)' : 'none' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>participation</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>participation</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {bars.map(b => (
                     <div key={b.label}>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', marginBottom: 3 }}>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)', marginBottom: 3 }}>
                         {b.label} {b.value}%
                       </div>
                       <div style={{ height: 2, background: 'var(--border)', borderRadius: 1, width: '100%' }}>
@@ -254,7 +254,7 @@ export default function ProjectDetail() {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                   {(project.skills ?? []).map(s => (
                     <span key={s.name} style={{
-                      fontFamily: 'var(--font-mono)', fontSize: 9,
+                      fontFamily: 'var(--font-mono)', fontSize: 11,
                       padding: '2px 6px',
                       border: '0.5px solid var(--border)',
                       color: 'var(--text-secondary)',
@@ -290,7 +290,7 @@ export default function ProjectDetail() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           borderRadius: 4,
         }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)' }}>
             [ media coming soon ]
           </span>
         </div>
@@ -300,7 +300,7 @@ export default function ProjectDetail() {
       <div style={{ padding: '0 8vw 40px', maxWidth: 680 }}>
         {project.technicalDecisions && (
           <div style={{ marginBottom: 48 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--accent-teal)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
               technical decisions
             </div>
             <p style={{ fontFamily: 'var(--font-serif)', fontSize: 17, color: 'var(--text-secondary)', lineHeight: 1.8 }}>
@@ -311,7 +311,7 @@ export default function ProjectDetail() {
 
         {project.challenges && project.challenges.length > 0 && (
           <div style={{ marginBottom: 48 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--accent-teal)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
               challenges
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

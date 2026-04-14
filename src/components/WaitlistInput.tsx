@@ -34,7 +34,7 @@ export default function WaitlistInput() {
   return (
     <div style={{ marginTop: 40, maxWidth: 360 }}>
       <div style={{
-        fontFamily: 'var(--font-mono)', fontSize: 10,
+        fontFamily: 'var(--font-mono)', fontSize: 11,
         color: 'var(--text-secondary)', letterSpacing: 2,
         marginBottom: 12, textTransform: 'uppercase',
       }}>
@@ -56,7 +56,7 @@ export default function WaitlistInput() {
             borderBottom: '0.5px solid var(--border)',
             color: 'var(--text-primary)',
             fontFamily: 'var(--font-mono)',
-            fontSize: 13,
+            fontSize: 14,
             padding: '8px 0',
             outline: 'none',
             caretColor: 'var(--accent-teal)',
@@ -70,7 +70,7 @@ export default function WaitlistInput() {
             border: '0.5px solid var(--border)',
             color: 'var(--text-secondary)',
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 11,
             letterSpacing: 1,
             padding: '6px 14px',
             borderRadius: 2,
@@ -91,7 +91,7 @@ export default function WaitlistInput() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             style={{
-              fontFamily: 'var(--font-mono)', fontSize: 11,
+              fontFamily: 'var(--font-mono)', fontSize: 12,
               color: state === 'success' ? 'var(--accent-teal)' : 'var(--accent-warm)',
               marginTop: 8,
             }}

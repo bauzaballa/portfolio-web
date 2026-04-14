@@ -84,7 +84,7 @@ export default function ConsoleDrawer() {
           border: `0.5px solid ${open ? 'var(--accent-teal)' : 'var(--border)'}`,
           color: open ? '#fff' : 'var(--text-secondary)',
           padding: '4px 12px', borderRadius: 3, cursor: 'pointer',
-          fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: 1, fontWeight: 600,
+          fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: 1, fontWeight: 600,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -121,7 +121,7 @@ export default function ConsoleDrawer() {
               background: 'var(--bg-surface)',
               borderLeft: '0.5px solid var(--border)',
               display: 'flex', flexDirection: 'column',
-              fontFamily: 'var(--font-mono)', fontSize: 12,
+              fontFamily: 'var(--font-mono)', fontSize: 13,
               zIndex: 150,
             }}
           >
@@ -130,14 +130,14 @@ export default function ConsoleDrawer() {
               borderBottom: '0.5px solid var(--border)',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center'
             }}>
-              <span style={{ color: 'var(--accent-teal)', fontSize: 10, letterSpacing: 2, fontWeight: 600 }}>
+              <span style={{ color: 'var(--accent-teal)', fontSize: 11, letterSpacing: 2, fontWeight: 600 }}>
                 PORTFOLIO CONSOLE — API: {API}
               </span>
               <button
                 onClick={() => setOpen(false)}
                 style={{
                   background: 'none', border: 'none', color: 'var(--text-secondary)',
-                  cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 12,
+                  cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 13,
                   padding: '2px 6px'
                 }}
               >
@@ -182,7 +182,7 @@ export default function ConsoleDrawer() {
                 style={{
                   flex: 1, background: 'none', border: 'none', outline: 'none',
                   color: 'var(--text-primary)', fontFamily: 'var(--font-mono)',
-                  fontSize: 12, caretColor: 'var(--accent-teal)'
+                  fontSize: 13, caretColor: 'var(--accent-teal)'
                 }}
               />
             </div>

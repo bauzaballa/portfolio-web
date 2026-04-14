@@ -76,7 +76,7 @@ export default function Home() {
           transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
         >
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
+            fontFamily: 'var(--font-mono)', fontSize: 12,
             color: 'var(--accent-teal)', letterSpacing: 3,
             textTransform: 'uppercase', marginBottom: 20, fontWeight: 600,
           }}>
@@ -108,7 +108,7 @@ export default function Home() {
               style={{
                 background: 'var(--accent-teal)', color: '#fff',
                 border: 'none', fontFamily: 'var(--font-mono)',
-                fontSize: 11, letterSpacing: 1, padding: '10px 24px',
+                fontSize: 12, letterSpacing: 1, padding: '10px 24px',
                 borderRadius: 3, cursor: 'pointer',
               }}
             >
@@ -121,7 +121,7 @@ export default function Home() {
                 border: '0.5px solid var(--border)',
                 color: 'var(--text-secondary)',
                 fontFamily: 'var(--font-mono)',
-                fontSize: 11, letterSpacing: 1, padding: '10px 24px',
+                fontSize: 12, letterSpacing: 1, padding: '10px 24px',
                 borderRadius: 3, cursor: 'pointer',
               }}
             >
@@ -146,7 +146,7 @@ export default function Home() {
           <span
             onClick={() => navigate('/projects')}
             style={{
-              fontFamily: 'var(--font-mono)', fontSize: 11,
+              fontFamily: 'var(--font-mono)', fontSize: 12,
               color: 'var(--accent-teal)', cursor: 'pointer',
             }}
           >
@@ -171,7 +171,7 @@ export default function Home() {
 
         {projectsError && (
           <p style={{
-            fontFamily: 'var(--font-mono)', fontSize: 12,
+            fontFamily: 'var(--font-mono)', fontSize: 13,
             color: 'var(--text-secondary)',
           }}>
             could not load projects
@@ -191,7 +191,7 @@ export default function Home() {
       }}>
         <div style={{ flex: 1, minWidth: 280 }}>
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 10,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--accent-teal)', letterSpacing: 3,
             textTransform: 'uppercase', marginBottom: 20,
           }}>
@@ -209,7 +209,7 @@ export default function Home() {
           <span
             onClick={() => navigate('/about')}
             style={{
-              fontFamily: 'var(--font-mono)', fontSize: 11,
+              fontFamily: 'var(--font-mono)', fontSize: 12,
               color: 'var(--accent-teal)', cursor: 'pointer',
               display: 'inline-block', marginTop: 24,
             }}
@@ -226,7 +226,7 @@ export default function Home() {
           flexShrink: 0,
         }}>
           <span style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
+            fontFamily: 'var(--font-mono)', fontSize: 12,
             color: 'var(--text-muted)',
           }}>
             [ photo ]
@@ -245,7 +245,7 @@ export default function Home() {
             flexWrap: 'wrap',
           }}>
             <span style={{
-              fontFamily: 'var(--font-mono)', fontSize: 10,
+              fontFamily: 'var(--font-mono)', fontSize: 11,
               color: 'var(--accent-teal)', letterSpacing: 2,
               textTransform: 'uppercase', minWidth: 120,
             }}>
@@ -254,7 +254,7 @@ export default function Home() {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {g.skills.map(s => (
                 <span key={s} style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 11,
+                  fontFamily: 'var(--font-mono)', fontSize: 12,
                   color: 'var(--text-secondary)',
                   padding: '3px 10px',
                   border: '0.5px solid var(--border)',
@@ -276,13 +276,13 @@ export default function Home() {
           display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,
         }}>
           <span style={{
-            fontFamily: 'var(--font-mono)', fontSize: 10,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--text-muted)',
           }}>
             bauzaballa@gmail.com
           </span>
           <span style={{
-            fontFamily: 'var(--font-mono)', fontSize: 10,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--text-muted)',
           }}>
             github / linkedin

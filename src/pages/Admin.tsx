@@ -108,7 +108,7 @@ export default function Admin() {
       }}>
         <div style={{ padding: '0 20px', marginBottom: 32 }}>
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 10,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--accent-teal)', letterSpacing: 3,
           }}>
             admin
@@ -131,7 +131,7 @@ export default function Admin() {
                 style={{
                   padding: '10px 20px',
                   fontFamily: 'var(--font-mono)',
-                  fontSize: 11,
+                  fontSize: 12,
                   cursor: 'pointer',
                   color: active ? 'var(--accent-teal)' : 'var(--text-secondary)',
                   background: active ? 'rgba(61,107,98,0.12)' : 'transparent',
@@ -160,7 +160,7 @@ export default function Admin() {
             style={{
               padding: '10px 20px',
               fontFamily: 'var(--font-mono)',
-              fontSize: 10,
+              fontSize: 11,
               letterSpacing: 1,
               color: 'var(--text-secondary)',
               cursor: 'pointer',
@@ -173,7 +173,7 @@ export default function Admin() {
           <span
             onClick={() => { logout(); navigate('/entry') }}
             style={{
-              fontFamily: 'var(--font-mono)', fontSize: 10,
+              fontFamily: 'var(--font-mono)', fontSize: 11,
               color: 'var(--text-muted)', cursor: 'pointer',
               transition: 'color 0.15s',
             }}
@@ -218,7 +218,7 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle: string })
         {title}
       </div>
       <div style={{
-        fontFamily: 'var(--font-mono)', fontSize: 10,
+        fontFamily: 'var(--font-mono)', fontSize: 11,
         color: 'var(--text-muted)', letterSpacing: 2, marginTop: 4,
       }}>
         {subtitle}
@@ -228,7 +228,7 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle: string })
 }
 
 const inputStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)', fontSize: 12,
+  fontFamily: 'var(--font-mono)', fontSize: 13,
   borderTop: 'none', borderLeft: 'none', borderRight: 'none',
   borderBottom: '0.5px solid var(--border)',
   background: 'transparent',
@@ -240,19 +240,19 @@ const inputStyle: React.CSSProperties = {
 
 const submitBtnStyle: React.CSSProperties = {
   background: 'var(--accent-teal)', color: 'white',
-  fontFamily: 'var(--font-mono)', fontSize: 11,
+  fontFamily: 'var(--font-mono)', fontSize: 12,
   padding: '8px 20px', borderRadius: 2,
   border: 'none', cursor: 'pointer',
 }
 
 const cancelBtnStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)', fontSize: 10,
+  fontFamily: 'var(--font-mono)', fontSize: 11,
   color: 'var(--text-muted)', cursor: 'pointer',
   background: 'none', border: 'none', marginLeft: 12,
 }
 
 const tableHeaderStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)', fontSize: 9,
+  fontFamily: 'var(--font-mono)', fontSize: 11,
   color: 'var(--text-muted)', letterSpacing: 2,
   textTransform: 'uppercase' as const,
   borderBottom: '0.5px solid var(--border)',
@@ -313,7 +313,7 @@ function OverviewSection({ authFetch, onNavigate }: { authFetch: AuthFetch; onNa
             padding: 20,
           }}>
             <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: 9,
+              fontFamily: 'var(--font-mono)', fontSize: 11,
               color: 'var(--text-muted)',
             }}>
               {c.label}
@@ -331,7 +331,7 @@ function OverviewSection({ authFetch, onNavigate }: { authFetch: AuthFetch; onNa
       {recent.length > 0 && (
         <div style={{ marginTop: 40 }}>
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 10,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--text-muted)', letterSpacing: 2,
             marginBottom: 16,
           }}>
@@ -358,14 +358,14 @@ function OverviewSection({ authFetch, onNavigate }: { authFetch: AuthFetch; onNa
                   {p.title}
                 </div>
                 <div style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 10,
+                  fontFamily: 'var(--font-mono)', fontSize: 11,
                   color: 'var(--text-secondary)', marginTop: 2,
                 }}>
                   {p.type}
                 </div>
               </div>
               <span style={{
-                fontFamily: 'var(--font-mono)', fontSize: 9,
+                fontFamily: 'var(--font-mono)', fontSize: 11,
                 color: 'var(--text-muted)',
               }}>
                 {new Date(p.createdAt).toLocaleDateString()}
@@ -477,7 +477,7 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
                 </td>
                 <td style={{ padding: '10px 0' }}>
                   <span style={{
-                    fontFamily: 'var(--font-mono)', fontSize: 9,
+                    fontFamily: 'var(--font-mono)', fontSize: 11,
                     padding: '2px 6px', borderRadius: 2,
                     background: p.type === 'work' ? 'rgba(61,107,98,0.12)' : 'rgba(196,176,144,0.12)',
                     color: p.type === 'work' ? 'var(--accent-teal)' : 'var(--accent-warm)',
@@ -494,7 +494,7 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
                   <span
                     onClick={() => startEdit(p)}
                     style={{
-                      fontFamily: 'var(--font-mono)', fontSize: 10,
+                      fontFamily: 'var(--font-mono)', fontSize: 11,
                       color: 'var(--accent-teal)', cursor: 'pointer',
                     }}
                   >
@@ -503,7 +503,7 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
                   <span
                     onClick={() => remove(p.id)}
                     style={{
-                      fontFamily: 'var(--font-mono)', fontSize: 10,
+                      fontFamily: 'var(--font-mono)', fontSize: 11,
                       color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 12,
                       transition: 'color 0.15s',
                     }}
@@ -536,7 +536,7 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
         <div
           onClick={startAdd}
           style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
+            fontFamily: 'var(--font-mono)', fontSize: 12,
             color: 'var(--accent-teal)', cursor: 'pointer',
             marginTop: 16,
           }}
@@ -580,7 +580,7 @@ function ProjectForm({
       <input style={inputStyle} placeholder="sort order" type="number" value={form.sortOrder} onChange={e => set('sortOrder', +e.target.value)} />
       <input style={inputStyle} placeholder="github url" value={form.githubUrl} onChange={e => set('githubUrl', e.target.value)} />
       <input style={inputStyle} placeholder="live url" value={form.liveUrl} onChange={e => set('liveUrl', e.target.value)} />
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>
         <input type="checkbox" checked={form.isFeatured} onChange={e => set('isFeatured', e.target.checked)} />
         featured
       </label>
@@ -659,7 +659,7 @@ function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
                 <td style={{ padding: '10px 0', fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--text-primary)' }}>
                   {s.name}
                 </td>
-                <td style={{ padding: '10px 0', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-secondary)' }}>
+                <td style={{ padding: '10px 0', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>
                   {s.category}
                 </td>
                 <td style={{ padding: '10px 0' }}>
@@ -674,10 +674,10 @@ function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
                   </div>
                 </td>
                 <td style={{ padding: '10px 0', textAlign: 'right' }}>
-                  <span onClick={() => startEdit(s)} style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--accent-teal)', cursor: 'pointer' }}>edit</span>
+                  <span onClick={() => startEdit(s)} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', cursor: 'pointer' }}>edit</span>
                   <span
                     onClick={() => remove(s.id)}
-                    style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 12, transition: 'color 0.15s' }}
+                    style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 12, transition: 'color 0.15s' }}
                     onMouseEnter={e => (e.currentTarget.style.color = '#c44')}
                     onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
                   >delete</span>
@@ -702,7 +702,7 @@ function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
       )}
 
       {!adding && !editingId && (
-        <div onClick={() => { setEditingId(null); setForm(emptySkill); setAdding(true) }} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', cursor: 'pointer', marginTop: 16 }}>
+        <div onClick={() => { setEditingId(null); setForm(emptySkill); setAdding(true) }} style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-teal)', cursor: 'pointer', marginTop: 16 }}>
           + add skill
         </div>
       )}
@@ -819,17 +819,17 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
                 <td style={{ padding: '10px 0', fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--text-primary)' }}>
                   {e.company}
                 </td>
-                <td style={{ padding: '10px 0', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>
+                <td style={{ padding: '10px 0', fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>
                   {e.role}
                 </td>
-                <td style={{ padding: '10px 0', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)' }}>
+                <td style={{ padding: '10px 0', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)' }}>
                   {formatPeriod(e)}
                 </td>
                 <td style={{ padding: '10px 0', textAlign: 'right' }}>
-                  <span onClick={() => startEdit(e)} style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--accent-teal)', cursor: 'pointer' }}>edit</span>
+                  <span onClick={() => startEdit(e)} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', cursor: 'pointer' }}>edit</span>
                   <span
                     onClick={() => remove(e.id)}
-                    style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 12, transition: 'color 0.15s' }}
+                    style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 12, transition: 'color 0.15s' }}
                     onMouseEnter={ev => (ev.currentTarget.style.color = '#c44')}
                     onMouseLeave={ev => (ev.currentTarget.style.color = 'var(--text-muted)')}
                   >delete</span>
@@ -854,7 +854,7 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
       )}
 
       {!adding && !editingId && (
-        <div onClick={() => { setEditingId(null); setForm(emptyExperience); setAdding(true) }} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', cursor: 'pointer', marginTop: 16 }}>
+        <div onClick={() => { setEditingId(null); setForm(emptyExperience); setAdding(true) }} style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-teal)', cursor: 'pointer', marginTop: 16 }}>
           + add position
         </div>
       )}
@@ -878,7 +878,7 @@ function ExperienceForm({
       <input style={inputStyle} placeholder="role" value={form.role} onChange={e => set('role', e.target.value)} />
       <input style={inputStyle} placeholder="start date (YYYY-MM-DD)" value={form.startDate} onChange={e => set('startDate', e.target.value)} />
       <input style={inputStyle} placeholder="end date (YYYY-MM-DD)" value={form.endDate} onChange={e => set('endDate', e.target.value)} disabled={form.isCurrent} />
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>
         <input type="checkbox" checked={form.isCurrent} onChange={e => set('isCurrent', e.target.checked)} />
         current position
       </label>
@@ -951,7 +951,7 @@ function ProfileSection({ authFetch }: { authFetch: AuthFetch }) {
         <div style={{ gridColumn: '1 / -1', marginTop: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
           <button style={submitBtnStyle} onClick={save}>save</button>
           {saved && (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-teal)' }}>
               saved.
             </span>
           )}

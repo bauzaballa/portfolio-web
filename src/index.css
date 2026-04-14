@@ -23,6 +23,15 @@
   --border: #D8D0C0;
 }
 
+:root {
+  /* ... tus variables existentes ... */
+  --text-xs: 11px;    /* reemplaza todos los 9px y 10px */
+  --text-sm: 13px;    /* reemplaza los 11px y 12px */
+  --text-base: 16px;  /* cuerpo */
+  --text-md: 18px;    /* descripciones */
+  --text-lg: 22px;    /* subtítulos */
+}
+
 * {
   margin: 0;
   padding: 0;

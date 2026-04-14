@@ -69,7 +69,7 @@ export default function About() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 10,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--text-muted)', letterSpacing: 3,
             marginBottom: 16,
           }}>
@@ -87,7 +87,7 @@ export default function About() {
           </h1>
 
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 12,
+            fontFamily: 'var(--font-mono)', fontSize: 13,
             color: 'var(--accent-teal)', letterSpacing: 2,
             marginTop: 12,
           }}>
@@ -127,13 +127,13 @@ export default function About() {
             marginBottom: 16,
           }} />
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
+            fontFamily: 'var(--font-mono)', fontSize: 12,
             color: 'var(--text-muted)',
           }}>
             [ photo ]
           </div>
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 9,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--text-muted)', marginTop: 8,
           }}>
             analog photo coming soon
@@ -152,7 +152,7 @@ export default function About() {
         {/* Location */}
         <div>
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 9,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--text-muted)', letterSpacing: 2,
             textTransform: 'uppercase', marginBottom: 12,
           }}>
@@ -169,7 +169,7 @@ export default function About() {
         {/* Contact */}
         <div>
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 9,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--text-muted)', letterSpacing: 2,
             textTransform: 'uppercase', marginBottom: 12,
           }}>
@@ -177,7 +177,7 @@ export default function About() {
           </div>
           <a href={`mailto:${profile?.email}`} style={{
             display: 'block',
-            fontFamily: 'var(--font-mono)', fontSize: 12,
+            fontFamily: 'var(--font-mono)', fontSize: 13,
             color: 'var(--accent-teal)',
             textDecoration: 'none',
           }}>
@@ -186,7 +186,7 @@ export default function About() {
           {profile?.phone && (
             <span style={{
               display: 'block',
-              fontFamily: 'var(--font-mono)', fontSize: 12,
+              fontFamily: 'var(--font-mono)', fontSize: 13,
               color: 'var(--text-secondary)', marginTop: 4,
             }}>
               {profile.phone}
@@ -197,7 +197,7 @@ export default function About() {
         {/* Elsewhere */}
         <div>
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 9,
+            fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--text-muted)', letterSpacing: 2,
             textTransform: 'uppercase', marginBottom: 12,
           }}>
@@ -206,7 +206,7 @@ export default function About() {
           {profile?.githubUrl && (
             <a href={profile.githubUrl} target="_blank" rel="noreferrer" style={{
               display: 'block',
-              fontFamily: 'var(--font-mono)', fontSize: 12,
+              fontFamily: 'var(--font-mono)', fontSize: 13,
               color: 'var(--accent-teal)',
               textDecoration: 'none',
             }}>
@@ -216,7 +216,7 @@ export default function About() {
           {profile?.linkedinUrl && (
             <a href={profile.linkedinUrl} target="_blank" rel="noreferrer" style={{
               display: 'block',
-              fontFamily: 'var(--font-mono)', fontSize: 12,
+              fontFamily: 'var(--font-mono)', fontSize: 13,
               color: 'var(--accent-teal)',
               textDecoration: 'none', marginTop: 4,
             }}>
@@ -279,7 +279,7 @@ function PhotoCell({ film }: { film: string }) {
       }}
     >
       <span style={{
-        fontFamily: 'var(--font-mono)', fontSize: 9,
+        fontFamily: 'var(--font-mono)', fontSize: 11,
         color: 'var(--text-muted)',
       }}>
         {film}

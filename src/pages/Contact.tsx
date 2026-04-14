@@ -69,7 +69,7 @@ export default function Contact() {
         >
           <div style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 11,
             color: 'var(--text-muted)',
             letterSpacing: 3,
             marginBottom: 16,
@@ -122,7 +122,7 @@ export default function Contact() {
           style={{
             marginTop: 40,
             fontFamily: 'var(--font-mono)',
-            fontSize: 11,
+            fontSize: 12,
             color: 'var(--text-muted)',
           }}
         >
@@ -160,7 +160,7 @@ function LinkRow({ label, value, href, delay, isLast }: LinkRowProps) {
     >
       <span style={{
         fontFamily: 'var(--font-mono)',
-        fontSize: 9,
+        fontSize: 11,
         color: 'var(--text-muted)',
         letterSpacing: 2,
         textTransform: 'uppercase',
@@ -175,7 +175,7 @@ function LinkRow({ label, value, href, delay, isLast }: LinkRowProps) {
         onMouseLeave={() => setHovered(false)}
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: 13,
+          fontSize: 14,
           color: hovered ? 'var(--text-primary)' : 'var(--accent-teal)',
           textDecoration: 'none',
           cursor: 'pointer',

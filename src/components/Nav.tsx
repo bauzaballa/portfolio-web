@@ -30,7 +30,7 @@ export default function Nav() {
         <span
           onClick={() => navigate('/home')}
           style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
+            fontFamily: 'var(--font-mono)', fontSize: 12,
             color: 'var(--text-secondary)', letterSpacing: 2,
             fontWeight: 600, cursor: 'pointer',
           }}
@@ -46,7 +46,7 @@ export default function Nav() {
                 key={link.path}
                 onClick={() => navigate(link.path)}
                 style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 10,
+                  fontFamily: 'var(--font-mono)', fontSize: 11,
                   letterSpacing: 1, cursor: 'pointer',
                   color: isActive ? 'var(--accent-teal)' : 'var(--text-secondary)',
                   fontWeight: isActive ? 600 : 400,
@@ -61,7 +61,7 @@ export default function Nav() {
             <span
               onClick={() => navigate('/admin')}
               style={{
-                fontFamily: 'var(--font-mono)', fontSize: 10,
+                fontFamily: 'var(--font-mono)', fontSize: 11,
                 letterSpacing: 1, cursor: 'pointer',
                 color: 'var(--accent-warm)',
                 padding: '3px 8px',
