@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useTheme } from '../context/ThemeContext'
+import Nav from '../components/Nav'
+import ProjectRow from '../components/ProjectRow'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -38,9 +39,7 @@ function filterProjects(projects: Project[], filter: Filter): Project[] {
 }
 
 export default function Projects() {
-  const { theme, toggle } = useTheme()
   const navigate = useNavigate()
-  const location = useLocation()
 
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
@@ -58,69 +57,9 @@ export default function Projects() {
 
   const filtered = filterProjects(projects, filter)
 
-  const navLinks = [
-    { label: 'home', path: '/home' },
-    { label: 'work', path: '/projects' },
-    { label: 'experience', path: '/experience' },
-    { label: 'about', path: '/about' },
-    { label: 'contact', path: '/contact' },
-  ]
-
   return (
     <div>
-      {/* NAV */}
-      <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0,
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '20px 8vw',
-        borderBottom: '0.5px solid var(--border)',
-        background: 'var(--bg)',
-        zIndex: 10,
-      }}>
-        <span style={{
-          fontFamily: 'var(--font-mono)', fontSize: 11,
-          color: 'var(--text-secondary)', letterSpacing: 2, fontWeight: 600,
-        }}>
-          BZ — {new Date().getFullYear()}
-        </span>
-
-        <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-          {navLinks.map(link => {
-            const isActive = location.pathname === link.path
-            return (
-              <span
-                key={link.path}
-                onClick={() => navigate(link.path)}
-                style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 10,
-                  letterSpacing: 1, cursor: 'pointer',
-                  color: isActive ? 'var(--accent-teal)' : 'var(--text-secondary)',
-                  fontWeight: isActive ? 600 : 400,
-                }}
-              >
-                {link.label}
-              </span>
-            )
-          })}
-          <button
-            onClick={toggle}
-            style={{
-              background: theme === 'dark' ? '#F2EDE4' : '#0E0F12',
-              border: 'none',
-              color: theme === 'dark' ? '#1A1A1A' : '#C8D4C0',
-              padding: '4px 12px',
-              borderRadius: 3,
-              cursor: 'pointer',
-              fontFamily: 'var(--font-mono)',
-              fontSize: 10,
-              letterSpacing: 1,
-              fontWeight: 500,
-            }}
-          >
-            {theme === 'dark' ? 'LIGHT' : 'DARK'}
-          </button>
-        </div>
-      </nav>
+      <Nav />
 
       {/* PAGE HEADER */}
       <section style={{
@@ -256,102 +195,4 @@ export default function Projects() {
       </section>
     </div>
   )
-}
-
-function ProjectRow({ project, index, onClick }: { project: Project; index: number; onClick: () => void }) {
-  const [hovered, setHovered] = useState(false)
-  const isSolo = project.participationFrontend === 100 && project.participationBackend === 100
-  const barColor = isSolo ? 'var(--accent-warm)' : 'var(--accent-teal)'
-
-  const bars: { label: string; value: number }[] = []
-  if (project.participationFrontend) bars.push({ label: 'frontend', value: project.participationFrontend })
-  if (project.participationBackend) bars.push({ label: 'backend', value: project.participationBackend })
-  if (project.participationDesign) bars.push({ label: 'design', value: project.participationDesign })
-
-  return (
-    <div
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        borderTop: index === 1 ? 'none' : '0.5px solid var(--border)',
-        display: 'grid',
-        gridTemplateColumns: '48px 1fr 220px',
-        alignItems: 'center',
-        padding: '20px 0',
-        cursor: 'pointer',
-        background: hovered ? 'rgba(61, 107, 98, 0.03)' : 'transparent',
-        transition: 'background 0.2s ease',
-      }}
-    >
-      <span style={{
-        fontFamily: 'var(--font-serif)', fontSize: 36,
-        color: hovered ? 'var(--accent-teal)' : 'var(--text-muted)',
-        transition: 'color 0.2s ease',
-      }}>
-        {String(index).padStart(2, '0')}
-      </span>
-
-      <div>
-        <span style={{
-          fontFamily: 'var(--font-mono)', fontSize: 9,
-          color: 'var(--accent-teal)', textTransform: 'uppercase',
-          letterSpacing: 1,
-        }}>
-          {project.type}
-        </span>
-        <div style={{
-          fontFamily: 'var(--font-serif)', fontSize: 20,
-          color: 'var(--text-primary)', marginTop: 2,
-        }}>
-          {project.title}
-        </div>
-        <div style={{
-          fontSize: 12, color: 'var(--text-secondary)',
-          marginTop: 4, maxWidth: 420,
-        }}>
-          {project.descriptionShort}
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
-          {(project.skills ?? []).map(s => (
-            <span key={s.name} style={{
-              fontFamily: 'var(--font-mono)', fontSize: 9,
-              padding: '2px 6px',
-              border: '0.5px solid var(--border)',
-              color: 'var(--text-secondary)',
-              borderRadius: 2,
-            }}>
-              {s.name}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div style={{
-        borderLeft: '0.5px solid var(--border)',
-        paddingLeft: 16,
-        display: 'flex', flexDirection: 'column', gap: 8,
-      }}>
-        {bars.map(b => (
-          <div key={b.label}>
-            <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: 9,
-              color: 'var(--text-secondary)', marginBottom: 3,
-            }}>
-              {b.label} {b.value}%
-            </div>
-            <div style={{
-              height: 2, background: 'var(--border)', borderRadius: 1, width: '100%',
-            }}>
-              <div style={{
-                height: '100%', width: `${b.value}%`,
-                background: barColor, borderRadius: 1,
-              }} />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-
 }

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
+import Nav from '../components/Nav'
+import ProjectRow from '../components/ProjectRow'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -22,7 +24,7 @@ interface SkillGroup {
 }
 
 export default function Home() {
-  const { theme, toggle } = useTheme()
+  const { theme } = useTheme()
   const navigate = useNavigate()
 
   const [projects, setProjects] = useState<Project[]>([])
@@ -59,39 +61,7 @@ export default function Home() {
 
   return (
     <div>
-      {/* NAV */}
-      <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0,
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '20px 8vw',
-        borderBottom: '0.5px solid var(--border)',
-        background: 'var(--bg)',
-        zIndex: 10,
-      }}>
-        <span style={{
-          fontFamily: 'var(--font-mono)', fontSize: 11,
-          color: 'var(--text-secondary)', letterSpacing: 2, fontWeight: 600,
-        }}>
-          BZ — {new Date().getFullYear()}
-        </span>
-        <button
-          onClick={toggle}
-          style={{
-            background: theme === 'dark' ? '#F2EDE4' : '#0E0F12',
-            border: 'none',
-            color: theme === 'dark' ? '#1A1A1A' : '#C8D4C0',
-            padding: '4px 12px',
-            borderRadius: 3,
-            cursor: 'pointer',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 10,
-            letterSpacing: 1,
-            fontWeight: 500,
-          }}
-        >
-          {theme === 'dark' ? 'LIGHT' : 'DARK'}
-        </button>
-      </nav>
+      <Nav />
 
       {/* SECTION 1: HERO */}
       <section style={{
@@ -319,106 +289,6 @@ export default function Home() {
           </span>
         </div>
       </section>
-    </div>
-  )
-}
-
-function ProjectRow({ project, index, onClick }: { project: Project; index: number; onClick: () => void }) {
-  const [hovered, setHovered] = useState(false)
-  const isSolo = project.participationFrontend === 100 && project.participationBackend === 100
-  const barColor = isSolo ? 'var(--accent-warm)' : 'var(--accent-teal)'
-
-  const bars: { label: string; value: number }[] = []
-  if (project.participationFrontend > 0) bars.push({ label: 'frontend', value: project.participationFrontend })
-  if (project.participationBackend > 0) bars.push({ label: 'backend', value: project.participationBackend })
-  if (project.participationDesign > 0) bars.push({ label: 'design', value: project.participationDesign })
-
-  return (
-    <div
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        borderTop: '0.5px solid var(--border)',
-        display: 'grid',
-        gridTemplateColumns: '48px 1fr 220px',
-        alignItems: 'center',
-        padding: '20px 0',
-        cursor: 'pointer',
-        background: hovered ? 'rgba(61, 107, 98, 0.03)' : 'transparent',
-        transition: 'background 0.2s ease',
-      }}
-    >
-      {/* number */}
-      <span style={{
-        fontFamily: 'var(--font-serif)', fontSize: 36,
-        color: hovered ? 'var(--accent-teal)' : 'var(--text-muted)',
-        transition: 'color 0.2s ease',
-      }}>
-        {String(index).padStart(2, '0')}
-      </span>
-
-      {/* content */}
-      <div>
-        <span style={{
-          fontFamily: 'var(--font-mono)', fontSize: 9,
-          color: 'var(--accent-teal)', textTransform: 'uppercase',
-          letterSpacing: 1,
-        }}>
-          {project.type}
-        </span>
-        <div style={{
-          fontFamily: 'var(--font-serif)', fontSize: 20,
-          color: 'var(--text-primary)', marginTop: 2,
-        }}>
-          {project.title}
-        </div>
-        <div style={{
-          fontSize: 12, color: 'var(--text-secondary)',
-          marginTop: 4, maxWidth: 420,
-        }}>
-          {project.descriptionShort}
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
-          {(project.skills ?? []).map((s: { name: string }) => (
-            <span key={s.name} style={{
-              fontFamily: 'var(--font-mono)', fontSize: 9,
-              padding: '2px 6px',
-              border: '0.5px solid var(--border)',
-              color: 'var(--text-secondary)',
-              borderRadius: 2,
-            }}>
-              {s.name}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* participation sidebar */}
-      <div style={{
-        borderLeft: '0.5px solid var(--border)',
-        paddingLeft: 16,
-        display: 'flex', flexDirection: 'column', gap: 8,
-      }}>
-        {bars.map(b => (
-          <div key={b.label}>
-            <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: 9,
-              color: 'var(--text-secondary)', marginBottom: 3,
-            }}>
-              {b.label} {b.value}%
-            </div>
-            <div style={{
-              height: 2, background: 'var(--border)', borderRadius: 1, width: '100%',
-            }}>
-              <div style={{
-                height: '100%', width: `${b.value}%`,
-                background: barColor, borderRadius: 1,
-              }} />
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }

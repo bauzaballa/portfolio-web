@@ -154,8 +154,22 @@ export default function Admin() {
         <div style={{
           marginTop: 'auto',
           borderTop: '0.5px solid var(--border)',
-          padding: '16px 20px',
         }}>
+          <div
+            onClick={() => navigate('/home')}
+            style={{
+              padding: '10px 20px',
+              fontFamily: 'var(--font-mono)',
+              fontSize: 10,
+              letterSpacing: 1,
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              borderBottom: '0.5px solid var(--border)',
+            }}
+          >
+            {'<-'} view site
+          </div>
+          <div style={{ padding: '16px 20px' }}>
           <span
             onClick={() => { logout(); navigate('/entry') }}
             style={{
@@ -168,6 +182,7 @@ export default function Admin() {
           >
             logout
           </span>
+          </div>
         </div>
       </aside>
 

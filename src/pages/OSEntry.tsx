@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
+import ThemeToggle from '../components/ThemeToggle'
 
 function Clock() {
   const [now, setNow] = useState(new Date())
@@ -315,6 +316,20 @@ export default function OSEntry() {
       position: 'relative',
       overflow: 'hidden',
     }}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+        style={{
+          position: 'absolute',
+          top: '2rem',
+          right: '2rem',
+          zIndex: 100,
+        }}
+      >
+        <ThemeToggle />
+      </motion.div>
+
       <AnimatePresence mode="wait">
         {selected === null ? (
           <motion.div

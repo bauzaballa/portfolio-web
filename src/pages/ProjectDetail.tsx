@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useTheme } from '../context/ThemeContext'
+import Nav from '../components/Nav'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -37,9 +37,7 @@ interface Project {
 
 export default function ProjectDetail() {
   const { slug } = useParams()
-  const { theme, toggle } = useTheme()
   const navigate = useNavigate()
-  const location = useLocation()
 
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
@@ -56,72 +54,10 @@ export default function ProjectDetail() {
       .finally(() => setLoading(false))
   }, [slug])
 
-  const navLinks = [
-    { label: 'home', path: '/home' },
-    { label: 'work', path: '/projects' },
-    { label: 'experience', path: '/experience' },
-    { label: 'about', path: '/about' },
-    { label: 'contact', path: '/contact' },
-  ]
-
-  const nav = (
-    <nav style={{
-      position: 'fixed', top: 0, left: 0, right: 0,
-      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      padding: '20px 8vw',
-      borderBottom: '0.5px solid var(--border)',
-      background: 'var(--bg)',
-      zIndex: 10,
-    }}>
-      <span style={{
-        fontFamily: 'var(--font-mono)', fontSize: 11,
-        color: 'var(--text-secondary)', letterSpacing: 2, fontWeight: 600,
-      }}>
-        BZ — {new Date().getFullYear()}
-      </span>
-      <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-        {navLinks.map(link => {
-          const isActive = location.pathname === link.path
-          return (
-            <span
-              key={link.path}
-              onClick={() => navigate(link.path)}
-              style={{
-                fontFamily: 'var(--font-mono)', fontSize: 10,
-                letterSpacing: 1, cursor: 'pointer',
-                color: isActive ? 'var(--accent-teal)' : 'var(--text-secondary)',
-                fontWeight: isActive ? 600 : 400,
-              }}
-            >
-              {link.label}
-            </span>
-          )
-        })}
-        <button
-          onClick={toggle}
-          style={{
-            background: theme === 'dark' ? '#F2EDE4' : '#0E0F12',
-            border: 'none',
-            color: theme === 'dark' ? '#1A1A1A' : '#C8D4C0',
-            padding: '4px 12px',
-            borderRadius: 3,
-            cursor: 'pointer',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 10,
-            letterSpacing: 1,
-            fontWeight: 500,
-          }}
-        >
-          {theme === 'dark' ? 'LIGHT' : 'DARK'}
-        </button>
-      </div>
-    </nav>
-  )
-
   if (loading) {
     return (
       <div>
-        {nav}
+        <Nav />
         <div style={{ padding: '120px 8vw 40px', display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ height: 14, width: 80, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
           <div style={{ height: 48, width: 400, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
@@ -137,7 +73,7 @@ export default function ProjectDetail() {
   if (error || !project) {
     return (
       <div>
-        {nav}
+        <Nav />
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
           <span style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
             project not found.
@@ -174,7 +110,7 @@ export default function ProjectDetail() {
 
   return (
     <div>
-      {nav}
+      <Nav />
 
       {/* BACK BUTTON */}
       <div style={{ padding: '100px 8vw 0' }}>
