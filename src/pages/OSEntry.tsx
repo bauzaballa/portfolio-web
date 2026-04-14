@@ -134,7 +134,8 @@ const errorMessages = [
   'ok you can stop now.',
 ]
 
-function PasswordForm({ onCancel, onSuccess }: {
+function PasswordForm({ username, onCancel, onSuccess }: {
+  username: string
   onCancel: () => void
   onSuccess: (token: string) => void
 }) {
@@ -157,12 +158,12 @@ function PasswordForm({ onCancel, onSuccess }: {
       const res = await fetch(import.meta.env.VITE_API_URL + '/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       })
 
       if (res.ok) {
         const data = await res.json()
-        onSuccess(data.token)
+        onSuccess(data.data.token)
       } else {
         const attempt = attempts + 1
         setAttempts(attempt)
@@ -229,7 +230,7 @@ function PasswordForm({ onCancel, onSuccess }: {
         color: 'var(--text-primary)',
         marginTop: '-0.75rem',
       }}>
-        Bautista
+        {username}
       </span>
 
       <div style={{ width: '100%' }}>
@@ -279,12 +280,24 @@ function PasswordForm({ onCancel, onSuccess }: {
 }
 
 export default function OSEntry() {
-  const [selected, setSelected] = useState<'bautista' | null>(null)
+  const [selected, setSelected] = useState<string | null>(null)
+  const [users, setUsers] = useState<{ username: string }[]>([])
   const navigate = useNavigate()
   const { login } = useAuth()
 
+  useEffect(() => {
+    fetch(import.meta.env.VITE_API_URL + '/api/v1/auth/users')
+      .then(res => res.json())
+      .then(data => {
+        if (data?.data) {
+          setUsers(data.data)
+        }
+      })
+      .catch(console.error)
+  }, [])
+
   const handleGuestClick = () => navigate('/home')
-  const handleBautistaClick = () => setSelected('bautista')
+  const handleUserClick = (username: string) => setSelected(username)
 
   const handleLoginSuccess = (token: string) => {
     login(token)
@@ -328,16 +341,20 @@ export default function OSEntry() {
                 onClick={handleGuestClick}
                 delay={0.6}
               />
-              <UserCard
-                name="Bautista"
-                avatar={<BautistaAvatar />}
-                onClick={handleBautistaClick}
-                delay={0.75}
-              />
+              {users.map((user, idx) => (
+                <UserCard
+                  key={user.username}
+                  name={user.username}
+                  avatar={<BautistaAvatar />}
+                  onClick={() => handleUserClick(user.username)}
+                  delay={0.75 + idx * 0.1}
+                />
+              ))}
             </div>
           </motion.div>
         ) : (
           <PasswordForm
+            username={selected}
             onCancel={() => setSelected(null)}
             onSuccess={handleLoginSuccess}
           />

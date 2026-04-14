@@ -61,23 +61,23 @@ interface Profile {
 const NAV_ITEMS: Section[] = ['overview', 'projects', 'experience', 'skills', 'profile']
 
 export default function Admin() {
-  const { token, isAdmin, logout } = useAuth()
+  const { isAdmin, logout, loading } = useAuth()
   const navigate = useNavigate()
   const [section, setSection] = useState<Section>('overview')
 
   useEffect(() => {
-    if (!isAdmin) navigate('/entry')
-  }, [isAdmin, navigate])
-
-  const authHeaders = useCallback((): HeadersInit => ({
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
-  }), [token])
+    if (!loading && !isAdmin) navigate('/entry')
+  }, [isAdmin, loading, navigate])
 
   const authFetch = useCallback(async (url: string, opts?: RequestInit) => {
+    const currentToken = localStorage.getItem('portfolio_token')
     const res = await fetch(url, {
       ...opts,
-      headers: { ...authHeaders(), ...opts?.headers },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(currentToken ? { Authorization: `Bearer ${currentToken}` } : {}),
+        ...opts?.headers,
+      },
     })
     if (res.status === 401) {
       logout()
@@ -85,9 +85,9 @@ export default function Admin() {
       throw new Error('unauthorized')
     }
     return res
-  }, [authHeaders, logout, navigate])
+  }, [logout, navigate])
 
-  if (!isAdmin) return null
+  if (loading || !isAdmin) return null
 
   return (
     <div style={{
