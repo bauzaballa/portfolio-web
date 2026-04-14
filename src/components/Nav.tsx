@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import ConsoleDrawer from './ConsoleDrawer'
 import ThemeToggle from './ThemeToggle'
+import LikeButton from './LikeButton'
 
 const NAV_LINKS = [
   { label: 'home', path: '/home' },
@@ -72,6 +73,7 @@ export default function Nav() {
             </span>
           )}
 
+          <LikeButton />
           <ThemeToggle />
         </div>
       </nav>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
 import ConsoleDrawer from '../components/ConsoleDrawer'
 import ThemeToggle from '../components/ThemeToggle'
+import WaitlistInput from '../components/WaitlistInput'
 
 export default function ComingSoon() {
   const { theme } = useTheme()
@@ -92,6 +93,7 @@ export default function ComingSoon() {
           }}>
             {progress}% — React · Node.js · PostgreSQL · TypeScript
           </div>
+          <WaitlistInput />
         </motion.div>
       </main>
 
