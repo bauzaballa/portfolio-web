@@ -84,7 +84,9 @@ function UserCard({ name, avatar, onClick, isAdmin }: {
         alignItems: 'center',
         gap: '0.75rem',
         background: isAdmin ? 'rgba(20, 24, 20, 0.85)' : 'rgba(20, 24, 20, 0.5)',
-        border: `1px solid ${isAdmin ? 'rgba(196, 176, 144, 0.15)' : 'rgba(30, 40, 32, 0.6)'}`,
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: isAdmin ? 'rgba(196, 176, 144, 0.15)' : 'rgba(30, 40, 32, 0.6)',
         borderRadius: '8px',
         padding: '1.5rem 1rem',
         cursor: 'pointer',
@@ -219,6 +221,7 @@ function PasswordForm({ username, onCancel, onSuccess }: {
         <img
           src="/bau.jpg"
           alt="Bautista Zaballa"
+          loading="lazy"
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
         />
       </div>
@@ -367,6 +370,7 @@ export default function OSEntry() {
                       <img
                         src="/bau.jpg"
                         alt=""
+                        loading="lazy"
                         style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
                       />
                     </div>

@@ -111,7 +111,7 @@ export default function Nav() {
                       position: 'absolute',
                       top: 36,
                       right: 0,
-                      background: 'rgba(14,15,18,0.95)',
+                      background: 'var(--bg)',
                       border: '1px solid rgba(196,176,144,0.15)',
                       borderRadius: 6,
                       padding: '0.4rem 0',
@@ -131,7 +131,7 @@ export default function Nav() {
                     >
                       → {t('admin panel', 'panel admin')}
                     </button>
-                    <div style={{ height: '0.5px', background: 'rgba(30,40,32,0.8)', margin: '0.3rem 0' }} />
+                    <div style={{ height: '0.5px', background: 'var(--border)', margin: '0.3rem 0' }} />
                     <button
                       onClick={() => { setMenuOpen(false); logout(); navigate('/entry') }}
                       style={{
