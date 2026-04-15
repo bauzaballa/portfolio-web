@@ -83,7 +83,7 @@ function UserCard({ name, avatar, onClick, isAdmin }: {
         flexDirection: 'column',
         alignItems: 'center',
         gap: '0.75rem',
-        background: isAdmin ? 'rgba(20, 24, 20, 0.85)' : 'rgba(20, 24, 20, 0.5)',
+        background: 'var(--bg-surface)',
         borderWidth: '1px',
         borderStyle: 'solid',
         borderColor: isAdmin ? 'rgba(196, 176, 144, 0.15)' : 'rgba(30, 40, 32, 0.6)',
