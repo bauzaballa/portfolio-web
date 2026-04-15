@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
-const STORAGE_KEY = 'portfolio_liked'
 
 export default function LikeButton() {
   const [count, setCount] = useState(0)
@@ -10,31 +9,29 @@ export default function LikeButton() {
   const [burst, setBurst] = useState(false)
 
   useEffect(() => {
-    setLiked(localStorage.getItem(STORAGE_KEY) === 'true')
     fetch(`${API}/api/v1/likes`)
       .then(r => r.json())
-      .then(d => setCount(d.data?.count ?? 0))
+      .then(d => {
+        setCount(d.data?.count ?? 0)
+        setLiked(d.data?.hasLiked ?? false)
+      })
       .catch(() => {})
   }, [])
 
-  const toggle = async () => {
-    const wasLiked = liked
-    const newLiked = !wasLiked
-    const endpoint = wasLiked ? '/api/v1/likes/decrement' : '/api/v1/likes'
+  const handleLike = async () => {
+    if (liked) return
 
-    setLiked(newLiked)
-    setCount(c => wasLiked ? c - 1 : c + 1)
-    if (newLiked) setBurst(true)
-    localStorage.setItem(STORAGE_KEY, String(newLiked))
+    setLiked(true)
+    setCount(c => c + 1)
+    setBurst(true)
 
     try {
-      const res = await fetch(`${API}${endpoint}`, { method: 'POST' })
+      const res = await fetch(`${API}/api/v1/likes`, { method: 'POST' })
       const d = await res.json()
-      setCount(d.data?.count ?? 0)
+      if (d.data?.count != null) setCount(d.data.count)
     } catch {
-      setLiked(wasLiked)
-      setCount(c => wasLiked ? c + 1 : c - 1)
-      localStorage.setItem(STORAGE_KEY, String(wasLiked))
+      setLiked(false)
+      setCount(c => c - 1)
     }
   }
 
@@ -42,7 +39,7 @@ export default function LikeButton() {
     <div style={{
       display: 'flex', alignItems: 'center', gap: 8,
       cursor: 'pointer', userSelect: 'none',
-    }} onClick={toggle}>
+    }} onClick={handleLike}>
       <motion.div
         animate={burst ? { scale: [1, 1.4, 1] } : { scale: 1 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
