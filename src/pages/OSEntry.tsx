@@ -74,7 +74,7 @@ function UserCard({ name, avatar, onClick, isAdmin }: {
       whileHover={{
         y: -4,
         scale: 1.02,
-        borderColor: isAdmin ? 'rgba(196, 176, 144, 0.35)' : 'rgba(61, 107, 98, 0.3)',
+        borderColor: 'rgba(196, 176, 144, 0.35)',
       }}
       transition={{ duration: 0.15, ease: 'easeOut' }}
       onClick={onClick}
@@ -86,7 +86,7 @@ function UserCard({ name, avatar, onClick, isAdmin }: {
         background: 'var(--bg-surface)',
         borderWidth: '1px',
         borderStyle: 'solid',
-        borderColor: isAdmin ? 'rgba(196, 176, 144, 0.15)' : 'rgba(30, 40, 32, 0.6)',
+        borderColor: 'rgba(196, 176, 144, 0.15)',
         borderRadius: '8px',
         padding: '1.5rem 1rem',
         cursor: 'pointer',
