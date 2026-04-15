@@ -12,8 +12,11 @@ function Clock() {
     return () => clearInterval(id)
   }, [])
 
-  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
-  const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+  const hh = String(now.getHours()).padStart(2, '0')
+  const mm = String(now.getMinutes()).padStart(2, '0')
+  const weekday = now.toLocaleDateString('en-US', { weekday: 'long' })
+  const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+  const colonOn = now.getSeconds() % 2 === 0
 
   return (
     <motion.div
@@ -23,22 +26,43 @@ function Clock() {
       style={{ textAlign: 'center', marginBottom: '4rem' }}
     >
       <div style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: '4rem',
+        fontFamily: 'var(--font-serif)',
+        fontSize: 'clamp(3.5rem, 10vw, 6rem)',
         fontWeight: 300,
+        fontStyle: 'italic',
         color: 'var(--text-primary)',
-        letterSpacing: '0.1em',
+        lineHeight: 1,
+        letterSpacing: '-0.02em',
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'center',
+        gap: '0.05em',
       }}>
-        {time}
+        <span>{hh}</span>
+        <span style={{
+          color: 'var(--accent-warm)',
+          opacity: colonOn ? 1 : 0.15,
+          transition: 'opacity 0.4s ease',
+          fontSize: '0.75em',
+        }}>:</span>
+        <span>{mm}</span>
       </div>
+
+      <div style={{
+        width: 32,
+        height: '0.5px',
+        background: 'var(--border)',
+        margin: '1rem auto 0.75rem',
+      }} />
+
       <div style={{
         fontFamily: 'var(--font-mono)',
-        fontSize: '0.85rem',
+        fontSize: '0.62rem',
         color: 'var(--text-secondary)',
-        marginTop: '0.5rem',
-        letterSpacing: '0.05em',
+        letterSpacing: '0.2em',
+        textTransform: 'uppercase',
       }}>
-        {date}
+        {weekday} · {dateStr}
       </div>
     </motion.div>
   )
