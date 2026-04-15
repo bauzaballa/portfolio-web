@@ -49,7 +49,7 @@ function GuestAvatar() {
     <div style={{
       width: 72, height: 72,
       borderRadius: '50%',
-      background: '#1E2228',
+      background: 'var(--bg-surface)',
       border: '1.5px solid rgba(30,40,32,0.8)',
       display: 'flex',
       alignItems: 'center',
@@ -69,29 +69,26 @@ function UserCard({ name, avatar, onClick, isAdmin }: {
   onClick: () => void
   isAdmin?: boolean
 }) {
-  const [hovered, setHovered] = useState(false)
-
   return (
     <motion.button
-      whileHover={{ y: -4, scale: 1.02 }}
+      whileHover={{
+        y: -4,
+        scale: 1.02,
+        borderColor: isAdmin ? 'rgba(196, 176, 144, 0.35)' : 'rgba(61, 107, 98, 0.3)',
+      }}
       transition={{ duration: 0.15, ease: 'easeOut' }}
       onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         gap: '0.75rem',
         background: isAdmin ? 'rgba(20, 24, 20, 0.85)' : 'rgba(20, 24, 20, 0.5)',
-        border: `1px solid ${hovered
-          ? isAdmin ? 'rgba(196, 176, 144, 0.35)' : 'rgba(61, 107, 98, 0.3)'
-          : isAdmin ? 'rgba(196, 176, 144, 0.15)' : 'rgba(30, 40, 32, 0.6)'}`,
+        border: `1px solid ${isAdmin ? 'rgba(196, 176, 144, 0.15)' : 'rgba(30, 40, 32, 0.6)'}`,
         borderRadius: '8px',
         padding: '1.5rem 1rem',
         cursor: 'pointer',
         minWidth: '110px',
-        transition: 'border-color 0.2s ease',
       }}
     >
       {avatar}
@@ -221,6 +218,7 @@ function PasswordForm({ username, onCancel, onSuccess }: {
       }}>
         <img
           src="/bau.jpg"
+          alt="Bautista Zaballa"
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
         />
       </div>
@@ -368,6 +366,7 @@ export default function OSEntry() {
                     }}>
                       <img
                         src="/bau.jpg"
+                        alt=""
                         style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
                       />
                     </div>
