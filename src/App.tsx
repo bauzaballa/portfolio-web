@@ -9,6 +9,7 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 import Admin from './pages/Admin'
 import { LikeProvider } from './context/LikeContext'
+import ProtectedRoute from './components/ProtectedRoute'
 
 export default function App() {
   return (
@@ -16,13 +17,13 @@ export default function App() {
     <Routes>
       <Route path="/" element={<ComingSoon />} />
       <Route path="/entry" element={<OSEntry />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/projects" element={<Projects />} />
-      <Route path="/projects/:slug" element={<ProjectDetail />} />
-      <Route path="/experience" element={<Experience />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/admin" element={<Admin />} />
+      <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+      <Route path="/projects/:slug" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+      <Route path="/experience" element={<ProtectedRoute><Experience /></ProtectedRoute>} />
+      <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+      <Route path="/contact" element={<ProtectedRoute><Contact /></ProtectedRoute>} />
+      <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
     </Routes>
     </LikeProvider>
   )
