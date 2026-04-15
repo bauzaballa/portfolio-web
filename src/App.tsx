@@ -8,9 +8,11 @@ import Experience from './pages/Experience'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Admin from './pages/Admin'
+import { LikeProvider } from './context/LikeContext'
 
 export default function App() {
   return (
+    <LikeProvider>
     <Routes>
       <Route path="/" element={<ComingSoon />} />
       <Route path="/entry" element={<OSEntry />} />
@@ -20,7 +22,8 @@ export default function App() {
       <Route path="/experience" element={<Experience />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/admin" element={<Admin />} /> 
+      <Route path="/admin" element={<Admin />} />
     </Routes>
+    </LikeProvider>
   )
 }

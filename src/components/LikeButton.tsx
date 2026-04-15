@@ -1,45 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { useLike } from '../context/LikeContext'
 
 export default function LikeButton() {
-  const [count, setCount] = useState(0)
-  const [liked, setLiked] = useState(false)
+  const { count, liked, handleLike } = useLike()
   const [burst, setBurst] = useState(false)
 
-  useEffect(() => {
-    fetch(`${API}/api/v1/likes`)
-      .then(r => r.json())
-      .then(d => {
-        setCount(d.data?.count ?? 0)
-        setLiked(d.data?.hasLiked ?? false)
-      })
-      .catch(() => {})
-  }, [])
-
-  const handleLike = async () => {
+  const onClick = async () => {
     if (liked) return
-
-    setLiked(true)
-    setCount(c => c + 1)
     setBurst(true)
-
-    try {
-      const res = await fetch(`${API}/api/v1/likes`, { method: 'POST' })
-      const d = await res.json()
-      if (d.data?.count != null) setCount(d.data.count)
-    } catch {
-      setLiked(false)
-      setCount(c => c - 1)
-    }
+    await handleLike()
   }
 
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 8,
       cursor: 'pointer', userSelect: 'none',
-    }} onClick={handleLike}>
+    }} onClick={onClick}>
       <motion.div
         animate={burst ? { scale: [1, 1.4, 1] } : { scale: 1 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
