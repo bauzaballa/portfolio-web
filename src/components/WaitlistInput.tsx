@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLang } from '../context/LangContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export default function WaitlistInput() {
+  const { t } = useLang()
   const [email, setEmail] = useState('')
   const [state, setState] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle')
 
@@ -26,9 +28,9 @@ export default function WaitlistInput() {
   }
 
   const messages: Record<string, string> = {
-    success: "you're on the list.",
-    duplicate: 'already registered.',
-    error: 'something went wrong.',
+    success: t("you're on the list.", 'estás en la lista.'),
+    duplicate: t('already registered.', 'ya registrado.'),
+    error: t('something went wrong.', 'algo salió mal.'),
   }
 
   return (
@@ -38,7 +40,7 @@ export default function WaitlistInput() {
         color: 'var(--text-secondary)', letterSpacing: 2,
         marginBottom: 12, textTransform: 'uppercase',
       }}>
-        notify me when it's ready
+        {t("notify me when it's ready", 'te aviso cuando esté listo?')}
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -47,7 +49,7 @@ export default function WaitlistInput() {
           value={email}
           onChange={e => { setEmail(e.target.value); setState('idle') }}
           onKeyDown={e => e.key === 'Enter' && submit()}
-          placeholder="your@email.com"
+          placeholder={t('your@email.com', 'tu@email.com')}
           disabled={state === 'loading' || state === 'success'}
           style={{
             flex: 1,

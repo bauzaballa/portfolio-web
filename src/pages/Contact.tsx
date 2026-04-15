@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useLang } from '../context/LangContext'
 import Nav from '../components/Nav'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -16,17 +17,29 @@ interface Profile {
 }
 
 export default function Contact() {
+  const { lang, t } = useLang()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const cache = useRef<Record<string, any>>({})
 
   useEffect(() => {
-    fetch(`${API}/api/v1/profile`)
+    const cacheKey = `profile_${lang}`
+    if (cache.current[cacheKey]) {
+      setProfile(cache.current[cacheKey])
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+    fetch(`${API}/api/v1/profile?lang=${lang}`)
       .then(r => r.json())
-      .then(data => setProfile(data.data ?? data))
+      .then(data => {
+        cache.current[cacheKey] = data.data ?? data
+        setProfile(data.data ?? data)
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [])
+  }, [lang])
 
   if (loading) return <LoadingSkeleton />
 
@@ -41,15 +54,15 @@ export default function Contact() {
         color: 'var(--text-secondary)',
         fontStyle: 'italic',
       }}>
-        could not load profile.
+        {t('could not load profile.', 'no se pudo cargar el perfil.')}
       </div>
     </div>
   )
 
   const links = [
-    { label: 'email', value: profile?.email ?? '', href: `mailto:${profile?.email}` },
-    { label: 'github', value: 'bauzaballa', href: profile?.githubUrl ?? '#' },
-    { label: 'linkedin', value: 'bauzaballa', href: profile?.linkedinUrl ?? '#' },
+    { label: t('email', 'email'), value: profile?.email ?? '', href: `mailto:${profile?.email}` },
+    { label: t('github', 'github'), value: 'bauzaballa', href: profile?.githubUrl ?? '#' },
+    { label: t('linkedin', 'linkedin'), value: 'bauzaballa', href: profile?.linkedinUrl ?? '#' },
   ]
 
   return (
@@ -74,7 +87,7 @@ export default function Contact() {
             letterSpacing: 3,
             marginBottom: 16,
           }}>
-            / contact
+            {t('/ contact', '/ contacto')}
           </div>
 
           <h1 style={{
@@ -84,7 +97,7 @@ export default function Contact() {
             fontWeight: 700,
             lineHeight: 1,
           }}>
-            Get in touch.
+            {t('Get in touch.', 'Hablemos.')}
           </h1>
 
           <p style={{
@@ -96,7 +109,7 @@ export default function Contact() {
             marginTop: 16,
             maxWidth: 480,
           }}>
-            Open to fullstack roles, freelance projects, and interesting conversations.
+            {t('Open to fullstack roles, frontend roles, freelance projects, and play overwatch.', 'Abierto a roles fullstack, roles frontend, proyectos freelance y jugar overwatch.')}
           </p>
         </motion.div>
 
@@ -126,7 +139,7 @@ export default function Contact() {
             color: 'var(--text-muted)',
           }}
         >
-          based in La Plata, Buenos Aires &mdash; available remotely
+          {t('based in La Plata, Buenos Aires — available remotely', 'ubicado en La Plata, Buenos Aires — disponible de forma remota')}
         </motion.div>
       </div>
     </div>

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLang } from '../context/LangContext'
 import Nav from '../components/Nav'
 import ProjectRow from '../components/ProjectRow'
 
@@ -40,20 +41,32 @@ function filterProjects(projects: Project[], filter: Filter): Project[] {
 
 export default function Projects() {
   const navigate = useNavigate()
+  const { lang, t } = useLang()
 
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [filter, setFilter] = useState<Filter>('ALL')
   const [animKey, setAnimKey] = useState(0)
+  const cache = useRef<Record<string, any>>({})
 
   useEffect(() => {
-    fetch(`${API}/api/v1/projects?withSkills=true`)
+    const cacheKey = `projects_${lang}`
+    if (cache.current[cacheKey]) {
+      setProjects(cache.current[cacheKey])
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+    fetch(`${API}/api/v1/projects?withSkills=true&lang=${lang}`)
       .then(r => r.json())
-      .then(d => setProjects(d.data))
+      .then(d => {
+        cache.current[cacheKey] = d.data
+        setProjects(d.data)
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [])
+  }, [lang])
 
   const filtered = filterProjects(projects, filter)
 
@@ -86,14 +99,14 @@ export default function Projects() {
             fontWeight: 700,
             lineHeight: 1.05,
           }}>
-            Selected work.
+            {t('Selected work.', 'Trabajos seleccionados.')}
           </h1>
           {!loading && !error && (
             <div style={{
               fontFamily: 'var(--font-mono)', fontSize: 13,
               color: 'var(--text-secondary)', marginTop: 8,
             }}>
-              {projects.length} projects &middot; 2024&ndash;2025
+              {projects.length} {t('projects', 'proyectos')} &middot; 2024&ndash;2025
             </div>
           )}
         </div>
@@ -116,7 +129,7 @@ export default function Projects() {
                   color: active ? 'var(--accent-teal)' : 'var(--text-muted)',
                 }}
               >
-                {f}
+                {f === 'ALL' ? t('ALL', 'TODO') : f}
               </button>
             )
           })}
@@ -147,7 +160,7 @@ export default function Projects() {
             fontFamily: 'var(--font-mono)', fontSize: 13,
             color: 'var(--text-secondary)', paddingTop: 40,
           }}>
-            could not load projects
+            {t('could not load projects', 'no se pudieron cargar los proyectos')}
           </p>
         )}
 
@@ -170,7 +183,7 @@ export default function Projects() {
                     color: 'var(--text-secondary)',
                     fontSize: 18,
                   }}>
-                    nothing here yet.
+                    {t('nothing here yet.', 'nada por aquí todavía.')}
                   </span>
                 </div>
               ) : (

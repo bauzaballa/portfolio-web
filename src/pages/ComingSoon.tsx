@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
+import { useLang } from '../context/LangContext'
 import ConsoleDrawer from '../components/ConsoleDrawer'
 import ThemeToggle from '../components/ThemeToggle'
 import WaitlistInput from '../components/WaitlistInput'
 
 export default function ComingSoon() {
   const { theme } = useTheme()
+  const { t } = useLang()
   const [progress] = useState(70)
 
   return (
@@ -45,7 +47,7 @@ export default function ComingSoon() {
             color: 'var(--accent-teal)', letterSpacing: 3,
             marginBottom: 20, textTransform: 'uppercase'
           }}>
-            Fullstack Developer — La Plata, AR
+            {t('Fullstack Developer — La Plata, AR', 'Desarrollador Fullstack — La Plata, AR')}
           </div>
 
           <h1 style={{
@@ -68,7 +70,7 @@ export default function ComingSoon() {
             color: 'var(--text-secondary)', marginBottom: 48,
             fontStyle: 'italic', maxWidth: 480
           }}>
-            building something.
+            {t('building something.', 'construyendo algo.')}
           </p>
 
           <div style={{ width: 'min(320px, 80vw)', marginBottom: 12 }}>

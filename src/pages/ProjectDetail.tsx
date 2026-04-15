@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useLang } from '../context/LangContext'
 import Nav from '../components/Nav'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -38,21 +39,33 @@ interface Project {
 export default function ProjectDetail() {
   const { slug } = useParams()
   const navigate = useNavigate()
+  const { lang, t } = useLang()
 
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const cache = useRef<Record<string, any>>({})
 
   useEffect(() => {
-    fetch(`${API}/api/v1/projects/${slug}`)
+    const cacheKey = `project_${slug}_${lang}`
+    if (cache.current[cacheKey]) {
+      setProject(cache.current[cacheKey])
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+    fetch(`${API}/api/v1/projects/${slug}?lang=${lang}`)
       .then(r => {
         if (!r.ok) throw new Error()
         return r.json()
       })
-      .then(d => setProject(d.data))
+      .then(d => {
+        cache.current[cacheKey] = d.data
+        setProject(d.data)
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [slug])
+  }, [slug, lang])
 
   if (loading) {
     return (
@@ -76,7 +89,7 @@ export default function ProjectDetail() {
         <Nav />
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
           <span style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
-            project not found.
+            {t('project not found.', 'proyecto no encontrado.')}
           </span>
         </div>
       </div>
@@ -96,14 +109,15 @@ export default function ProjectDetail() {
     const start = new Date(project.periodStart).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
     const end = project.periodEnd
       ? new Date(project.periodEnd).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-      : 'present'
+      : t('present', 'presente')
     return `${start} - ${end}`
   }
 
   const visibilityBadge = () => {
-    if (project.nda) return { label: 'NDA', color: '#C47070' }
-    if (project.visibility === 'open-source') return { label: 'open source', color: 'var(--accent-teal)' }
-    return { label: 'personal', color: 'var(--text-muted)' }
+    if (project.nda) return { label: t('nda', 'nda'), color: '#C47070' }
+    if (project.visibility === 'open-source') return { label: t('open-source', 'código abierto'), color: 'var(--accent-teal)' }
+    if (project.visibility === 'work') return { label: t('work', 'trabajo'), color: 'var(--accent-teal)' }
+    return { label: t('personal', 'personal'), color: 'var(--text-muted)' }
   }
 
   const badge = visibilityBadge()
@@ -121,7 +135,7 @@ export default function ProjectDetail() {
             color: 'var(--text-secondary)', cursor: 'pointer',
           }}
         >
-          &larr; back to work
+          {t('← back to work', '← volver a trabajos')}
         </span>
       </div>
 
@@ -170,7 +184,7 @@ export default function ProjectDetail() {
               display: 'block', fontFamily: 'var(--font-mono)', fontSize: 12,
               color: 'var(--accent-teal)', marginTop: 24, textDecoration: 'none',
             }}>
-              view code &rarr;
+              {t('view code ->', 'ver código ->')}
             </a>
           )}
           {project.liveUrl && (
@@ -178,7 +192,7 @@ export default function ProjectDetail() {
               display: 'block', fontFamily: 'var(--font-mono)', fontSize: 12,
               color: 'var(--accent-warm)', marginTop: 8, textDecoration: 'none',
             }}>
-              live demo &rarr;
+              {t('live demo ->', 'demo en vivo ->')}
             </a>
           )}
         </motion.div>
@@ -199,28 +213,28 @@ export default function ProjectDetail() {
             {/* Info rows */}
             {project.company && (
               <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>company</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>{t('company', 'empresa')}</div>
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{project.company}</div>
               </div>
             )}
             {formatPeriod() && (
               <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>period</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>{t('period', 'período')}</div>
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{formatPeriod()}</div>
               </div>
             )}
             {project.role && (
               <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>role</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>{t('role', 'rol')}</div>
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{project.role}</div>
               </div>
             )}
             <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>type</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>{t('type', 'tipo')}</div>
               <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{project.type}</div>
             </div>
             <div style={{ padding: '12px 0', borderBottom: bars.length > 0 ? '0.5px solid var(--border)' : 'none' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>visibility</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>{t('visibility', 'visibilidad')}</div>
               <span style={{
                 fontFamily: 'var(--font-mono)', fontSize: 11,
                 color: badge.color,
@@ -232,7 +246,7 @@ export default function ProjectDetail() {
             {/* Participation bars */}
             {bars.length > 0 && (
               <div style={{ padding: '12px 0', borderBottom: (project.skills ?? []).length > 0 ? '0.5px solid var(--border)' : 'none' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>participation</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>{t('participation', 'participación')}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {bars.map(b => (
                     <div key={b.label}>
@@ -291,7 +305,7 @@ export default function ProjectDetail() {
           borderRadius: 4,
         }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)' }}>
-            [ media coming soon ]
+            {t('[ media coming soon ]', '[ media próximamente ]')}
           </span>
         </div>
       )}
@@ -301,7 +315,7 @@ export default function ProjectDetail() {
         {project.technicalDecisions && (
           <div style={{ marginBottom: 48 }}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
-              technical decisions
+              {t('technical decisions', 'decisiones técnicas')}
             </div>
             <p style={{ fontFamily: 'var(--font-serif)', fontSize: 17, color: 'var(--text-secondary)', lineHeight: 1.8 }}>
               {project.technicalDecisions}
@@ -312,7 +326,7 @@ export default function ProjectDetail() {
         {project.challenges && project.challenges.length > 0 && (
           <div style={{ marginBottom: 48 }}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
-              challenges
+              {t('challenges', 'desafíos')}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {project.challenges.map((c, i) => (

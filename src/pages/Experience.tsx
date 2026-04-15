@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useLang } from '../context/LangContext'
 import Nav from '../components/Nav'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -31,24 +32,39 @@ interface EducationItem {
 
 export default function Experience() {
   const navigate = useNavigate()
+  const { lang, t } = useLang()
 
   const [experience, setExperience] = useState<ExperienceItem[]>([])
   const [education, setEducation] = useState<EducationItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const cache = useRef<Record<string, any>>({})
 
   useEffect(() => {
+    const expKey = `experience_${lang}`
+    const eduKey = `education_${lang}`
+    if (cache.current[expKey] && cache.current[eduKey]) {
+      setExperience(cache.current[expKey])
+      setEducation(cache.current[eduKey])
+      setLoading(false)
+      return
+    }
+    setLoading(true)
     Promise.all([
-      fetch(`${API}/api/v1/experience`).then(r => r.json()),
-      fetch(`${API}/api/v1/education`).then(r => r.json()),
+      fetch(`${API}/api/v1/experience?lang=${lang}`).then(r => r.json()),
+      fetch(`${API}/api/v1/education?lang=${lang}`).then(r => r.json()),
     ])
       .then(([expData, eduData]) => {
-        setExperience((expData.data ?? expData).sort((a: ExperienceItem, b: ExperienceItem) => a.sortOrder - b.sortOrder))
-        setEducation((eduData.data ?? eduData).sort((a: EducationItem, b: EducationItem) => a.sortOrder - b.sortOrder))
+        const exp = (expData.data ?? expData).sort((a: ExperienceItem, b: ExperienceItem) => a.sortOrder - b.sortOrder)
+        const edu = (eduData.data ?? eduData).sort((a: EducationItem, b: EducationItem) => a.sortOrder - b.sortOrder)
+        cache.current[expKey] = exp
+        cache.current[eduKey] = edu
+        setExperience(exp)
+        setEducation(edu)
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [])
+  }, [lang])
 
   return (
     <div>
@@ -64,7 +80,7 @@ export default function Experience() {
           color: 'var(--text-muted)', letterSpacing: 3,
           marginBottom: 16,
         }}>
-          / experience
+          {t('/ experience', '/ experiencia')}
         </div>
         <h1 style={{
           fontFamily: 'var(--font-serif)',
@@ -73,7 +89,7 @@ export default function Experience() {
           fontWeight: 700,
           lineHeight: 1.05,
         }}>
-          Work & education.
+          {t('Work & education.', 'Experiencia y formación.')}
         </h1>
       </section>
 
@@ -86,7 +102,7 @@ export default function Experience() {
             fontFamily: 'var(--font-mono)', fontSize: 13,
             color: 'var(--text-secondary)',
           }}>
-            could not load experience
+            {t('could not load experience', 'no se pudo cargar la experiencia')}
           </p>
         )}
 
@@ -112,7 +128,7 @@ export default function Experience() {
               }}>
                 <div>{new Date(item.startDate).getFullYear()}</div>
                 <div>—</div>
-                <div>{item.isCurrent ? 'present' : item.endDate ? new Date(item.endDate).getFullYear() : ''}</div>
+                <div>{item.isCurrent ? t('present', 'presente') : item.endDate ? new Date(item.endDate).getFullYear() : ''}</div>
               </div>
 
               {/* Content column */}
@@ -160,7 +176,7 @@ export default function Experience() {
                     cursor: 'pointer', letterSpacing: 1,
                   }}
                 >
-                  view projects →
+                  {t('view projects →', 'ver proyectos →')}
                 </div>
               </div>
             </motion.div>
@@ -186,7 +202,7 @@ export default function Experience() {
           color: 'var(--text-primary)', fontWeight: 700,
           marginBottom: 40,
         }}>
-          Education & certifications.
+          {t('Education & certifications.', 'Formación y certificaciones.')}
         </h2>
 
         {loading && <SkeletonRows count={2} />}
@@ -251,7 +267,7 @@ export default function Experience() {
                     marginTop: 8,
                     letterSpacing: 1,
                   }}>
-                    certification
+                    {t('certification', 'certificación')}
                   </div>
                 )}
               </div>

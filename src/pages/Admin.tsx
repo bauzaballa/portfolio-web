@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLang } from '../context/LangContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -63,7 +64,16 @@ const NAV_ITEMS: Section[] = ['overview', 'projects', 'experience', 'skills', 'p
 export default function Admin() {
   const { isAdmin, logout, loading } = useAuth()
   const navigate = useNavigate()
+  const { lang, t } = useLang()
   const [section, setSection] = useState<Section>('overview')
+
+  const navLabel = (item: Section): string => ({
+    overview: t('overview', 'resumen'),
+    projects: t('projects', 'proyectos'),
+    experience: t('experience', 'experiencia'),
+    skills: t('skills', 'habilidades'),
+    profile: t('profile', 'perfil'),
+  }[item])
 
   useEffect(() => {
     if (!loading && !isAdmin) navigate('/entry')
@@ -145,7 +155,7 @@ export default function Admin() {
                   if (!active) (e.currentTarget as HTMLDivElement).style.color = 'var(--text-secondary)'
                 }}
               >
-                {item}
+                {navLabel(item)}
               </div>
             )
           })}
@@ -167,7 +177,7 @@ export default function Admin() {
               borderBottom: '0.5px solid var(--border)',
             }}
           >
-            {'<-'} view site
+            {t('← view site', '← ver sitio')}
           </div>
           <div style={{ padding: '16px 20px' }}>
           <span
@@ -180,7 +190,7 @@ export default function Admin() {
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent-warm)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
           >
-            logout
+            {t('logout', 'salir')}
           </span>
           </div>
         </div>
@@ -264,15 +274,16 @@ type AuthFetch = (url: string, opts?: RequestInit) => Promise<Response>
 // --- OVERVIEW ---
 
 function OverviewSection({ authFetch, onNavigate }: { authFetch: AuthFetch; onNavigate: (s: Section) => void }) {
+  const { lang, t } = useLang()
   const [counts, setCounts] = useState({ projects: 0, skills: 0, positions: 0, education: 0 })
   const [recent, setRecent] = useState<Project[]>([])
 
   useEffect(() => {
     Promise.all([
-      authFetch(`${API}/api/v1/projects`).then(r => r.json()),
-      authFetch(`${API}/api/v1/skills`).then(r => r.json()),
-      authFetch(`${API}/api/v1/experience`).then(r => r.json()),
-      authFetch(`${API}/api/v1/education`).then(r => r.json()),
+      authFetch(`${API}/api/v1/projects?lang=${lang}`).then(r => r.json()),
+      authFetch(`${API}/api/v1/skills?lang=${lang}`).then(r => r.json()),
+      authFetch(`${API}/api/v1/experience?lang=${lang}`).then(r => r.json()),
+      authFetch(`${API}/api/v1/education?lang=${lang}`).then(r => r.json()),
     ]).then(([proj, skills, exp, edu]) => {
       const projData = proj.data ?? proj
       const skillsData = skills.data ?? skills
@@ -291,7 +302,7 @@ function OverviewSection({ authFetch, onNavigate }: { authFetch: AuthFetch; onNa
         setRecent(sorted.slice(0, 3))
       }
     }).catch(() => {})
-  }, [authFetch])
+  }, [authFetch, lang])
 
   const cards = [
     { label: 'projects', value: counts.projects },
@@ -302,7 +313,7 @@ function OverviewSection({ authFetch, onNavigate }: { authFetch: AuthFetch; onNa
 
   return (
     <div>
-      <SectionHeader title="Overview" subtitle="DASHBOARD" />
+      <SectionHeader title={t('overview', 'resumen')} subtitle="DASHBOARD" />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
         {cards.map(c => (
@@ -388,16 +399,17 @@ const emptyProject = {
 }
 
 function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
+  const { lang, t } = useLang()
   const [projects, setProjects] = useState<Project[]>([])
   const [editingId, setEditingId] = useState<number | null>(null)
   const [adding, setAdding] = useState(false)
   const [form, setForm] = useState(emptyProject)
 
   const load = useCallback(() => {
-    authFetch(`${API}/api/v1/projects`).then(r => r.json()).then(d => {
+    authFetch(`${API}/api/v1/projects?lang=${lang}`).then(r => r.json()).then(d => {
       setProjects(d.data ?? d)
     }).catch(() => {})
-  }, [authFetch])
+  }, [authFetch, lang])
 
   useEffect(() => { load() }, [load])
 
@@ -457,7 +469,7 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
 
   return (
     <div>
-      <SectionHeader title="Projects" subtitle="MANAGE PROJECTS" />
+      <SectionHeader title={t('projects', 'proyectos')} subtitle="MANAGE PROJECTS" />
 
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
@@ -498,7 +510,7 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
                       color: 'var(--accent-teal)', cursor: 'pointer',
                     }}
                   >
-                    edit
+                    {t('edit', 'editar')}
                   </span>
                   <span
                     onClick={() => remove(p.id)}
@@ -510,14 +522,14 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
                     onMouseEnter={e => (e.currentTarget.style.color = '#c44')}
                     onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
                   >
-                    delete
+                    {t('delete', 'eliminar')}
                   </span>
                 </td>
               </tr>
               {editingId === p.id && (
                 <tr key={`edit-${p.id}`}>
                   <td colSpan={4} style={{ padding: '16px 0' }}>
-                    <ProjectForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} />
+                    <ProjectForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
                   </td>
                 </tr>
               )}
@@ -528,7 +540,7 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
 
       {adding && (
         <div style={{ marginTop: 16 }}>
-          <ProjectForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} />
+          <ProjectForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
         </div>
       )}
 
@@ -541,7 +553,7 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
             marginTop: 16,
           }}
         >
-          + add project
+          {t('+ add project', '+ agregar proyecto')}
         </div>
       )}
     </div>
@@ -549,12 +561,13 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
 }
 
 function ProjectForm({
-  form, setForm, onSave, onCancel,
+  form, setForm, onSave, onCancel, t,
 }: {
   form: typeof emptyProject
   setForm: React.Dispatch<React.SetStateAction<typeof emptyProject>>
   onSave: () => void
   onCancel: () => void
+  t: (en: string, es: string) => string
 }) {
   const set = (k: string, v: string | number | boolean) => setForm(f => ({ ...f, [k]: v }))
 
@@ -586,8 +599,8 @@ function ProjectForm({
       </label>
       <div />
       <div style={{ gridColumn: '1 / -1', marginTop: 8 }}>
-        <button style={submitBtnStyle} onClick={onSave}>save</button>
-        <button style={cancelBtnStyle} onClick={onCancel}>cancel</button>
+        <button style={submitBtnStyle} onClick={onSave}>{t('save', 'guardar')}</button>
+        <button style={cancelBtnStyle} onClick={onCancel}>{t('cancel', 'cancelar')}</button>
       </div>
     </div>
   )
@@ -599,16 +612,17 @@ const emptySkill = { name: '', category: 'frontend', level: 3, sortOrder: 0 }
 const SKILL_CATEGORIES = ['frontend', 'backend', 'database', 'devops', 'design', 'other']
 
 function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
+  const { lang, t } = useLang()
   const [skills, setSkills] = useState<SkillItem[]>([])
   const [editingId, setEditingId] = useState<number | null>(null)
   const [adding, setAdding] = useState(false)
   const [form, setForm] = useState(emptySkill)
 
   const load = useCallback(() => {
-    authFetch(`${API}/api/v1/skills`).then(r => r.json()).then(d => {
+    authFetch(`${API}/api/v1/skills?lang=${lang}`).then(r => r.json()).then(d => {
       setSkills(d.data ?? d)
     }).catch(() => {})
-  }, [authFetch])
+  }, [authFetch, lang])
 
   useEffect(() => { load() }, [load])
 
@@ -641,7 +655,7 @@ function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
 
   return (
     <div>
-      <SectionHeader title="Skills" subtitle="MANAGE SKILLS" />
+      <SectionHeader title={t('skills', 'habilidades')} subtitle="MANAGE SKILLS" />
 
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
@@ -674,19 +688,19 @@ function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
                   </div>
                 </td>
                 <td style={{ padding: '10px 0', textAlign: 'right' }}>
-                  <span onClick={() => startEdit(s)} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', cursor: 'pointer' }}>edit</span>
+                  <span onClick={() => startEdit(s)} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', cursor: 'pointer' }}>{t('edit', 'editar')}</span>
                   <span
                     onClick={() => remove(s.id)}
                     style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 12, transition: 'color 0.15s' }}
                     onMouseEnter={e => (e.currentTarget.style.color = '#c44')}
                     onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
-                  >delete</span>
+                  >{t('delete', 'eliminar')}</span>
                 </td>
               </tr>
               {editingId === s.id && (
                 <tr key={`edit-${s.id}`}>
                   <td colSpan={4} style={{ padding: '16px 0' }}>
-                    <SkillForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} />
+                    <SkillForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
                   </td>
                 </tr>
               )}
@@ -697,7 +711,7 @@ function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
 
       {adding && (
         <div style={{ marginTop: 16 }}>
-          <SkillForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} />
+          <SkillForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
         </div>
       )}
 
@@ -711,12 +725,13 @@ function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
 }
 
 function SkillForm({
-  form, setForm, onSave, onCancel,
+  form, setForm, onSave, onCancel, t,
 }: {
   form: typeof emptySkill
   setForm: React.Dispatch<React.SetStateAction<typeof emptySkill>>
   onSave: () => void
   onCancel: () => void
+  t: (en: string, es: string) => string
 }) {
   const set = (k: string, v: string | number) => setForm(f => ({ ...f, [k]: v }))
 
@@ -729,8 +744,8 @@ function SkillForm({
       <input style={inputStyle} placeholder="level (1-5)" type="number" min={1} max={5} value={form.level} onChange={e => set('level', +e.target.value)} />
       <input style={inputStyle} placeholder="sort order" type="number" value={form.sortOrder} onChange={e => set('sortOrder', +e.target.value)} />
       <div style={{ gridColumn: '1 / -1', marginTop: 8 }}>
-        <button style={submitBtnStyle} onClick={onSave}>save</button>
-        <button style={cancelBtnStyle} onClick={onCancel}>cancel</button>
+        <button style={submitBtnStyle} onClick={onSave}>{t('save', 'guardar')}</button>
+        <button style={cancelBtnStyle} onClick={onCancel}>{t('cancel', 'cancelar')}</button>
       </div>
     </div>
   )
@@ -744,16 +759,17 @@ const emptyExperience = {
 }
 
 function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
+  const { lang, t } = useLang()
   const [items, setItems] = useState<Experience[]>([])
   const [editingId, setEditingId] = useState<number | null>(null)
   const [adding, setAdding] = useState(false)
   const [form, setForm] = useState(emptyExperience)
 
   const load = useCallback(() => {
-    authFetch(`${API}/api/v1/experience`).then(r => r.json()).then(d => {
+    authFetch(`${API}/api/v1/experience?lang=${lang}`).then(r => r.json()).then(d => {
       setItems(d.data ?? d)
     }).catch(() => {})
-  }, [authFetch])
+  }, [authFetch, lang])
 
   useEffect(() => { load() }, [load])
 
@@ -801,7 +817,7 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
 
   return (
     <div>
-      <SectionHeader title="Experience" subtitle="MANAGE POSITIONS" />
+      <SectionHeader title={t('experience', 'experiencia')} subtitle="MANAGE POSITIONS" />
 
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
@@ -826,19 +842,19 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
                   {formatPeriod(e)}
                 </td>
                 <td style={{ padding: '10px 0', textAlign: 'right' }}>
-                  <span onClick={() => startEdit(e)} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', cursor: 'pointer' }}>edit</span>
+                  <span onClick={() => startEdit(e)} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', cursor: 'pointer' }}>{t('edit', 'editar')}</span>
                   <span
                     onClick={() => remove(e.id)}
                     style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 12, transition: 'color 0.15s' }}
                     onMouseEnter={ev => (ev.currentTarget.style.color = '#c44')}
                     onMouseLeave={ev => (ev.currentTarget.style.color = 'var(--text-muted)')}
-                  >delete</span>
+                  >{t('delete', 'eliminar')}</span>
                 </td>
               </tr>
               {editingId === e.id && (
                 <tr key={`edit-${e.id}`}>
                   <td colSpan={4} style={{ padding: '16px 0' }}>
-                    <ExperienceForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} />
+                    <ExperienceForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
                   </td>
                 </tr>
               )}
@@ -849,7 +865,7 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
 
       {adding && (
         <div style={{ marginTop: 16 }}>
-          <ExperienceForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} />
+          <ExperienceForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
         </div>
       )}
 
@@ -863,12 +879,13 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
 }
 
 function ExperienceForm({
-  form, setForm, onSave, onCancel,
+  form, setForm, onSave, onCancel, t,
 }: {
   form: typeof emptyExperience
   setForm: React.Dispatch<React.SetStateAction<typeof emptyExperience>>
   onSave: () => void
   onCancel: () => void
+  t: (en: string, es: string) => string
 }) {
   const set = (k: string, v: string | number | boolean) => setForm(f => ({ ...f, [k]: v }))
 
@@ -891,8 +908,8 @@ function ExperienceForm({
       />
       <input style={{ ...inputStyle, gridColumn: '1 / -1' }} placeholder="stack (comma-separated)" value={form.stack} onChange={e => set('stack', e.target.value)} />
       <div style={{ gridColumn: '1 / -1', marginTop: 8 }}>
-        <button style={submitBtnStyle} onClick={onSave}>save</button>
-        <button style={cancelBtnStyle} onClick={onCancel}>cancel</button>
+        <button style={submitBtnStyle} onClick={onSave}>{t('save', 'guardar')}</button>
+        <button style={cancelBtnStyle} onClick={onCancel}>{t('cancel', 'cancelar')}</button>
       </div>
     </div>
   )
@@ -907,15 +924,16 @@ const emptyProfile: Profile = {
 }
 
 function ProfileSection({ authFetch }: { authFetch: AuthFetch }) {
+  const { lang, t } = useLang()
   const [form, setForm] = useState<Profile>(emptyProfile)
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    authFetch(`${API}/api/v1/profile`).then(r => r.json()).then(d => {
+    authFetch(`${API}/api/v1/profile?lang=${lang}`).then(r => r.json()).then(d => {
       const data = d.data ?? d
       setForm({ ...emptyProfile, ...data })
     }).catch(() => {})
-  }, [authFetch])
+  }, [authFetch, lang])
 
   const set = (k: keyof Profile, v: string) => setForm(f => ({ ...f, [k]: v }))
 
@@ -930,7 +948,7 @@ function ProfileSection({ authFetch }: { authFetch: AuthFetch }) {
 
   return (
     <div>
-      <SectionHeader title="Profile" subtitle="PERSONAL INFORMATION" />
+      <SectionHeader title={t('profile', 'perfil')} subtitle="PERSONAL INFORMATION" />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 24px', maxWidth: 640 }}>
         <input style={inputStyle} placeholder="name" value={form.name} onChange={e => set('name', e.target.value)} />
@@ -949,10 +967,10 @@ function ProfileSection({ authFetch }: { authFetch: AuthFetch }) {
         <input style={inputStyle} placeholder="github url" value={form.githubUrl} onChange={e => set('githubUrl', e.target.value)} />
         <input style={inputStyle} placeholder="linkedin url" value={form.linkedinUrl} onChange={e => set('linkedinUrl', e.target.value)} />
         <div style={{ gridColumn: '1 / -1', marginTop: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button style={submitBtnStyle} onClick={save}>save</button>
+          <button style={submitBtnStyle} onClick={save}>{t('save', 'guardar')}</button>
           {saved && (
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-teal)' }}>
-              saved.
+              {t('saved.', 'guardado.')}
             </span>
           )}
         </div>

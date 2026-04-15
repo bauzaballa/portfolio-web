@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
+import { useLang } from '../context/LangContext'
 import Nav from '../components/Nav'
 import ProjectRow from '../components/ProjectRow'
 
@@ -25,6 +26,7 @@ interface SkillGroup {
 
 export default function Home() {
   const { theme } = useTheme()
+  const { lang, t } = useLang()
   const navigate = useNavigate()
 
   const [projects, setProjects] = useState<Project[]>([])
@@ -33,18 +35,37 @@ export default function Home() {
 
   const [bio, setBio] = useState('')
   const [skillGroups, setSkillGroups] = useState<SkillGroup[]>([])
+  const cache = useRef<Record<string, any>>({})
 
   useEffect(() => {
-    fetch(`${API}/api/v1/projects/featured`)
-      .then(r => r.json())
-      .then(d => setProjects(d.data))
-      .catch(() => setProjectsError(true))
-      .finally(() => setProjectsLoading(false))
+    const featuredKey = `featured_${lang}`
+    if (cache.current[featuredKey]) {
+      setProjects(cache.current[featuredKey])
+      setProjectsLoading(false)
+    } else {
+      setProjectsLoading(true)
+      fetch(`${API}/api/v1/projects/featured?lang=${lang}`)
+        .then(r => r.json())
+        .then(d => {
+          cache.current[featuredKey] = d.data
+          setProjects(d.data)
+        })
+        .catch(() => setProjectsError(true))
+        .finally(() => setProjectsLoading(false))
+    }
 
-    fetch(`${API}/api/v1/profile`)
-      .then(r => r.json())
-      .then(d => setBio(d.data.bioLong))
-      .catch(() => {})
+    const profileKey = `profile_${lang}`
+    if (cache.current[profileKey]) {
+      setBio(cache.current[profileKey])
+    } else {
+      fetch(`${API}/api/v1/profile?lang=${lang}`)
+        .then(r => r.json())
+        .then(d => {
+          cache.current[profileKey] = d.data.bioLong
+          setBio(d.data.bioLong)
+        })
+        .catch(() => {})
+    }
 
     fetch(`${API}/api/v1/skills`)
       .then(r => r.json())
@@ -57,7 +78,7 @@ export default function Home() {
         setSkillGroups(Object.entries(grouped).map(([category, skills]) => ({ category, skills })))
       })
       .catch(() => {})
-  }, [])
+  }, [lang])
 
   return (
     <div>
@@ -80,7 +101,7 @@ export default function Home() {
             color: 'var(--accent-teal)', letterSpacing: 3,
             textTransform: 'uppercase', marginBottom: 20, fontWeight: 600,
           }}>
-            Fullstack Developer — La Plata, AR
+            {t('Fullstack Developer — La Plata, AR', 'Desarrollador Fullstack — La Plata, AR')}
           </div>
 
           <h1 style={{
@@ -99,7 +120,7 @@ export default function Home() {
             color: 'var(--text-secondary)',
             fontStyle: 'italic',
           }}>
-            Fullstack dev with a design background.
+            {t('Fullstack dev with a design background.', 'Dev fullstack con formación en diseño.')}
           </p>
 
           <div style={{ display: 'flex', gap: 12, marginTop: 40 }}>
@@ -112,7 +133,7 @@ export default function Home() {
                 borderRadius: 3, cursor: 'pointer',
               }}
             >
-              view work
+              {t('view work', 'ver trabajos')}
             </button>
             <button
               onClick={() => navigate('/contact')}
@@ -125,7 +146,7 @@ export default function Home() {
                 borderRadius: 3, cursor: 'pointer',
               }}
             >
-              contact
+              {t('contact', 'contacto')}
             </button>
           </div>
         </motion.div>
@@ -141,7 +162,7 @@ export default function Home() {
             fontFamily: 'var(--font-serif)', fontSize: 32,
             color: 'var(--text-primary)', fontWeight: 400,
           }}>
-            selected work
+            {t('selected work', 'trabajos seleccionados')}
           </h2>
           <span
             onClick={() => navigate('/projects')}
@@ -150,7 +171,7 @@ export default function Home() {
               color: 'var(--accent-teal)', cursor: 'pointer',
             }}
           >
-            view all -&gt;
+            {t('view all ->', 'ver todos ->')}
           </span>
         </div>
 
@@ -174,7 +195,7 @@ export default function Home() {
             fontFamily: 'var(--font-mono)', fontSize: 13,
             color: 'var(--text-secondary)',
           }}>
-            could not load projects
+            {t('could not load projects', 'no se pudieron cargar los proyectos')}
           </p>
         )}
 
@@ -195,7 +216,7 @@ export default function Home() {
             color: 'var(--accent-teal)', letterSpacing: 3,
             textTransform: 'uppercase', marginBottom: 20,
           }}>
-            about
+            {t('about', 'sobre mí')}
           </div>
           {bio && (
             <p style={{
@@ -214,7 +235,7 @@ export default function Home() {
               display: 'inline-block', marginTop: 24,
             }}
           >
-            read more -&gt;
+            {t('read more ->', 'leer más ->')}
           </span>
         </div>
 
@@ -229,7 +250,7 @@ export default function Home() {
             fontFamily: 'var(--font-mono)', fontSize: 12,
             color: 'var(--text-muted)',
           }}>
-            [ photo ]
+            {t('[ photo ]', '[ foto ]')}
           </span>
         </div>
       </section>
@@ -285,7 +306,7 @@ export default function Home() {
             fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--text-muted)',
           }}>
-            github / linkedin
+            {t('github / linkedin', 'github / linkedin')}
           </span>
         </div>
       </section>

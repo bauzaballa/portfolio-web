@@ -60,20 +60,22 @@ export default function LikeButton() {
         </svg>
       </motion.div>
       <AnimatePresence mode="wait">
-        <motion.span
-          key={count}
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 4 }}
-          transition={{ duration: 0.15 }}
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 12,
-            color: liked ? 'var(--accent-warm)' : 'var(--text-secondary)',
-          }}
-        >
-          {count}
-        </motion.span>
+        {liked && (
+          <motion.span
+            key={count}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 12,
+              color: 'var(--accent-warm)',
+            }}
+          >
+            {count}
+          </motion.span>
+        )}
       </AnimatePresence>
     </div>
   )
