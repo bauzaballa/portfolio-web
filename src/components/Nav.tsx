@@ -1,21 +1,39 @@
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
+import { useLang } from '../context/LangContext'
 import ConsoleDrawer from './ConsoleDrawer'
 import ThemeToggle from './ThemeToggle'
+import LangToggle from './LangToggle'
 import LikeButton from './LikeButton'
-
-const NAV_LINKS = [
-  { label: 'home', path: '/home' },
-  { label: 'work', path: '/projects' },
-  { label: 'experience', path: '/experience' },
-  { label: 'about', path: '/about' },
-  { label: 'contact', path: '/contact' },
-]
 
 export default function Nav() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { isAdmin } = useAuth()
+  const { isAdmin, logout } = useAuth()
+  const { t } = useLang()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [menuOpen])
+
+  const NAV_LINKS = [
+    { label: t('home', 'inicio'), path: '/home' },
+    { label: t('work', 'trabajos'), path: '/projects' },
+    { label: t('experience', 'experiencia'), path: '/experience' },
+    { label: t('about', 'sobre mí'), path: '/about' },
+    { label: t('contact', 'contacto'), path: '/contact' },
+  ]
 
   return (
     <>
@@ -27,16 +45,19 @@ export default function Nav() {
         background: 'var(--bg)',
         zIndex: 100,
       }}>
-        <span
-          onClick={() => navigate('/home')}
-          style={{
-            fontFamily: 'var(--font-mono)', fontSize: 12,
-            color: 'var(--text-secondary)', letterSpacing: 2,
-            fontWeight: 600, cursor: 'pointer',
-          }}
-        >
-          BZ — {new Date().getFullYear()}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <span
+            onClick={() => navigate('/home')}
+            style={{
+              fontFamily: 'var(--font-mono)', fontSize: 12,
+              color: 'var(--text-secondary)', letterSpacing: 2,
+              fontWeight: 600, cursor: 'pointer',
+            }}
+          >
+            BZ — {new Date().getFullYear()}
+          </span>
+          <LikeButton />
+        </div>
 
         <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
           {NAV_LINKS.map(link => {
@@ -58,22 +79,78 @@ export default function Nav() {
           })}
 
           {isAdmin && (
-            <span
-              onClick={() => navigate('/admin')}
-              style={{
-                fontFamily: 'var(--font-mono)', fontSize: 11,
-                letterSpacing: 1, cursor: 'pointer',
-                color: 'var(--accent-warm)',
-                padding: '3px 8px',
-                border: '0.5px solid var(--accent-warm)',
-                borderRadius: 2,
-              }}
-            >
-              admin
-            </span>
+            <div ref={menuRef} style={{ position: 'relative', zIndex: 200 }}>
+              <button
+                onClick={() => setMenuOpen(v => !v)}
+                style={{
+                  width: 28, height: 28,
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  border: '1.5px solid rgba(196,176,144,0.4)',
+                  boxShadow: '0 0 0 2px rgba(61,107,98,0.2)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  background: 'none',
+                }}
+              >
+                <img
+                  src="/bau.jpg"
+                  alt="Bautista Zaballa"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+                />
+              </button>
+
+              <AnimatePresence>
+                {menuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.15 }}
+                    style={{
+                      position: 'absolute',
+                      top: 36,
+                      right: 0,
+                      background: 'rgba(14,15,18,0.95)',
+                      border: '1px solid rgba(196,176,144,0.15)',
+                      borderRadius: 6,
+                      padding: '0.4rem 0',
+                      minWidth: 140,
+                      backdropFilter: 'blur(12px)',
+                    }}
+                  >
+                    <button
+                      onClick={() => { setMenuOpen(false); navigate('/admin') }}
+                      style={{
+                        display: 'block', width: '100%', textAlign: 'left',
+                        padding: '0.4rem 0.8rem',
+                        fontFamily: 'var(--font-mono)', fontSize: 11,
+                        color: 'var(--accent-warm)',
+                        background: 'none', border: 'none', cursor: 'pointer',
+                      }}
+                    >
+                      → {t('admin panel', 'panel admin')}
+                    </button>
+                    <div style={{ height: '0.5px', background: 'rgba(30,40,32,0.8)', margin: '0.3rem 0' }} />
+                    <button
+                      onClick={() => { setMenuOpen(false); logout(); navigate('/entry') }}
+                      style={{
+                        display: 'block', width: '100%', textAlign: 'left',
+                        padding: '0.4rem 0.8rem',
+                        fontFamily: 'var(--font-mono)', fontSize: 11,
+                        color: 'var(--text-secondary)',
+                        background: 'none', border: 'none', cursor: 'pointer',
+                      }}
+                    >
+                      × {t('logout', 'cerrar sesión')}
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           )}
 
-          <LikeButton />
+          <LangToggle />
           <ThemeToggle />
         </div>
       </nav>
