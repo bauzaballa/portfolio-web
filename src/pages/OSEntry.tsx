@@ -44,86 +44,75 @@ function Clock() {
   )
 }
 
-function BautistaAvatar({ size = 80 }: { size?: number }) {
+function GuestAvatar() {
   return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-      <defs>
-        <clipPath id="bau-clip">
-          <circle cx="40" cy="40" r="39" />
-        </clipPath>
-      </defs>
-      <circle cx="40" cy="40" r="39" fill="var(--bg-surface)" stroke="var(--border)" strokeWidth="0.5" />
-      <g clipPath="url(#bau-clip)">
-        <rect x="28" y="28" width="24" height="28" rx="10" fill="#C4A882" />
-        <path d="M24 22c0-8 6-14 16-14s16 6 16 14c0 4-2 6-4 7-1-4-5-8-12-8s-11 4-12 8c-2-1-4-3-4-7z" fill="#1A1008" />
-        <path d="M36 46q4 2.5 8 0" stroke="#1A1008" strokeWidth="1.8" strokeLinecap="round" fill="none" />
-        <rect x="22" y="62" width="36" height="20" rx="4" fill="#0E0E10" />
-        <path d="M22 66l8-4h20l8 4v16H22z" fill="#8B7355" />
-        <rect x="26" y="64" width="28" height="18" rx="2" fill="#0E0E10" />
-      </g>
-    </svg>
+    <div style={{
+      width: 72, height: 72,
+      borderRadius: '50%',
+      background: '#1E2228',
+      border: '1.5px solid rgba(30,40,32,0.8)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      <svg width={36} height={36} viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="12" r="6" fill="#4A4A5A" />
+        <ellipse cx="16" cy="28" rx="10" ry="7" fill="#3A3A4A" />
+      </svg>
+    </div>
   )
 }
 
-function GuestAvatar({ size = 80 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-      <defs>
-        <clipPath id="guest-clip">
-          <circle cx="40" cy="40" r="39" />
-        </clipPath>
-      </defs>
-      <circle cx="40" cy="40" r="39" fill="var(--bg-surface)" stroke="var(--border)" strokeWidth="0.5" />
-      <g clipPath="url(#guest-clip)">
-        <circle cx="40" cy="32" r="12" fill="#4A4A5A" />
-        <ellipse cx="40" cy="72" rx="22" ry="18" fill="#3A3A4A" />
-      </g>
-    </svg>
-  )
-}
-
-function UserCard({ name, avatar, onClick, delay }: {
+function UserCard({ name, avatar, onClick, isAdmin }: {
   name: string
   avatar: React.ReactNode
   onClick: () => void
-  delay: number
+  isAdmin?: boolean
 }) {
+  const [hovered, setHovered] = useState(false)
+
   return (
     <motion.button
-      whileHover={{ y: -4, scale: 1.03 }}
+      whileHover={{ y: -4, scale: 1.02 }}
       transition={{ duration: 0.15, ease: 'easeOut' }}
       onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         gap: '0.75rem',
-        background: 'none',
-        border: 'none',
+        background: isAdmin ? 'rgba(20, 24, 20, 0.85)' : 'rgba(20, 24, 20, 0.5)',
+        border: `1px solid ${hovered
+          ? isAdmin ? 'rgba(196, 176, 144, 0.35)' : 'rgba(61, 107, 98, 0.3)'
+          : isAdmin ? 'rgba(196, 176, 144, 0.15)' : 'rgba(30, 40, 32, 0.6)'}`,
+        borderRadius: '8px',
+        padding: '1.5rem 1rem',
         cursor: 'pointer',
-        padding: '1rem',
+        minWidth: '110px',
+        transition: 'border-color 0.2s ease',
       }}
     >
-      <div style={{
-        borderRadius: '50%',
-        transition: 'box-shadow 0.3s ease',
-      }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(61, 107, 98, 0.4)'
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = 'none'
-        }}
-      >
-        {avatar}
-      </div>
+      {avatar}
       <span style={{
         fontFamily: 'var(--font-serif)',
-        fontSize: '0.9rem',
+        fontSize: '0.85rem',
         color: 'var(--text-primary)',
       }}>
         {name}
       </span>
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.55rem',
+        letterSpacing: '0.1em',
+        color: isAdmin ? 'var(--accent-teal)' : 'var(--text-secondary)',
+        padding: '0.15rem 0.4rem',
+        border: `1px solid ${isAdmin ? 'rgba(61, 107, 98, 0.4)' : 'rgba(30, 40, 32, 0.6)'}`,
+        borderRadius: '3px',
+      }}>
+        {isAdmin ? 'admin' : 'visitor'}
+      </div>
     </motion.button>
   )
 }
@@ -223,7 +212,18 @@ function PasswordForm({ username, onCancel, onSuccess }: {
         back
       </button>
 
-      <BautistaAvatar size={40} />
+      <div style={{
+        width: 40, height: 40,
+        borderRadius: '50%',
+        overflow: 'hidden',
+        border: '1px solid rgba(196,176,144,0.3)',
+        flexShrink: 0,
+      }}>
+        <img
+          src="/bau.jpg"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+        />
+      </div>
 
       <span style={{
         fontFamily: 'var(--font-serif)',
@@ -354,15 +354,26 @@ export default function OSEntry() {
                 name="Guest"
                 avatar={<GuestAvatar />}
                 onClick={handleGuestClick}
-                delay={0.6}
               />
-              {users.map((user, idx) => (
+              {users.map((user) => (
                 <UserCard
                   key={user.username}
                   name={user.username}
-                  avatar={<BautistaAvatar />}
+                  avatar={
+                    <div style={{
+                      width: 72, height: 72,
+                      borderRadius: '50%',
+                      overflow: 'hidden',
+                      border: '1.5px solid rgba(196,176,144,0.3)',
+                    }}>
+                      <img
+                        src="/bau.jpg"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+                      />
+                    </div>
+                  }
                   onClick={() => handleUserClick(user.username)}
-                  delay={0.75 + idx * 0.1}
+                  isAdmin={true}
                 />
               ))}
             </div>
