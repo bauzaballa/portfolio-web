@@ -1,7 +1,11 @@
-import { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LangContext'
+import { AdminInput, AdminSelect, AdminTextarea, AdminToggle } from '../components/admin/FormField'
+import { FormCard, FormGrid, FormGroupLabel, FormDivider, FormActions } from '../components/admin/FormCard'
+import { EditAction, DeleteAction, PrimaryButton, CancelButton, AddButton } from '../components/admin/AdminActions'
+import './Admin.css'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -61,10 +65,12 @@ interface Profile {
 
 const NAV_ITEMS: Section[] = ['overview', 'projects', 'experience', 'skills', 'profile']
 
+type AuthFetch = (url: string, opts?: RequestInit) => Promise<Response>
+
 export default function Admin() {
   const { isAdmin, logout, loading } = useAuth()
   const navigate = useNavigate()
-  const { lang, t } = useLang()
+  const { t } = useLang()
   const [section, setSection] = useState<Section>('overview')
 
   const navLabel = (item: Section): string => ({
@@ -100,108 +106,38 @@ export default function Admin() {
   if (loading || !isAdmin) return null
 
   return (
-    <div style={{
-      display: 'flex',
-      height: '100vh',
-      overflow: 'hidden',
-    }}>
-      {/* SIDEBAR */}
-      <aside style={{
-        width: 220,
-        minWidth: 220,
-        background: 'var(--bg-surface)',
-        borderRight: '0.5px solid var(--border)',
-        padding: '24px 0',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto',
-      }}>
-        <div style={{ padding: '0 20px', marginBottom: 32 }}>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
-            color: 'var(--accent-teal)', letterSpacing: 3,
-          }}>
-            admin
-          </div>
-          <div style={{
-            fontFamily: 'var(--font-serif)', fontSize: 18,
-            color: 'var(--text-primary)', marginTop: 4,
-          }}>
-            portfolio.bz
-          </div>
+    <div className="admin-layout">
+      <aside className="admin-sidebar">
+        <div className="admin-sidebar__brand">
+          <div className="admin-sidebar__label">admin</div>
+          <div className="admin-sidebar__title">portfolio.bz</div>
         </div>
 
         <nav>
-          {NAV_ITEMS.map(item => {
-            const active = section === item
-            return (
-              <div
-                key={item}
-                onClick={() => setSection(item)}
-                style={{
-                  padding: '10px 20px',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 12,
-                  cursor: 'pointer',
-                  color: active ? 'var(--accent-teal)' : 'var(--text-secondary)',
-                  background: active ? 'rgba(61,107,98,0.12)' : 'transparent',
-                  borderLeft: active ? '2px solid var(--accent-teal)' : '2px solid transparent',
-                  transition: 'color 0.15s, background 0.15s',
-                }}
-                onMouseEnter={e => {
-                  if (!active) (e.currentTarget as HTMLDivElement).style.color = 'var(--text-primary)'
-                }}
-                onMouseLeave={e => {
-                  if (!active) (e.currentTarget as HTMLDivElement).style.color = 'var(--text-secondary)'
-                }}
-              >
-                {navLabel(item)}
-              </div>
-            )
-          })}
+          {NAV_ITEMS.map(item => (
+            <div
+              key={item}
+              onClick={() => setSection(item)}
+              className={`admin-sidebar__nav-item ${section === item ? 'admin-sidebar__nav-item--active' : ''}`}
+            >
+              {navLabel(item)}
+            </div>
+          ))}
         </nav>
 
-        <div style={{
-          marginTop: 'auto',
-          borderTop: '0.5px solid var(--border)',
-        }}>
-          <div
-            onClick={() => navigate('/home')}
-            style={{
-              padding: '10px 20px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              letterSpacing: 1,
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              borderBottom: '0.5px solid var(--border)',
-            }}
-          >
-            {t('← view site', '← ver sitio')}
+        <div className="admin-sidebar__footer">
+          <div className="admin-sidebar__link" onClick={() => navigate('/home')}>
+            {t('< view site', '< ver sitio')}
           </div>
           <div style={{ padding: '16px 20px' }}>
-          <span
-            onClick={() => { logout(); navigate('/entry') }}
-            style={{
-              fontFamily: 'var(--font-mono)', fontSize: 11,
-              color: 'var(--text-muted)', cursor: 'pointer',
-              transition: 'color 0.15s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent-warm)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
-          >
-            {t('logout', 'salir')}
-          </span>
+            <button className="admin-sidebar__logout" onClick={() => { logout(); navigate('/entry') }}>
+              {t('logout', 'salir')}
+            </button>
           </div>
         </div>
       </aside>
 
-      {/* MAIN CONTENT */}
-      <main style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '32px 40px',
-      }}>
+      <main className="admin-main">
         {section === 'overview' && <OverviewSection authFetch={authFetch} onNavigate={setSection} />}
         {section === 'projects' && <ProjectsSection authFetch={authFetch} />}
         {section === 'experience' && <ExperienceSection authFetch={authFetch} />}
@@ -216,60 +152,12 @@ export default function Admin() {
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <div style={{
-      borderBottom: '0.5px solid var(--border)',
-      paddingBottom: 20,
-      marginBottom: 32,
-    }}>
-      <div style={{
-        fontFamily: 'var(--font-serif)', fontSize: 28,
-        color: 'var(--text-primary)',
-      }}>
-        {title}
-      </div>
-      <div style={{
-        fontFamily: 'var(--font-mono)', fontSize: 11,
-        color: 'var(--text-muted)', letterSpacing: 2, marginTop: 4,
-      }}>
-        {subtitle}
-      </div>
+    <div className="admin-section-header">
+      <div className="admin-section-header__title">{title}</div>
+      <div className="admin-section-header__subtitle">{subtitle}</div>
     </div>
   )
 }
-
-const inputStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)', fontSize: 13,
-  borderTop: 'none', borderLeft: 'none', borderRight: 'none',
-  borderBottom: '0.5px solid var(--border)',
-  background: 'transparent',
-  color: 'var(--text-primary)',
-  padding: '8px 0',
-  width: '100%',
-  outline: 'none',
-}
-
-const submitBtnStyle: React.CSSProperties = {
-  background: 'var(--accent-teal)', color: 'white',
-  fontFamily: 'var(--font-mono)', fontSize: 12,
-  padding: '8px 20px', borderRadius: 2,
-  border: 'none', cursor: 'pointer',
-}
-
-const cancelBtnStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)', fontSize: 11,
-  color: 'var(--text-muted)', cursor: 'pointer',
-  background: 'none', border: 'none', marginLeft: 12,
-}
-
-const tableHeaderStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)', fontSize: 11,
-  color: 'var(--text-muted)', letterSpacing: 2,
-  textTransform: 'uppercase' as const,
-  borderBottom: '0.5px solid var(--border)',
-  padding: '8px 0',
-}
-
-type AuthFetch = (url: string, opts?: RequestInit) => Promise<Response>
 
 // --- OVERVIEW ---
 
@@ -317,68 +205,23 @@ function OverviewSection({ authFetch, onNavigate }: { authFetch: AuthFetch; onNa
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
         {cards.map(c => (
-          <div key={c.label} style={{
-            background: 'var(--bg-surface)',
-            border: '0.5px solid var(--border)',
-            borderRadius: 4,
-            padding: 20,
-          }}>
-            <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: 11,
-              color: 'var(--text-muted)',
-            }}>
-              {c.label}
-            </div>
-            <div style={{
-              fontFamily: 'var(--font-serif)', fontSize: 36,
-              color: 'var(--text-primary)',
-            }}>
-              {c.value}
-            </div>
+          <div key={c.label} className="admin-stat-card">
+            <div className="admin-stat-card__label">{c.label}</div>
+            <div className="admin-stat-card__value">{c.value}</div>
           </div>
         ))}
       </div>
 
       {recent.length > 0 && (
         <div style={{ marginTop: 40 }}>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
-            color: 'var(--text-muted)', letterSpacing: 2,
-            marginBottom: 16,
-          }}>
-            RECENT PROJECTS
-          </div>
+          <div className="admin-recent__label">RECENT PROJECTS</div>
           {recent.map(p => (
-            <div
-              key={p.id}
-              onClick={() => onNavigate('projects')}
-              style={{
-                borderTop: '0.5px solid var(--border)',
-                padding: '12px 0',
-                cursor: 'pointer',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
+            <div key={p.id} className="admin-recent__item" onClick={() => onNavigate('projects')}>
               <div>
-                <div style={{
-                  fontFamily: 'var(--font-serif)', fontSize: 15,
-                  color: 'var(--text-primary)',
-                }}>
-                  {p.title}
-                </div>
-                <div style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 11,
-                  color: 'var(--text-secondary)', marginTop: 2,
-                }}>
-                  {p.type}
-                </div>
+                <div className="admin-recent__title">{p.title}</div>
+                <div className="admin-recent__type">{p.type}</div>
               </div>
-              <span style={{
-                fontFamily: 'var(--font-mono)', fontSize: 11,
-                color: 'var(--text-muted)',
-              }}>
+              <span className="admin-recent__date">
                 {new Date(p.createdAt).toLocaleDateString()}
               </span>
             </div>
@@ -471,69 +314,43 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
     <div>
       <SectionHeader title={t('projects', 'proyectos')} subtitle="MANAGE PROJECTS" />
 
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <table className="admin-table">
         <thead>
           <tr>
-            <th style={{ ...tableHeaderStyle, textAlign: 'left' }}>title</th>
-            <th style={{ ...tableHeaderStyle, textAlign: 'left' }}>type</th>
-            <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>featured</th>
-            <th style={{ ...tableHeaderStyle, textAlign: 'right' }}>actions</th>
+            <th>{t('title', 'titulo')}</th>
+            <th>{t('type', 'tipo')}</th>
+            <th style={{ textAlign: 'center' }}>featured</th>
+            <th>{t('actions', 'acciones')}</th>
           </tr>
         </thead>
         <tbody>
           {projects.map(p => (
-            <>
-              <tr key={p.id} style={{ borderBottom: '0.5px solid var(--border)' }}>
-                <td style={{ padding: '10px 0', fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--text-primary)' }}>
-                  {p.title}
-                </td>
-                <td style={{ padding: '10px 0' }}>
-                  <span style={{
-                    fontFamily: 'var(--font-mono)', fontSize: 11,
-                    padding: '2px 6px', borderRadius: 2,
-                    background: p.type === 'work' ? 'rgba(61,107,98,0.12)' : 'rgba(196,176,144,0.12)',
-                    color: p.type === 'work' ? 'var(--accent-teal)' : 'var(--accent-warm)',
-                  }}>
+            <React.Fragment key={p.id}>
+              <tr>
+                <td className="admin-table__name">{p.title}</td>
+                <td>
+                  <span className={`admin-badge ${p.type === 'work' ? 'admin-badge--teal' : 'admin-badge--warm'}`}>
                     {p.type}
                   </span>
                 </td>
-                <td style={{ padding: '10px 0', textAlign: 'center', cursor: 'pointer' }} onClick={() => toggleFeatured(p)}>
-                  <span style={{ color: p.isFeatured ? 'var(--accent-warm)' : 'var(--text-muted)' }}>
+                <td style={{ textAlign: 'center' }} onClick={() => toggleFeatured(p)}>
+                  <span className={`admin-star ${p.isFeatured ? 'admin-star--active' : 'admin-star--inactive'}`}>
                     {p.isFeatured ? '\u2605' : '\u2606'}
                   </span>
                 </td>
-                <td style={{ padding: '10px 0', textAlign: 'right' }}>
-                  <span
-                    onClick={() => startEdit(p)}
-                    style={{
-                      fontFamily: 'var(--font-mono)', fontSize: 11,
-                      color: 'var(--accent-teal)', cursor: 'pointer',
-                    }}
-                  >
-                    {t('edit', 'editar')}
-                  </span>
-                  <span
-                    onClick={() => remove(p.id)}
-                    style={{
-                      fontFamily: 'var(--font-mono)', fontSize: 11,
-                      color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 12,
-                      transition: 'color 0.15s',
-                    }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#c44')}
-                    onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
-                  >
-                    {t('delete', 'eliminar')}
-                  </span>
+                <td style={{ textAlign: 'right' }}>
+                  <EditAction onClick={() => startEdit(p)}>{t('edit', 'editar')}</EditAction>
+                  <DeleteAction onClick={() => remove(p.id)}>{t('delete', 'eliminar')}</DeleteAction>
                 </td>
               </tr>
               {editingId === p.id && (
-                <tr key={`edit-${p.id}`}>
+                <tr>
                   <td colSpan={4} style={{ padding: '16px 0' }}>
                     <ProjectForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
                   </td>
                 </tr>
               )}
-            </>
+            </React.Fragment>
           ))}
         </tbody>
       </table>
@@ -545,16 +362,7 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
       )}
 
       {!adding && !editingId && (
-        <div
-          onClick={startAdd}
-          style={{
-            fontFamily: 'var(--font-mono)', fontSize: 12,
-            color: 'var(--accent-teal)', cursor: 'pointer',
-            marginTop: 16,
-          }}
-        >
-          {t('+ add project', '+ agregar proyecto')}
-        </div>
+        <AddButton onClick={startAdd}>{t('+ add project', '+ agregar proyecto')}</AddButton>
       )}
     </div>
   )
@@ -572,37 +380,59 @@ function ProjectForm({
   const set = (k: string, v: string | number | boolean) => setForm(f => ({ ...f, [k]: v }))
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 24px' }}>
-      <input style={inputStyle} placeholder="title" value={form.title} onChange={e => set('title', e.target.value)} />
-      <input style={inputStyle} placeholder="slug" value={form.slug} onChange={e => set('slug', e.target.value)} />
-      <input style={{ ...inputStyle, gridColumn: '1 / -1' }} placeholder="short description" value={form.descriptionShort} onChange={e => set('descriptionShort', e.target.value)} />
-      <select style={inputStyle} value={form.type} onChange={e => set('type', e.target.value)}>
-        <option value="work">work</option>
-        <option value="personal">personal</option>
-      </select>
-      <select style={inputStyle} value={form.visibility} onChange={e => set('visibility', e.target.value)}>
-        <option value="public">public</option>
-        <option value="nda">nda</option>
-        <option value="open-source">open-source</option>
-      </select>
-      <input style={inputStyle} placeholder="company" value={form.company} onChange={e => set('company', e.target.value)} />
-      <input style={inputStyle} placeholder="role" value={form.role} onChange={e => set('role', e.target.value)} />
-      <input style={inputStyle} placeholder="frontend %" type="number" min={0} max={100} value={form.participationFrontend} onChange={e => set('participationFrontend', +e.target.value)} />
-      <input style={inputStyle} placeholder="backend %" type="number" min={0} max={100} value={form.participationBackend} onChange={e => set('participationBackend', +e.target.value)} />
-      <input style={inputStyle} placeholder="design %" type="number" min={0} max={100} value={form.participationDesign} onChange={e => set('participationDesign', +e.target.value)} />
-      <input style={inputStyle} placeholder="sort order" type="number" value={form.sortOrder} onChange={e => set('sortOrder', +e.target.value)} />
-      <input style={inputStyle} placeholder="github url" value={form.githubUrl} onChange={e => set('githubUrl', e.target.value)} />
-      <input style={inputStyle} placeholder="live url" value={form.liveUrl} onChange={e => set('liveUrl', e.target.value)} />
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>
-        <input type="checkbox" checked={form.isFeatured} onChange={e => set('isFeatured', e.target.checked)} />
-        featured
-      </label>
-      <div />
-      <div style={{ gridColumn: '1 / -1', marginTop: 8 }}>
-        <button style={submitBtnStyle} onClick={onSave}>{t('save', 'guardar')}</button>
-        <button style={cancelBtnStyle} onClick={onCancel}>{t('cancel', 'cancelar')}</button>
-      </div>
-    </div>
+    <FormCard>
+      <FormGroupLabel>{t('General', 'General')}</FormGroupLabel>
+      <FormGrid>
+        <AdminInput label={t('Title', 'Titulo')} value={form.title} onChange={v => set('title', v)} />
+        <AdminInput label="Slug" value={form.slug} onChange={v => set('slug', v)} />
+        <AdminInput label={t('Description', 'Descripcion')} value={form.descriptionShort} onChange={v => set('descriptionShort', v)} className="admin-form-card__grid--full" />
+        <AdminSelect
+          label={t('Type', 'Tipo')}
+          value={form.type}
+          onChange={v => set('type', v)}
+          options={[{ value: 'work', label: 'work' }, { value: 'personal', label: 'personal' }]}
+        />
+        <AdminSelect
+          label={t('Visibility', 'Visibilidad')}
+          value={form.visibility}
+          onChange={v => set('visibility', v)}
+          options={[
+            { value: 'public', label: 'public' },
+            { value: 'nda', label: 'nda' },
+            { value: 'open-source', label: 'open-source' },
+          ]}
+        />
+      </FormGrid>
+
+      <FormDivider />
+      <FormGroupLabel>{t('Team', 'Equipo')}</FormGroupLabel>
+      <FormGrid>
+        <AdminInput label={t('Company', 'Empresa')} value={form.company} onChange={v => set('company', v)} />
+        <AdminInput label={t('Role', 'Rol')} value={form.role} onChange={v => set('role', v)} />
+      </FormGrid>
+
+      <FormDivider />
+      <FormGroupLabel>{t('Participation', 'Participacion')}</FormGroupLabel>
+      <FormGrid>
+        <AdminInput label="Frontend %" type="number" min={0} max={100} value={form.participationFrontend} onChange={v => set('participationFrontend', v)} />
+        <AdminInput label="Backend %" type="number" min={0} max={100} value={form.participationBackend} onChange={v => set('participationBackend', v)} />
+        <AdminInput label="Design %" type="number" min={0} max={100} value={form.participationDesign} onChange={v => set('participationDesign', v)} />
+        <AdminInput label={t('Sort Order', 'Orden')} type="number" value={form.sortOrder} onChange={v => set('sortOrder', v)} />
+      </FormGrid>
+
+      <FormDivider />
+      <FormGroupLabel>{t('Links', 'Enlaces')}</FormGroupLabel>
+      <FormGrid>
+        <AdminInput label="GitHub URL" value={form.githubUrl} onChange={v => set('githubUrl', v)} />
+        <AdminInput label="Live URL" value={form.liveUrl} onChange={v => set('liveUrl', v)} />
+        <AdminToggle label="Featured" checked={form.isFeatured} onChange={v => set('isFeatured', v)} />
+      </FormGrid>
+
+      <FormActions>
+        <PrimaryButton onClick={onSave}>{t('save', 'guardar')}</PrimaryButton>
+        <CancelButton onClick={onCancel}>{t('cancel', 'cancelar')}</CancelButton>
+      </FormActions>
+    </FormCard>
   )
 }
 
@@ -657,54 +487,41 @@ function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
     <div>
       <SectionHeader title={t('skills', 'habilidades')} subtitle="MANAGE SKILLS" />
 
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <table className="admin-table">
         <thead>
           <tr>
-            <th style={{ ...tableHeaderStyle, textAlign: 'left' }}>name</th>
-            <th style={{ ...tableHeaderStyle, textAlign: 'left' }}>category</th>
-            <th style={{ ...tableHeaderStyle, textAlign: 'left' }}>level</th>
-            <th style={{ ...tableHeaderStyle, textAlign: 'right' }}>actions</th>
+            <th>{t('name', 'nombre')}</th>
+            <th>{t('category', 'categoria')}</th>
+            <th>{t('level', 'nivel')}</th>
+            <th>{t('actions', 'acciones')}</th>
           </tr>
         </thead>
         <tbody>
           {skills.map(s => (
-            <>
-              <tr key={s.id} style={{ borderBottom: '0.5px solid var(--border)' }}>
-                <td style={{ padding: '10px 0', fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--text-primary)' }}>
-                  {s.name}
-                </td>
-                <td style={{ padding: '10px 0', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>
-                  {s.category}
-                </td>
-                <td style={{ padding: '10px 0' }}>
-                  <div style={{ display: 'flex', gap: 4 }}>
+            <React.Fragment key={s.id}>
+              <tr>
+                <td className="admin-table__name">{s.name}</td>
+                <td className="admin-table__meta">{s.category}</td>
+                <td>
+                  <div className="admin-skill-dots">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <span key={i} style={{
-                        width: 6, height: 6, borderRadius: '50%',
-                        background: i < s.level ? 'var(--accent-teal)' : 'var(--border)',
-                        display: 'inline-block',
-                      }} />
+                      <span key={i} className={`admin-skill-dot ${i < s.level ? 'admin-skill-dot--filled' : 'admin-skill-dot--empty'}`} />
                     ))}
                   </div>
                 </td>
-                <td style={{ padding: '10px 0', textAlign: 'right' }}>
-                  <span onClick={() => startEdit(s)} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', cursor: 'pointer' }}>{t('edit', 'editar')}</span>
-                  <span
-                    onClick={() => remove(s.id)}
-                    style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 12, transition: 'color 0.15s' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#c44')}
-                    onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
-                  >{t('delete', 'eliminar')}</span>
+                <td style={{ textAlign: 'right' }}>
+                  <EditAction onClick={() => startEdit(s)}>{t('edit', 'editar')}</EditAction>
+                  <DeleteAction onClick={() => remove(s.id)}>{t('delete', 'eliminar')}</DeleteAction>
                 </td>
               </tr>
               {editingId === s.id && (
-                <tr key={`edit-${s.id}`}>
+                <tr>
                   <td colSpan={4} style={{ padding: '16px 0' }}>
                     <SkillForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
                   </td>
                 </tr>
               )}
-            </>
+            </React.Fragment>
           ))}
         </tbody>
       </table>
@@ -716,9 +533,9 @@ function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
       )}
 
       {!adding && !editingId && (
-        <div onClick={() => { setEditingId(null); setForm(emptySkill); setAdding(true) }} style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-teal)', cursor: 'pointer', marginTop: 16 }}>
+        <AddButton onClick={() => { setEditingId(null); setForm(emptySkill); setAdding(true) }}>
           + add skill
-        </div>
+        </AddButton>
       )}
     </div>
   )
@@ -736,18 +553,23 @@ function SkillForm({
   const set = (k: string, v: string | number) => setForm(f => ({ ...f, [k]: v }))
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 24px' }}>
-      <input style={inputStyle} placeholder="name" value={form.name} onChange={e => set('name', e.target.value)} />
-      <select style={inputStyle} value={form.category} onChange={e => set('category', e.target.value)}>
-        {SKILL_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-      </select>
-      <input style={inputStyle} placeholder="level (1-5)" type="number" min={1} max={5} value={form.level} onChange={e => set('level', +e.target.value)} />
-      <input style={inputStyle} placeholder="sort order" type="number" value={form.sortOrder} onChange={e => set('sortOrder', +e.target.value)} />
-      <div style={{ gridColumn: '1 / -1', marginTop: 8 }}>
-        <button style={submitBtnStyle} onClick={onSave}>{t('save', 'guardar')}</button>
-        <button style={cancelBtnStyle} onClick={onCancel}>{t('cancel', 'cancelar')}</button>
-      </div>
-    </div>
+    <FormCard>
+      <FormGrid>
+        <AdminInput label={t('Name', 'Nombre')} value={form.name} onChange={v => set('name', v)} />
+        <AdminSelect
+          label={t('Category', 'Categoria')}
+          value={form.category}
+          onChange={v => set('category', v)}
+          options={SKILL_CATEGORIES.map(c => ({ value: c, label: c }))}
+        />
+        <AdminInput label={t('Level (1-5)', 'Nivel (1-5)')} type="number" min={1} max={5} value={form.level} onChange={v => set('level', v)} />
+        <AdminInput label={t('Sort Order', 'Orden')} type="number" value={form.sortOrder} onChange={v => set('sortOrder', v)} />
+      </FormGrid>
+      <FormActions>
+        <PrimaryButton onClick={onSave}>{t('save', 'guardar')}</PrimaryButton>
+        <CancelButton onClick={onCancel}>{t('cancel', 'cancelar')}</CancelButton>
+      </FormActions>
+    </FormCard>
   )
 }
 
@@ -755,7 +577,7 @@ function SkillForm({
 
 const emptyExperience = {
   company: '', role: '', startDate: '', endDate: '',
-  isCurrent: false, description: '', stack: '',  sortOrder: 0,
+  isCurrent: false, description: '', stack: '', sortOrder: 0,
 }
 
 function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
@@ -819,46 +641,37 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
     <div>
       <SectionHeader title={t('experience', 'experiencia')} subtitle="MANAGE POSITIONS" />
 
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <table className="admin-table">
         <thead>
           <tr>
-            <th style={{ ...tableHeaderStyle, textAlign: 'left' }}>company</th>
-            <th style={{ ...tableHeaderStyle, textAlign: 'left' }}>role</th>
-            <th style={{ ...tableHeaderStyle, textAlign: 'left' }}>period</th>
-            <th style={{ ...tableHeaderStyle, textAlign: 'right' }}>actions</th>
+            <th>{t('company', 'empresa')}</th>
+            <th>{t('role', 'rol')}</th>
+            <th>{t('period', 'periodo')}</th>
+            <th>{t('actions', 'acciones')}</th>
           </tr>
         </thead>
         <tbody>
           {items.map(e => (
-            <>
-              <tr key={e.id} style={{ borderBottom: '0.5px solid var(--border)' }}>
-                <td style={{ padding: '10px 0', fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--text-primary)' }}>
-                  {e.company}
-                </td>
-                <td style={{ padding: '10px 0', fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>
-                  {e.role}
-                </td>
-                <td style={{ padding: '10px 0', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)' }}>
+            <React.Fragment key={e.id}>
+              <tr>
+                <td className="admin-table__name">{e.company}</td>
+                <td className="admin-table__meta" style={{ fontSize: 12 }}>{e.role}</td>
+                <td className="admin-table__meta" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                   {formatPeriod(e)}
                 </td>
-                <td style={{ padding: '10px 0', textAlign: 'right' }}>
-                  <span onClick={() => startEdit(e)} style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', cursor: 'pointer' }}>{t('edit', 'editar')}</span>
-                  <span
-                    onClick={() => remove(e.id)}
-                    style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 12, transition: 'color 0.15s' }}
-                    onMouseEnter={ev => (ev.currentTarget.style.color = '#c44')}
-                    onMouseLeave={ev => (ev.currentTarget.style.color = 'var(--text-muted)')}
-                  >{t('delete', 'eliminar')}</span>
+                <td style={{ textAlign: 'right' }}>
+                  <EditAction onClick={() => startEdit(e)}>{t('edit', 'editar')}</EditAction>
+                  <DeleteAction onClick={() => remove(e.id)}>{t('delete', 'eliminar')}</DeleteAction>
                 </td>
               </tr>
               {editingId === e.id && (
-                <tr key={`edit-${e.id}`}>
+                <tr>
                   <td colSpan={4} style={{ padding: '16px 0' }}>
                     <ExperienceForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
                   </td>
                 </tr>
               )}
-            </>
+            </React.Fragment>
           ))}
         </tbody>
       </table>
@@ -870,9 +683,9 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
       )}
 
       {!adding && !editingId && (
-        <div onClick={() => { setEditingId(null); setForm(emptyExperience); setAdding(true) }} style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-teal)', cursor: 'pointer', marginTop: 16 }}>
+        <AddButton onClick={() => { setEditingId(null); setForm(emptyExperience); setAdding(true) }}>
           + add position
-        </div>
+        </AddButton>
       )}
     </div>
   )
@@ -890,28 +703,34 @@ function ExperienceForm({
   const set = (k: string, v: string | number | boolean) => setForm(f => ({ ...f, [k]: v }))
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 24px' }}>
-      <input style={inputStyle} placeholder="company" value={form.company} onChange={e => set('company', e.target.value)} />
-      <input style={inputStyle} placeholder="role" value={form.role} onChange={e => set('role', e.target.value)} />
-      <input style={inputStyle} placeholder="start date (YYYY-MM-DD)" value={form.startDate} onChange={e => set('startDate', e.target.value)} />
-      <input style={inputStyle} placeholder="end date (YYYY-MM-DD)" value={form.endDate} onChange={e => set('endDate', e.target.value)} disabled={form.isCurrent} />
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>
-        <input type="checkbox" checked={form.isCurrent} onChange={e => set('isCurrent', e.target.checked)} />
-        current position
-      </label>
-      <input style={inputStyle} placeholder="sort order" type="number" value={form.sortOrder} onChange={e => set('sortOrder', +e.target.value)} />
-      <textarea
-        style={{ ...inputStyle, gridColumn: '1 / -1', minHeight: 60, resize: 'vertical' }}
-        placeholder="description"
-        value={form.description}
-        onChange={e => set('description', e.target.value)}
-      />
-      <input style={{ ...inputStyle, gridColumn: '1 / -1' }} placeholder="stack (comma-separated)" value={form.stack} onChange={e => set('stack', e.target.value)} />
-      <div style={{ gridColumn: '1 / -1', marginTop: 8 }}>
-        <button style={submitBtnStyle} onClick={onSave}>{t('save', 'guardar')}</button>
-        <button style={cancelBtnStyle} onClick={onCancel}>{t('cancel', 'cancelar')}</button>
-      </div>
-    </div>
+    <FormCard>
+      <FormGroupLabel>{t('Position', 'Puesto')}</FormGroupLabel>
+      <FormGrid>
+        <AdminInput label={t('Company', 'Empresa')} value={form.company} onChange={v => set('company', v)} />
+        <AdminInput label={t('Role', 'Rol')} value={form.role} onChange={v => set('role', v)} />
+      </FormGrid>
+
+      <FormDivider />
+      <FormGroupLabel>{t('Dates', 'Fechas')}</FormGroupLabel>
+      <FormGrid>
+        <AdminInput label={t('Start Date', 'Fecha inicio')} value={form.startDate} onChange={v => set('startDate', v)} placeholder="YYYY-MM-DD" />
+        <AdminInput label={t('End Date', 'Fecha fin')} value={form.endDate} onChange={v => set('endDate', v)} placeholder="YYYY-MM-DD" disabled={form.isCurrent} />
+        <AdminToggle label={t('Current Position', 'Puesto actual')} checked={form.isCurrent} onChange={v => set('isCurrent', v)} />
+        <AdminInput label={t('Sort Order', 'Orden')} type="number" value={form.sortOrder} onChange={v => set('sortOrder', v)} />
+      </FormGrid>
+
+      <FormDivider />
+      <FormGroupLabel>{t('Details', 'Detalles')}</FormGroupLabel>
+      <FormGrid>
+        <AdminTextarea label={t('Description', 'Descripcion')} value={form.description} onChange={v => set('description', v)} className="admin-form-card__grid--full" />
+        <AdminInput label={t('Stack (comma-separated)', 'Stack (separado por comas)')} value={form.stack} onChange={v => set('stack', v)} className="admin-form-card__grid--full" />
+      </FormGrid>
+
+      <FormActions>
+        <PrimaryButton onClick={onSave}>{t('save', 'guardar')}</PrimaryButton>
+        <CancelButton onClick={onCancel}>{t('cancel', 'cancelar')}</CancelButton>
+      </FormActions>
+    </FormCard>
   )
 }
 
@@ -950,31 +769,36 @@ function ProfileSection({ authFetch }: { authFetch: AuthFetch }) {
     <div>
       <SectionHeader title={t('profile', 'perfil')} subtitle="PERSONAL INFORMATION" />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 24px', maxWidth: 640 }}>
-        <input style={inputStyle} placeholder="name" value={form.name} onChange={e => set('name', e.target.value)} />
-        <input style={inputStyle} placeholder="title" value={form.title} onChange={e => set('title', e.target.value)} />
-        <input style={{ ...inputStyle, gridColumn: '1 / -1' }} placeholder="short bio" value={form.bioShort} onChange={e => set('bioShort', e.target.value)} />
-        <textarea
-          style={{ ...inputStyle, gridColumn: '1 / -1', minHeight: 80, resize: 'vertical' }}
-          placeholder="long bio"
-          value={form.bioLong}
-          onChange={e => set('bioLong', e.target.value)}
-        />
-        <input style={inputStyle} placeholder="location" value={form.location} onChange={e => set('location', e.target.value)} />
-        <input style={inputStyle} placeholder="email" value={form.email} onChange={e => set('email', e.target.value)} />
-        <input style={inputStyle} placeholder="phone" value={form.phone} onChange={e => set('phone', e.target.value)} />
-        <input style={inputStyle} placeholder="photo url" value={form.photoUrl} onChange={e => set('photoUrl', e.target.value)} />
-        <input style={inputStyle} placeholder="github url" value={form.githubUrl} onChange={e => set('githubUrl', e.target.value)} />
-        <input style={inputStyle} placeholder="linkedin url" value={form.linkedinUrl} onChange={e => set('linkedinUrl', e.target.value)} />
-        <div style={{ gridColumn: '1 / -1', marginTop: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button style={submitBtnStyle} onClick={save}>{t('save', 'guardar')}</button>
-          {saved && (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-teal)' }}>
-              {t('saved.', 'guardado.')}
-            </span>
-          )}
-        </div>
-      </div>
+      <FormCard>
+        <FormGroupLabel>{t('Identity', 'Identidad')}</FormGroupLabel>
+        <FormGrid>
+          <AdminInput label={t('Name', 'Nombre')} value={form.name} onChange={v => set('name', String(v))} />
+          <AdminInput label={t('Title', 'Titulo')} value={form.title} onChange={v => set('title', String(v))} />
+          <AdminInput label={t('Short Bio', 'Bio corta')} value={form.bioShort} onChange={v => set('bioShort', String(v))} className="admin-form-card__grid--full" />
+          <AdminTextarea label={t('Long Bio', 'Bio larga')} value={form.bioLong} onChange={v => set('bioLong', v)} rows={4} className="admin-form-card__grid--full" />
+        </FormGrid>
+
+        <FormDivider />
+        <FormGroupLabel>{t('Contact', 'Contacto')}</FormGroupLabel>
+        <FormGrid>
+          <AdminInput label={t('Location', 'Ubicacion')} value={form.location} onChange={v => set('location', String(v))} />
+          <AdminInput label="Email" value={form.email} onChange={v => set('email', String(v))} />
+          <AdminInput label={t('Phone', 'Telefono')} value={form.phone} onChange={v => set('phone', String(v))} />
+          <AdminInput label="Photo URL" value={form.photoUrl} onChange={v => set('photoUrl', String(v))} />
+        </FormGrid>
+
+        <FormDivider />
+        <FormGroupLabel>{t('Social', 'Redes')}</FormGroupLabel>
+        <FormGrid>
+          <AdminInput label="GitHub URL" value={form.githubUrl} onChange={v => set('githubUrl', String(v))} />
+          <AdminInput label="LinkedIn URL" value={form.linkedinUrl} onChange={v => set('linkedinUrl', String(v))} />
+        </FormGrid>
+
+        <FormActions>
+          <PrimaryButton onClick={save}>{t('save', 'guardar')}</PrimaryButton>
+          {saved && <span className="admin-saved">{t('saved.', 'guardado.')}</span>}
+        </FormActions>
+      </FormCard>
     </div>
   )
 }
