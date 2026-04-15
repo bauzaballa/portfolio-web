@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
+import { useLang } from '../context/LangContext'
 import Nav from '../components/Nav'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -18,18 +19,30 @@ interface Profile {
 
 export default function About() {
   const { theme } = useTheme()
+  const { lang, t } = useLang()
 
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const cache = useRef<Record<string, any>>({})
 
   useEffect(() => {
-    fetch(`${API}/api/v1/profile`)
+    const cacheKey = `profile_${lang}`
+    if (cache.current[cacheKey]) {
+      setProfile(cache.current[cacheKey])
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+    fetch(`${API}/api/v1/profile?lang=${lang}`)
       .then(r => r.json())
-      .then(data => setProfile(data.data ?? data))
+      .then(data => {
+        cache.current[cacheKey] = data.data ?? data
+        setProfile(data.data ?? data)
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [])
+  }, [lang])
 
   if (loading) return <LoadingSkeleton />
 
@@ -44,7 +57,7 @@ export default function About() {
         color: 'var(--text-secondary)',
         fontStyle: 'italic',
       }}>
-        could not load profile.
+        {t('could not load profile.', 'no se pudo cargar el perfil.')}
       </div>
     </div>
   )
@@ -73,7 +86,7 @@ export default function About() {
             color: 'var(--text-muted)', letterSpacing: 3,
             marginBottom: 16,
           }}>
-            / about
+            {t('/ about', '/ sobre mí')}
           </div>
 
           <h1 style={{
@@ -103,41 +116,31 @@ export default function About() {
           </p>
         </motion.div>
 
-        {/* Right column — photo placeholder */}
+        {/* Right column — photo */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.9, delay: 0.15, ease: 'easeOut' }}
           style={{
             width: 340, height: 440,
-            background: 'var(--bg-surface)',
             border: '0.5px solid var(--border)',
             borderRadius: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
+            overflow: 'hidden',
             flexShrink: 0,
           }}
         >
-          <div style={{
-            width: 60, height: 60,
-            background: 'var(--border)',
-            borderRadius: '50%',
-            marginBottom: 16,
-          }} />
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 12,
-            color: 'var(--text-muted)',
-          }}>
-            [ photo ]
-          </div>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
-            color: 'var(--text-muted)', marginTop: 8,
-          }}>
-            analog photo coming soon
-          </div>
+          <img
+            src="/bau.jpg"
+            alt="Bautista Zaballa"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center top',
+              filter: 'sepia(0.08) contrast(1.02)',
+              display: 'block',
+            }}
+          />
         </motion.div>
       </section>
 
@@ -156,7 +159,7 @@ export default function About() {
             color: 'var(--text-muted)', letterSpacing: 2,
             textTransform: 'uppercase', marginBottom: 12,
           }}>
-            location
+            {t('location', 'ubicación')}
           </div>
           <div style={{
             fontFamily: 'var(--font-serif)', fontSize: 16,
@@ -173,7 +176,7 @@ export default function About() {
             color: 'var(--text-muted)', letterSpacing: 2,
             textTransform: 'uppercase', marginBottom: 12,
           }}>
-            contact
+            {t('contact', 'contacto')}
           </div>
           <a href={`mailto:${profile?.email}`} style={{
             display: 'block',
@@ -201,7 +204,7 @@ export default function About() {
             color: 'var(--text-muted)', letterSpacing: 2,
             textTransform: 'uppercase', marginBottom: 12,
           }}>
-            elsewhere
+            {t('elsewhere', 'en la web')}
           </div>
           {profile?.githubUrl && (
             <a href={profile.githubUrl} target="_blank" rel="noreferrer" style={{
@@ -233,14 +236,14 @@ export default function About() {
             fontFamily: 'var(--font-serif)', fontSize: 28,
             color: 'var(--text-primary)',
           }}>
-            analog.
+            {t('analog.', 'analógico.')}
           </div>
           <div style={{
             fontFamily: 'var(--font-serif)', fontSize: 18,
             color: 'var(--text-secondary)', fontStyle: 'italic',
             marginTop: 4,
           }}>
-            some frames.
+            {t('some frames.', 'algunos fotogramas.')}
           </div>
         </div>
 
