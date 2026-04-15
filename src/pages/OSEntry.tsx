@@ -16,8 +16,6 @@ function Clock() {
   const mm = String(now.getMinutes()).padStart(2, '0')
   const weekday = now.toLocaleDateString('en-US', { weekday: 'long' })
   const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
-  const colonOn = now.getSeconds() % 2 === 0
-
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -41,8 +39,6 @@ function Clock() {
         <span>{hh}</span>
         <span style={{
           color: 'var(--accent-warm)',
-          opacity: colonOn ? 1 : 0.15,
-          transition: 'opacity 0.4s ease',
           fontSize: '0.75em',
         }}>:</span>
         <span>{mm}</span>
