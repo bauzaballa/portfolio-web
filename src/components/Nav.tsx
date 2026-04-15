@@ -79,7 +79,7 @@ export default function Nav() {
           })}
 
           {isAdmin && (
-            <div ref={menuRef} style={{ position: 'relative', zIndex: 200 }}>
+            <div ref={menuRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setMenuOpen(v => !v)}
                 style={{
