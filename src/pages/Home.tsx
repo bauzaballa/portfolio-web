@@ -91,65 +91,83 @@ export default function Home() {
         alignItems: 'center',
         padding: '0 8vw',
       }}>
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 12,
-            color: 'var(--accent-teal)', letterSpacing: 3,
-            textTransform: 'uppercase', marginBottom: 20, fontWeight: 600,
-          }}>
-            {t('Fullstack Developer — La Plata, AR', 'Desarrollador Fullstack — La Plata, AR')}
-          </div>
+        <div>
+          {/* Label — blurred by scrim */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div style={{
+              fontFamily: 'var(--font-mono)', fontSize: 12,
+              color: 'var(--accent-teal)', letterSpacing: 3,
+              textTransform: 'uppercase', marginBottom: 20, fontWeight: 600,
+            }}>
+              {t('La Plata, AR', 'La Plata, AR')}
+            </div>
+          </motion.div>
 
-          <h1 style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: 'clamp(52px, 8vw, 96px)',
-            fontWeight: 700, lineHeight: 1.05,
-            color: theme === 'dark' ? 'var(--text-primary)' : 'var(--accent-warm)',
-            marginBottom: 12,
-          }}>
-            Bautista Zaballa.
-          </h1>
-
-          <p style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: 'clamp(18px, 2vw, 22px)',
-            color: 'var(--text-secondary)',
-            fontStyle: 'italic',
-          }}>
-            {t('Fullstack dev with a design background.', 'Dev fullstack con formación en diseño.')}
-          </p>
-
-          <div style={{ display: 'flex', gap: 12, marginTop: 40 }}>
-            <button
-              onClick={() => navigate('/projects')}
+          {/* Name — above scrim, never blurred */}
+          <div style={{ position: 'relative', zIndex: 145 }}>
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
               style={{
-                background: 'var(--accent-teal)', color: '#fff',
-                border: 'none', fontFamily: 'var(--font-mono)',
-                fontSize: 12, letterSpacing: 1, padding: '10px 24px',
-                borderRadius: 3, cursor: 'pointer',
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'clamp(52px, 8vw, 96px)',
+                fontWeight: 700, lineHeight: 1.05,
+                color: theme === 'dark' ? 'var(--text-primary)' : 'var(--accent-warm)',
+                marginBottom: 12,
               }}
             >
-              {t('view work', 'ver trabajos')}
-            </button>
-            <button
-              onClick={() => navigate('/contact')}
-              style={{
-                background: 'transparent',
-                border: '0.5px solid var(--border)',
-                color: 'var(--text-secondary)',
-                fontFamily: 'var(--font-mono)',
-                fontSize: 12, letterSpacing: 1, padding: '10px 24px',
-                borderRadius: 3, cursor: 'pointer',
-              }}
-            >
-              {t('contact', 'contacto')}
-            </button>
+              Bautista Zaballa.
+            </motion.h1>
           </div>
-        </motion.div>
+
+          {/* Tagline + buttons — blurred by scrim */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.26, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'clamp(18px, 2vw, 22px)',
+              color: 'var(--text-secondary)',
+              fontStyle: 'italic',
+            }}>
+              {t('Fullstack dev with a design background.', 'Dev fullstack con formación en diseño.')}
+            </p>
+
+            <div style={{ display: 'flex', gap: 12, marginTop: 40 }}>
+              <button
+                onClick={() => navigate('/projects')}
+                style={{
+                  background: 'var(--accent-teal)', color: '#fff',
+                  border: 'none', fontFamily: 'var(--font-mono)',
+                  fontSize: 12, letterSpacing: 1, padding: '10px 24px',
+                  borderRadius: 3, cursor: 'pointer',
+                }}
+              >
+                {t('view work', 'ver trabajos')}
+              </button>
+              <button
+                onClick={() => navigate('/contact')}
+                style={{
+                  background: 'transparent',
+                  border: '0.5px solid var(--border)',
+                  color: 'var(--text-secondary)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 12, letterSpacing: 1, padding: '10px 24px',
+                  borderRadius: 3, cursor: 'pointer',
+                }}
+              >
+                {t('contact', 'contacto')}
+              </button>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* SECTION 2: FEATURED PROJECTS */}

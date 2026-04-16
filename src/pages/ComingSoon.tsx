@@ -10,6 +10,7 @@ export default function ComingSoon() {
   const { theme } = useTheme()
   const { t } = useLang()
   const [progress] = useState(70)
+  const [consoleOpen, setConsoleOpen] = useState(false)
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', position: 'relative' }}>
@@ -36,70 +37,88 @@ export default function ComingSoon() {
           <ThemeToggle />
         </nav>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          style={{ paddingTop: 80 }}
-        >
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 600,
-            color: 'var(--accent-teal)', letterSpacing: 3,
-            marginBottom: 20, textTransform: 'uppercase'
-          }}>
-            {t('Fullstack Developer — La Plata, AR', 'Desarrollador Fullstack — La Plata, AR')}
-          </div>
+        <div style={{ paddingTop: 80 }}>
 
-          <h1 style={{
-            fontFamily: 'var(--font-serif)', fontSize: 'clamp(48px, 8vw, 96px)',
-            fontWeight: 700, lineHeight: 1,
-            color: theme === 'dark' ? 'var(--text-primary)' : 'var(--accent-warm)', marginBottom: 8
-          }}>
-            Bautista
-          </h1>
-          <h1 style={{
-            fontFamily: 'var(--font-serif)', fontSize: 'clamp(48px, 8vw, 96px)',
-            fontWeight: 700, lineHeight: 1,
-            color: theme === 'dark' ? 'var(--text-primary)' : 'var(--accent-warm)', marginBottom: 32
-          }}>
-            Zaballa.
-          </h1>
-
-          <p style={{
-            fontFamily: 'var(--font-serif)', fontSize: 'clamp(18px, 2vw, 24px)',
-            color: 'var(--text-secondary)', marginBottom: 48,
-            fontStyle: 'italic', maxWidth: 480
-          }}>
-            {t('building something.', 'construyendo algo.')}
-          </p>
-
-          <div style={{ width: 'min(320px, 80vw)', marginBottom: 12 }}>
+          {/* Label — blurred by scrim */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+          >
             <div style={{
-              width: '100%', height: 2,
-              background: 'var(--border)', borderRadius: 1
+              fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 600,
+              color: 'var(--accent-teal)', letterSpacing: 3,
+              marginBottom: 20, textTransform: 'uppercase'
             }}>
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
-                style={{
-                  height: '100%', background: 'var(--accent-teal)',
-                  borderRadius: 1
-                }}
-              />
+              {t('Fullstack Developer — La Plata, AR', 'Desarrollador Fullstack — La Plata, AR')}
             </div>
+          </motion.div>
+
+          {/* Name — above scrim, never blurred */}
+          <div style={{ position: 'relative', zIndex: 145 }}>
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                fontFamily: 'var(--font-serif)', fontSize: 'clamp(48px, 8vw, 96px)',
+                fontWeight: 700, lineHeight: 1,
+                color: theme === 'dark' ? 'var(--text-primary)' : 'var(--accent-warm)', marginBottom: 8
+              }}
+            >
+              Bautista
+            </motion.h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                fontFamily: 'var(--font-serif)', fontSize: 'clamp(48px, 8vw, 96px)',
+                fontWeight: 700, lineHeight: 1,
+                color: theme === 'dark' ? 'var(--text-primary)' : 'var(--accent-warm)', marginBottom: 32
+              }}
+            >
+              Zaballa.
+            </motion.h1>
           </div>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600,
-            color: 'var(--text-secondary)', letterSpacing: 1
-          }}>
-            {progress}% — React · Node.js · PostgreSQL · TypeScript
-          </div>
-          <WaitlistInput />
-        </motion.div>
+
+          {/* Rest — blurred by scrim */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p style={{
+              fontFamily: 'var(--font-serif)', fontSize: 'clamp(18px, 2vw, 24px)',
+              color: 'var(--text-secondary)', marginBottom: 48,
+              fontStyle: 'italic', maxWidth: 480
+            }}>
+              {t('building something.', 'construyendo algo.')}
+            </p>
+
+            <div style={{ width: 'min(320px, 80vw)', marginBottom: 12 }}>
+              <div style={{ width: '100%', height: 2, background: 'var(--border)', borderRadius: 1 }}>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
+                  style={{ height: '100%', background: 'var(--accent-teal)', borderRadius: 1 }}
+                />
+              </div>
+            </div>
+            <div style={{
+              fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600,
+              color: 'var(--text-secondary)', letterSpacing: 1
+            }}>
+              {progress}% — React · Node.js · PostgreSQL · TypeScript
+            </div>
+            <WaitlistInput />
+          </motion.div>
+
+        </div>
       </main>
 
-      <ConsoleDrawer />
+      <ConsoleDrawer open={consoleOpen} setOpen={setConsoleOpen} />
     </div>
   )
 }
