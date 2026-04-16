@@ -4,6 +4,12 @@ import { motion } from 'framer-motion'
 import { useLang } from '../context/LangContext'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
+import SkillChip from '../components/SkillChip'
+import SkeletonLoader from '../components/SkeletonLoader'
+import SectionLabel from '../components/SectionLabel'
+import TextLink from '../components/TextLink'
+import InfoRow from '../components/InfoRow'
+import ParticipationBar from '../components/ParticipationBar'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -73,14 +79,18 @@ export default function ProjectDetail() {
     return (
       <div>
         <Nav />
-        <div style={{ padding: isMobile ? '80px 6vw 40px' : '120px 8vw 40px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ height: 14, width: 80, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
-          <div style={{ height: 48, width: '100%', maxWidth: 400, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
-          <div style={{ height: 16, width: '100%', maxWidth: 560, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
-          <div style={{ height: 16, width: '100%', maxWidth: 480, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
-          <div style={{ height: 280, width: '100%', background: 'var(--bg-surface)', borderRadius: 2, marginTop: 32, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
+        <div style={{ padding: isMobile ? '80px 6vw 40px' : '120px 8vw 40px' }}>
+          <SkeletonLoader
+            blocks={[
+              { height: 14, width: 80 },
+              { height: 48, width: '100%' },
+              { height: 16, width: '100%' },
+              { height: 16, width: '80%' },
+              { height: 280, width: '100%' },
+            ]}
+            gap={16}
+          />
         </div>
-        <style>{`@keyframes detailPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
       </div>
     )
   }
@@ -130,15 +140,9 @@ export default function ProjectDetail() {
 
       {/* BACK BUTTON */}
       <div style={{ padding: isMobile ? '72px 6vw 0' : '100px 8vw 0' }}>
-        <span
-          onClick={() => navigate(-1)}
-          style={{
-            fontFamily: 'var(--font-mono)', fontSize: 12,
-            color: 'var(--text-secondary)', cursor: 'pointer',
-          }}
-        >
+        <TextLink onClick={() => navigate(-1)} color="var(--text-secondary)">
           {t('← back to work', '← volver a trabajos')}
-        </span>
+        </TextLink>
       </div>
 
       {/* HERO SECTION */}
@@ -156,13 +160,9 @@ export default function ProjectDetail() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <span style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
-            color: 'var(--accent-teal)', textTransform: 'uppercase',
-            letterSpacing: 2,
-          }}>
+          <SectionLabel color="teal" style={{ letterSpacing: 2 }}>
             {project.type}
-          </span>
+          </SectionLabel>
           <h1 style={{
             fontFamily: 'var(--font-serif)',
             fontSize: 'clamp(36px, 5vw, 64px)',
@@ -186,21 +186,15 @@ export default function ProjectDetail() {
             const repoName = url.split('/').pop() ?? 'repo'
             const label = (project.repoUrls?.length ?? 0) > 1 ? `${repoName} ->` : t('view code ->', 'ver código ->')
             return (
-              <a key={i} href={url} target="_blank" rel="noopener noreferrer" style={{
-                display: 'block', fontFamily: 'var(--font-mono)', fontSize: 12,
-                color: 'var(--accent-teal)', marginTop: i === 0 ? 24 : 8, textDecoration: 'none',
-              }}>
+              <TextLink key={i} href={url} style={{ marginTop: i === 0 ? 24 : 8 }}>
                 {label}
-              </a>
+              </TextLink>
             )
           })}
           {project.liveUrl && (
-            <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" style={{
-              display: 'block', fontFamily: 'var(--font-mono)', fontSize: 12,
-              color: 'var(--accent-warm)', marginTop: 8, textDecoration: 'none',
-            }}>
+            <TextLink href={project.liveUrl} color="var(--accent-warm)" style={{ marginTop: 8 }}>
               {t('live demo ->', 'demo en vivo ->')}
-            </a>
+            </TextLink>
           )}
         </motion.div>
 
@@ -217,38 +211,24 @@ export default function ProjectDetail() {
             borderRadius: 4,
             padding: 24,
           }}>
-            {/* Info rows */}
             {project.company && (
-              <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>{t('company', 'empresa')}</div>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{project.company}</div>
-              </div>
+              <InfoRow label={t('company', 'empresa')}>{project.company}</InfoRow>
             )}
             {formatPeriod() && (
-              <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>{t('period', 'período')}</div>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{formatPeriod()}</div>
-              </div>
+              <InfoRow label={t('period', 'período')}>{formatPeriod()}</InfoRow>
             )}
             {project.role && (
-              <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>{t('role', 'rol')}</div>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{project.role}</div>
-              </div>
+              <InfoRow label={t('role', 'rol')}>{project.role}</InfoRow>
             )}
-            <div style={{ borderBottom: '0.5px solid var(--border)', padding: '12px 0' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>{t('type', 'tipo')}</div>
-              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-primary)' }}>{project.type}</div>
-            </div>
-            <div style={{ padding: '12px 0', borderBottom: bars.length > 0 ? '0.5px solid var(--border)' : 'none' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>{t('visibility', 'visibilidad')}</div>
+            <InfoRow label={t('type', 'tipo')}>{project.type}</InfoRow>
+            <InfoRow label={t('visibility', 'visibilidad')} borderBottom={bars.length > 0}>
               <span style={{
                 fontFamily: 'var(--font-mono)', fontSize: 11,
                 color: badge.color,
               }}>
                 {badge.label}
               </span>
-            </div>
+            </InfoRow>
 
             {/* Participation bars */}
             {bars.length > 0 && (
@@ -256,14 +236,7 @@ export default function ProjectDetail() {
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>{t('participation', 'participación')}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {bars.map(b => (
-                    <div key={b.label}>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)', marginBottom: 3 }}>
-                        {b.label} {b.value}%
-                      </div>
-                      <div style={{ height: 2, background: 'var(--border)', borderRadius: 1, width: '100%' }}>
-                        <div style={{ height: '100%', width: `${b.value}%`, background: barColor, borderRadius: 1 }} />
-                      </div>
-                    </div>
+                    <ParticipationBar key={b.label} label={b.label} value={b.value} color={barColor} />
                   ))}
                 </div>
               </div>
@@ -274,15 +247,7 @@ export default function ProjectDetail() {
               <div style={{ padding: '12px 0 0' }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                   {(project.skills ?? []).map(s => (
-                    <span key={s.name} style={{
-                      fontFamily: 'var(--font-mono)', fontSize: 11,
-                      padding: '2px 6px',
-                      border: '0.5px solid var(--border)',
-                      color: 'var(--text-secondary)',
-                      borderRadius: 2,
-                    }}>
-                      {s.name}
-                    </span>
+                    <SkillChip key={s.name} name={s.name} />
                   ))}
                 </div>
               </div>
@@ -321,9 +286,9 @@ export default function ProjectDetail() {
       <div style={{ padding: isMobile ? '0 6vw 40px' : '0 8vw 40px', maxWidth: 680 }}>
         {project.technicalDecisions && (
           <div style={{ marginBottom: 48 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
+            <SectionLabel color="teal" style={{ letterSpacing: 2, marginBottom: 12 }}>
               {t('technical decisions', 'decisiones técnicas')}
-            </div>
+            </SectionLabel>
             <p style={{ fontFamily: 'var(--font-serif)', fontSize: 17, color: 'var(--text-secondary)', lineHeight: 1.8 }}>
               {project.technicalDecisions}
             </p>
@@ -332,9 +297,9 @@ export default function ProjectDetail() {
 
         {project.challenges && project.challenges.length > 0 && (
           <div style={{ marginBottom: 48 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
+            <SectionLabel color="teal" style={{ letterSpacing: 2, marginBottom: 12 }}>
               {t('challenges', 'desafíos')}
-            </div>
+            </SectionLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {project.challenges.map((c, i) => (
                 <div key={i} style={{ fontFamily: 'var(--font-serif)', fontSize: 17, color: 'var(--text-secondary)', lineHeight: 1.8 }}>

@@ -7,6 +7,11 @@ import { useBreakpoint } from '../hooks/useBreakpoint'
 import { useConsole } from '../context/ConsoleContext'
 import Nav from '../components/Nav'
 import ProjectRow from '../components/ProjectRow'
+import SkillChip from '../components/SkillChip'
+import SkeletonLoader from '../components/SkeletonLoader'
+import SectionLabel from '../components/SectionLabel'
+import TextLink from '../components/TextLink'
+import Divider from '../components/Divider'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -186,31 +191,12 @@ export default function Home() {
           }}>
             {t('selected work', 'trabajos seleccionados')}
           </h2>
-          <span
-            onClick={() => navigate('/projects')}
-            style={{
-              fontFamily: 'var(--font-mono)', fontSize: 12,
-              color: 'var(--accent-teal)', cursor: 'pointer',
-            }}
-          >
+          <TextLink onClick={() => navigate('/projects')}>
             {t('view all ->', 'ver todos ->')}
-          </span>
+          </TextLink>
         </div>
 
-        {projectsLoading && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {[0, 1, 2].map(i => (
-              <div
-                key={i}
-                style={{
-                  height: 80, background: 'var(--bg-surface)', borderRadius: 2,
-                  animation: 'pulse 1.5s ease-in-out infinite',
-                }}
-              />
-            ))}
-            <style>{`@keyframes pulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
-          </div>
-        )}
+        {projectsLoading && <SkeletonLoader rows={3} />}
 
         {projectsError && (
           <p style={{
@@ -236,13 +222,9 @@ export default function Home() {
         flexWrap: 'wrap',
       }}>
         <div style={{ flex: 1, minWidth: isMobile ? 0 : 280 }}>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
-            color: 'var(--accent-teal)', letterSpacing: 3,
-            textTransform: 'uppercase', marginBottom: 20,
-          }}>
+          <SectionLabel color="teal" style={{ marginBottom: 20 }}>
             {t('about', 'sobre mí')}
-          </div>
+          </SectionLabel>
           {bio && (
             <p style={{
               fontFamily: 'var(--font-serif)', fontSize: isMobile ? 16 : 18,
@@ -252,16 +234,9 @@ export default function Home() {
               {bio}
             </p>
           )}
-          <span
-            onClick={() => navigate('/about')}
-            style={{
-              fontFamily: 'var(--font-mono)', fontSize: 12,
-              color: 'var(--accent-teal)', cursor: 'pointer',
-              display: 'inline-block', marginTop: 24,
-            }}
-          >
+          <TextLink onClick={() => navigate('/about')} style={{ display: 'inline-block', marginTop: 24 }}>
             {t('read more ->', 'leer más ->')}
-          </span>
+          </TextLink>
         </div>
 
         {!isMobile && (
@@ -305,24 +280,13 @@ export default function Home() {
             </span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {g.skills.map(s => (
-                <span key={s} style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 12,
-                  color: 'var(--text-secondary)',
-                  padding: '3px 10px',
-                  border: '0.5px solid var(--border)',
-                  borderRadius: 2,
-                }}>
-                  {s}
-                </span>
+                <SkillChip key={s} name={s} />
               ))}
             </div>
           </div>
         ))}
 
-        <hr style={{
-          border: 'none', borderTop: '0.5px solid var(--border)',
-          marginTop: 48, marginBottom: 24,
-        }} />
+        <Divider style={{ marginTop: 48, marginBottom: 24 }} />
 
         <div style={{
           display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,

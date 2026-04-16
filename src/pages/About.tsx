@@ -4,6 +4,10 @@ import { useTheme } from '../context/ThemeContext'
 import { useLang } from '../context/LangContext'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
+import SectionLabel from '../components/SectionLabel'
+import SkeletonLoader from '../components/SkeletonLoader'
+import ErrorState from '../components/ErrorState'
+import TextLink from '../components/TextLink'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -46,23 +50,27 @@ export default function About() {
       .finally(() => setLoading(false))
   }, [lang])
 
-  if (loading) return <LoadingSkeleton />
-
-  if (error) return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
-      <Nav />
-      <div style={{
-        padding: '200px 0',
-        textAlign: 'center',
-        fontFamily: 'var(--font-serif)',
-        fontSize: 18,
-        color: 'var(--text-secondary)',
-        fontStyle: 'italic',
-      }}>
-        {t('could not load profile.', 'no se pudo cargar el perfil.')}
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+        <Nav />
+        <div style={{ padding: '120px 8vw 80px' }}>
+          <SkeletonLoader
+            blocks={[
+              { height: 72, width: '40%' },
+              { height: 20, width: '24%' },
+              { height: 20, width: '16%' },
+              { height: 100, width: '64%' },
+              { height: 20, width: '12%' },
+            ]}
+            gap={16}
+          />
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
+
+  if (error) return <ErrorState message={t('could not load profile.', 'no se pudo cargar el perfil.')} />
 
   return (
     <div>
@@ -84,13 +92,7 @@ export default function About() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
-            color: 'var(--text-muted)', letterSpacing: 3,
-            marginBottom: 16,
-          }}>
-            {t('/ about', '/ sobre mí')}
-          </div>
+          <SectionLabel>{t('/ about', '/ sobre mí')}</SectionLabel>
 
           <h1 style={{
             fontFamily: 'var(--font-serif)',
@@ -161,13 +163,7 @@ export default function About() {
       }}>
         {/* Location */}
         <div>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
-            color: 'var(--text-muted)', letterSpacing: 2,
-            textTransform: 'uppercase', marginBottom: 12,
-          }}>
-            {t('location', 'ubicación')}
-          </div>
+          <SectionLabel style={{ letterSpacing: 2, marginBottom: 12 }}>{t('location', 'ubicación')}</SectionLabel>
           <div style={{
             fontFamily: 'var(--font-serif)', fontSize: 16,
             color: 'var(--text-primary)',
@@ -178,13 +174,7 @@ export default function About() {
 
         {/* Contact */}
         <div>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
-            color: 'var(--text-muted)', letterSpacing: 2,
-            textTransform: 'uppercase', marginBottom: 12,
-          }}>
-            {t('contact', 'contacto')}
-          </div>
+          <SectionLabel style={{ letterSpacing: 2, marginBottom: 12 }}>{t('contact', 'contacto')}</SectionLabel>
           <a href={`mailto:${profile?.email}`} style={{
             display: 'block',
             fontFamily: 'var(--font-mono)', fontSize: 13,
@@ -206,32 +196,12 @@ export default function About() {
 
         {/* Elsewhere */}
         <div>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
-            color: 'var(--text-muted)', letterSpacing: 2,
-            textTransform: 'uppercase', marginBottom: 12,
-          }}>
-            {t('elsewhere', 'en la web')}
-          </div>
+          <SectionLabel style={{ letterSpacing: 2, marginBottom: 12 }}>{t('elsewhere', 'en la web')}</SectionLabel>
           {profile?.githubUrl && (
-            <a href={profile.githubUrl} target="_blank" rel="noreferrer" style={{
-              display: 'block',
-              fontFamily: 'var(--font-mono)', fontSize: 13,
-              color: 'var(--accent-teal)',
-              textDecoration: 'none',
-            }}>
-              github -&gt;
-            </a>
+            <TextLink href={profile.githubUrl}>github -&gt;</TextLink>
           )}
           {profile?.linkedinUrl && (
-            <a href={profile.linkedinUrl} target="_blank" rel="noreferrer" style={{
-              display: 'block',
-              fontFamily: 'var(--font-mono)', fontSize: 13,
-              color: 'var(--accent-teal)',
-              textDecoration: 'none', marginTop: 4,
-            }}>
-              linkedin -&gt;
-            </a>
+            <TextLink href={profile.linkedinUrl} style={{ marginTop: 4 }}>linkedin -&gt;</TextLink>
           )}
         </div>
       </section>
@@ -294,27 +264,6 @@ function PhotoCell({ film }: { film: string }) {
       }}>
         {film}
       </span>
-    </div>
-  )
-}
-
-function LoadingSkeleton() {
-  return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
-      <Nav />
-      <div style={{ padding: '120px 8vw 80px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {[200, 120, 80, 320, 60].map((w, i) => (
-          <div key={i} style={{
-            height: i === 0 ? 72 : i === 3 ? 100 : 20,
-            width: `min(${w * 2}px, ${w / 5}%)`,
-            background: 'var(--bg-surface)',
-            borderRadius: 2,
-            animation: 'aboutPulse 1.2s ease-in-out infinite',
-            animationDelay: `${i * 0.12}s`,
-          }} />
-        ))}
-      </div>
-      <style>{`@keyframes aboutPulse { 0%,100% { opacity: 0.3 } 50% { opacity: 0.7 } }`}</style>
     </div>
   )
 }

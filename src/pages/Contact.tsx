@@ -3,6 +3,9 @@ import { motion } from 'framer-motion'
 import { useLang } from '../context/LangContext'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
+import SectionLabel from '../components/SectionLabel'
+import SkeletonLoader from '../components/SkeletonLoader'
+import ErrorState from '../components/ErrorState'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -44,22 +47,7 @@ export default function Contact() {
   }, [lang])
 
   if (loading) return <LoadingSkeleton />
-
-  if (error) return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
-      <Nav />
-      <div style={{
-        padding: '200px 0',
-        textAlign: 'center',
-        fontFamily: 'var(--font-serif)',
-        fontSize: 18,
-        color: 'var(--text-secondary)',
-        fontStyle: 'italic',
-      }}>
-        {t('could not load profile.', 'no se pudo cargar el perfil.')}
-      </div>
-    </div>
-  )
+  if (error) return <ErrorState message={t('could not load profile.', 'no se pudo cargar el perfil.')} />
 
   const links = [
     { label: t('email', 'email'), value: profile?.email ?? '', href: `mailto:${profile?.email}` },
@@ -82,15 +70,7 @@ export default function Contact() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 11,
-            color: 'var(--text-muted)',
-            letterSpacing: 3,
-            marginBottom: 16,
-          }}>
-            {t('/ contact', '/ contacto')}
-          </div>
+          <SectionLabel>{t('/ contact', '/ contacto')}</SectionLabel>
 
           <h1 style={{
             fontFamily: 'var(--font-serif)',
@@ -214,20 +194,16 @@ function LoadingSkeleton() {
         maxWidth: 600,
         margin: '0 auto',
         padding: '140px 8vw 80px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 16,
       }}>
-        {[80, 300, 400, 40].map((w, i) => (
-          <div key={i} style={{
-            height: i === 1 ? 72 : i === 2 ? 60 : 14,
-            width: `min(${w}px, 100%)`,
-            background: 'var(--bg-surface)',
-            borderRadius: 2,
-            animation: 'contactPulse 1.2s ease-in-out infinite',
-            animationDelay: `${i * 0.12}s`,
-          }} />
-        ))}
+        <SkeletonLoader
+          blocks={[
+            { height: 14, width: 80 },
+            { height: 72, width: '100%' },
+            { height: 60, width: '100%' },
+            { height: 14, width: 40 },
+          ]}
+          gap={16}
+        />
         <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 0 }}>
           {[0, 1, 2].map(i => (
             <div key={i} style={{
@@ -241,21 +217,20 @@ function LoadingSkeleton() {
                 height: 10, width: 40,
                 background: 'var(--bg-surface)',
                 borderRadius: 2,
-                animation: 'contactPulse 1.2s ease-in-out infinite',
+                animation: 'skeletonPulse 1.2s ease-in-out infinite',
                 animationDelay: `${i * 0.1}s`,
               }} />
               <div style={{
                 height: 10, width: 120,
                 background: 'var(--bg-surface)',
                 borderRadius: 2,
-                animation: 'contactPulse 1.2s ease-in-out infinite',
+                animation: 'skeletonPulse 1.2s ease-in-out infinite',
                 animationDelay: `${i * 0.1 + 0.05}s`,
               }} />
             </div>
           ))}
         </div>
       </div>
-      <style>{`@keyframes contactPulse { 0%,100% { opacity: 0.3 } 50% { opacity: 0.7 } }`}</style>
     </div>
   )
 }

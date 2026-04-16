@@ -4,6 +4,11 @@ import { motion } from 'framer-motion'
 import { useLang } from '../context/LangContext'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
+import PageHeader from '../components/PageHeader'
+import SkeletonLoader from '../components/SkeletonLoader'
+import SkillChip from '../components/SkillChip'
+import TextLink from '../components/TextLink'
+import Divider from '../components/Divider'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -72,32 +77,14 @@ export default function Experience() {
     <div>
       <Nav />
 
-      {/* PAGE HEADER */}
-      <section style={{
-        padding: isMobile ? '80px 6vw 32px' : '120px 8vw 40px',
-        borderBottom: '0.5px solid var(--border)',
-      }}>
-        <div style={{
-          fontFamily: 'var(--font-mono)', fontSize: 11,
-          color: 'var(--text-muted)', letterSpacing: 3,
-          marginBottom: 16,
-        }}>
-          {t('/ experience', '/ experiencia')}
-        </div>
-        <h1 style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: 'clamp(40px, 6vw, 72px)',
-          color: 'var(--text-primary)',
-          fontWeight: 700,
-          lineHeight: 1.05,
-        }}>
-          {t('Work & education.', 'Experiencia y formación.')}
-        </h1>
-      </section>
+      <PageHeader
+        label={t('/ experience', '/ experiencia')}
+        title={t('Work & education.', 'Experiencia y formación.')}
+      />
 
       {/* EXPERIENCE TIMELINE */}
       <section style={{ padding: isMobile ? '40px 6vw' : '60px 8vw', maxWidth: 800 }}>
-        {loading && <SkeletonRows />}
+        {loading && <SkeletonLoader rows={3} />}
 
         {error && (
           <p style={{
@@ -174,36 +161,21 @@ export default function Experience() {
                 {item.skills && item.skills.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 12 }}>
                     {item.skills.map(s => (
-                      <span key={s.name} style={{
-                        fontFamily: 'var(--font-mono)', fontSize: 11,
-                        padding: '2px 6px',
-                        border: '0.5px solid var(--border)',
-                        color: 'var(--text-secondary)',
-                        borderRadius: 2,
-                      }}>
-                        {s.name}
-                      </span>
+                      <SkillChip key={s.name} name={s.name} />
                     ))}
                   </div>
                 )}
-                <div
+                <TextLink
                   onClick={() => navigate('/projects')}
-                  style={{
-                    fontFamily: 'var(--font-mono)', fontSize: 11,
-                    color: 'var(--accent-teal)', marginTop: 16,
-                    cursor: 'pointer', letterSpacing: 1,
-                  }}
+                  style={{ marginTop: 16, fontSize: 11, letterSpacing: 1 }}
                 >
                   {t('view projects →', 'ver proyectos →')}
-                </div>
+                </TextLink>
               </div>
             </motion.div>
 
             {i < experience.length - 1 && (
-              <div style={{
-                borderTop: '0.5px solid var(--border)',
-                margin: isMobile ? '28px 0' : '40px 0',
-              }} />
+              <Divider style={{ margin: isMobile ? '28px 0' : '40px 0' }} />
             )}
           </div>
         ))}
@@ -223,7 +195,7 @@ export default function Experience() {
           {t('Education & certifications.', 'Formación y certificaciones.')}
         </h2>
 
-        {loading && <SkeletonRows count={2} />}
+        {loading && <SkeletonLoader rows={2} />}
 
         {!loading && !error && education.map((item, i) => (
           <div key={item.id}>
@@ -308,34 +280,11 @@ export default function Experience() {
             </motion.div>
 
             {i < education.length - 1 && (
-              <div style={{
-                borderTop: '0.5px solid var(--border)',
-                margin: isMobile ? '28px 0' : '40px 0',
-              }} />
+              <Divider style={{ margin: isMobile ? '28px 0' : '40px 0' }} />
             )}
           </div>
         ))}
       </section>
-    </div>
-  )
-}
-
-function SkeletonRows({ count = 3 }: { count?: number }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {Array.from({ length: count }).map((_, i) => (
-        <div
-          key={i}
-          style={{
-            height: 80,
-            background: 'var(--bg-surface)',
-            borderRadius: 2,
-            animation: 'experiencePulse 1.2s ease-in-out infinite',
-            animationDelay: `${i * 0.15}s`,
-          }}
-        />
-      ))}
-      <style>{`@keyframes experiencePulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
     </div>
   )
 }

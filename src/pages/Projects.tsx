@@ -5,6 +5,8 @@ import { useLang } from '../context/LangContext'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
 import ProjectRow from '../components/ProjectRow'
+import PageHeader from '../components/PageHeader'
+import SkeletonLoader from '../components/SkeletonLoader'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -27,16 +29,15 @@ interface Project {
   skills?: Skill[]
 }
 
-type Filter = 'ALL' | 'FULLSTACK' | 'PERSONAL' | 'E-COMMERCE'
+type Filter = 'ALL' | 'FULLSTACK' | 'PERSONAL'
 
-const FILTERS: Filter[] = ['ALL', 'FULLSTACK', 'PERSONAL', 'E-COMMERCE']
+const FILTERS: Filter[] = ['ALL', 'FULLSTACK', 'PERSONAL']
 
 function filterProjects(projects: Project[], filter: Filter): Project[] {
   switch (filter) {
     case 'ALL': return projects
     case 'FULLSTACK': return projects.filter(p => p.type === 'work')
     case 'PERSONAL': return projects.filter(p => p.type === 'personal')
-    case 'E-COMMERCE': return projects.filter(p => p.company === 'Galarreta Consultora E-Commerce')
   }
 }
 
@@ -77,33 +78,19 @@ export default function Projects() {
       <Nav />
 
       {/* PAGE HEADER */}
-      <section style={{
-        padding: isMobile ? '80px 6vw 24px' : '120px 8vw 40px',
-        borderBottom: '0.5px solid var(--border)',
-        display: 'flex',
-        flexDirection: isMobile ? 'column' : 'row',
-        justifyContent: 'space-between',
-        alignItems: isMobile ? 'flex-start' : 'flex-end',
-        flexWrap: 'wrap',
-        gap: isMobile ? 20 : 32,
-      }}>
-        <div>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11,
-            color: 'var(--text-muted)', letterSpacing: 3,
-            marginBottom: 16,
-          }}>
-            / projects
-          </div>
-          <h1 style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: 'clamp(40px, 6vw, 72px)',
-            color: 'var(--text-primary)',
-            fontWeight: 700,
-            lineHeight: 1.05,
-          }}>
-            {t('Selected work.', 'Trabajos seleccionados.')}
-          </h1>
+      <PageHeader
+        label="/ projects"
+        title={t('Selected work.', 'Trabajos seleccionados.')}
+        style={{ padding: isMobile ? '80px 6vw 24px' : '120px 8vw 40px' }}
+      >
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          justifyContent: 'space-between',
+          alignItems: isMobile ? 'flex-start' : 'flex-end',
+          flexWrap: 'wrap',
+          gap: isMobile ? 20 : 32,
+        }}>
           {!loading && !error && (
             <div style={{
               fontFamily: 'var(--font-mono)', fontSize: 13,
@@ -112,51 +99,35 @@ export default function Projects() {
               {projects.length} {t('projects', 'proyectos')} &middot; 2024&ndash;2025
             </div>
           )}
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {FILTERS.map(f => {
+              const active = filter === f
+              return (
+                <button
+                  key={f}
+                  onClick={() => { setFilter(f); setAnimKey(k => k + 1) }}
+                  style={{
+                    fontFamily: 'var(--font-mono)', fontSize: 11,
+                    letterSpacing: 1,
+                    padding: isMobile ? '8px 14px' : '4px 12px',
+                    borderRadius: 3,
+                    cursor: 'pointer',
+                    background: active ? 'rgba(61,107,98,0.15)' : 'transparent',
+                    border: `0.5px solid ${active ? 'var(--accent-teal)' : 'var(--border)'}`,
+                    color: active ? 'var(--accent-teal)' : 'var(--text-muted)',
+                  }}
+                >
+                  {f === 'ALL' ? t('ALL', 'TODO') : f}
+                </button>
+              )
+            })}
+          </div>
         </div>
-
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {FILTERS.map(f => {
-            const active = filter === f
-            return (
-              <button
-                key={f}
-                onClick={() => { setFilter(f); setAnimKey(k => k + 1) }}
-                style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 11,
-                  letterSpacing: 1,
-                  padding: isMobile ? '8px 14px' : '4px 12px',
-                  borderRadius: 3,
-                  cursor: 'pointer',
-                  background: active ? 'rgba(61,107,98,0.15)' : 'transparent',
-                  border: `0.5px solid ${active ? 'var(--accent-teal)' : 'var(--border)'}`,
-                  color: active ? 'var(--accent-teal)' : 'var(--text-muted)',
-                }}
-              >
-                {f === 'ALL' ? t('ALL', 'TODO') : f}
-              </button>
-            )
-          })}
-        </div>
-      </section>
+      </PageHeader>
 
       {/* PROJECT LIST */}
       <section style={{ padding: isMobile ? '0 6vw 48px' : '0 8vw 80px' }}>
-        {loading && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 24 }}>
-            {[0, 1, 2].map(i => (
-              <div
-                key={i}
-                style={{
-                  height: 80,
-                  background: 'var(--bg-surface)',
-                  borderRadius: 2,
-                  animation: 'projectsPulse 1.2s ease-in-out infinite',
-                }}
-              />
-            ))}
-            <style>{`@keyframes projectsPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
-          </div>
-        )}
+        {loading && <SkeletonLoader rows={3} style={{ paddingTop: 24 }} />}
 
         {error && (
           <p style={{

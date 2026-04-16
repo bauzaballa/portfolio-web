@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useBreakpoint } from '../hooks/useBreakpoint'
+import SkillChip from './SkillChip'
+import ParticipationBar from './ParticipationBar'
 
 interface Project {
   slug: string
@@ -70,15 +72,7 @@ export default function ProjectRow({ project, index, onClick }: {
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
           {(project.skills ?? []).map(s => (
-            <span key={s.name} style={{
-              fontFamily: 'var(--font-mono)', fontSize: 11,
-              padding: '2px 6px',
-              border: '0.5px solid var(--border)',
-              color: 'var(--text-secondary)',
-              borderRadius: 2,
-            }}>
-              {s.name}
-            </span>
+            <SkillChip key={s.name} name={s.name} />
           ))}
         </div>
 
@@ -89,18 +83,7 @@ export default function ProjectRow({ project, index, onClick }: {
           }}>
             {bars.map(b => (
               <div key={b.label} style={{ flex: 1 }}>
-                <div style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 11,
-                  color: 'var(--text-secondary)', marginBottom: 3,
-                }}>
-                  {b.label} {b.value}%
-                </div>
-                <div style={{ height: 2, background: 'var(--border)', borderRadius: 1 }}>
-                  <div style={{
-                    height: '100%', width: `${b.value}%`,
-                    background: barColor, borderRadius: 1,
-                  }} />
-                </div>
+                <ParticipationBar label={b.label} value={b.value} color={barColor} />
               </div>
             ))}
           </div>
@@ -155,15 +138,7 @@ export default function ProjectRow({ project, index, onClick }: {
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
           {(project.skills ?? []).map(s => (
-            <span key={s.name} style={{
-              fontFamily: 'var(--font-mono)', fontSize: 11,
-              padding: '2px 6px',
-              border: '0.5px solid var(--border)',
-              color: 'var(--text-secondary)',
-              borderRadius: 2,
-            }}>
-              {s.name}
-            </span>
+            <SkillChip key={s.name} name={s.name} />
           ))}
         </div>
       </div>
@@ -175,22 +150,7 @@ export default function ProjectRow({ project, index, onClick }: {
           display: 'flex', flexDirection: 'column', gap: 8,
         }}>
           {bars.map(b => (
-            <div key={b.label}>
-              <div style={{
-                fontFamily: 'var(--font-mono)', fontSize: 11,
-                color: 'var(--text-secondary)', marginBottom: 3,
-              }}>
-                {b.label} {b.value}%
-              </div>
-              <div style={{
-                height: 2, background: 'var(--border)', borderRadius: 1, width: '100%',
-              }}>
-                <div style={{
-                  height: '100%', width: `${b.value}%`,
-                  background: barColor, borderRadius: 1,
-                }} />
-              </div>
-            </div>
+            <ParticipationBar key={b.label} label={b.label} value={b.value} color={barColor} />
           ))}
         </div>
       )}
