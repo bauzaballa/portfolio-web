@@ -26,7 +26,7 @@ interface Project {
   nda: boolean
   periodStart: string | null
   periodEnd: string | null
-  githubUrl: string | null
+  repoUrls: string[] | null
   liveUrl: string | null
   technicalDecisions: string | null
   challenges: string[] | null
@@ -182,14 +182,18 @@ export default function ProjectDetail() {
               {project.descriptionLong}
             </p>
           )}
-          {project.githubUrl && (
-            <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" style={{
-              display: 'block', fontFamily: 'var(--font-mono)', fontSize: 12,
-              color: 'var(--accent-teal)', marginTop: 24, textDecoration: 'none',
-            }}>
-              {t('view code ->', 'ver código ->')}
-            </a>
-          )}
+          {(project.repoUrls ?? []).map((url, i) => {
+            const repoName = url.split('/').pop() ?? 'repo'
+            const label = (project.repoUrls?.length ?? 0) > 1 ? `${repoName} ->` : t('view code ->', 'ver código ->')
+            return (
+              <a key={i} href={url} target="_blank" rel="noopener noreferrer" style={{
+                display: 'block', fontFamily: 'var(--font-mono)', fontSize: 12,
+                color: 'var(--accent-teal)', marginTop: i === 0 ? 24 : 8, textDecoration: 'none',
+              }}>
+                {label}
+              </a>
+            )
+          })}
           {project.liveUrl && (
             <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" style={{
               display: 'block', fontFamily: 'var(--font-mono)', fontSize: 12,

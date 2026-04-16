@@ -24,7 +24,7 @@ interface Project {
   participationBackend: number | null
   participationDesign: number | null
   isFeatured: boolean
-  githubUrl: string | null
+  repoUrls: string[] | null
   liveUrl: string | null
   sortOrder: number
   createdAt: string
@@ -289,7 +289,7 @@ const emptyProject = {
   title: '', slug: '', descriptionShort: '', type: 'work',
   visibility: 'public', company: '', role: '',
   participationFrontend: 0, participationBackend: 0, participationDesign: 0,
-  isFeatured: false, githubUrl: '', liveUrl: '', sortOrder: 0,
+  isFeatured: false, repoUrls: '', liveUrl: '', sortOrder: 0,
 }
 
 function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
@@ -308,7 +308,13 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
   useEffect(() => { load() }, [load])
 
   const save = async () => {
-    const body = JSON.stringify(form)
+    const payload = {
+      ...form,
+      repoUrls: form.repoUrls
+        ? form.repoUrls.split(',').map((s: string) => s.trim()).filter(Boolean)
+        : [],
+    }
+    const body = JSON.stringify(payload)
     if (editingId) {
       await authFetch(`${API}/api/v1/projects/${editingId}`, { method: 'PATCH', body })
     } else {
@@ -344,7 +350,7 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
       participationFrontend: p.participationFrontend ?? 0,
       participationBackend: p.participationBackend ?? 0,
       participationDesign: p.participationDesign ?? 0,
-      isFeatured: p.isFeatured, githubUrl: p.githubUrl ?? '',
+      isFeatured: p.isFeatured, repoUrls: p.repoUrls ? p.repoUrls.join(', ') : '',
       liveUrl: p.liveUrl ?? '', sortOrder: p.sortOrder,
     })
   }
@@ -476,7 +482,7 @@ function ProjectForm({
       <FormDivider />
       <FormGroupLabel>{t('Links', 'Enlaces')}</FormGroupLabel>
       <FormGrid>
-        <AdminInput label="GitHub URL" value={form.githubUrl} onChange={v => set('githubUrl', v)} />
+        <AdminInput label={t('Repo URLs (comma-separated)', 'URLs de repos (separadas por coma)')} value={form.repoUrls} onChange={v => set('repoUrls', v)} className="admin-form-card__grid--full" />
         <AdminInput label="Live URL" value={form.liveUrl} onChange={v => set('liveUrl', v)} />
         <AdminToggle label="Featured" checked={form.isFeatured} onChange={v => set('isFeatured', v)} />
       </FormGrid>
