@@ -10,6 +10,7 @@ import SectionLabel from '../components/SectionLabel'
 import TextLink from '../components/TextLink'
 import InfoRow from '../components/InfoRow'
 import ParticipationBar from '../components/ParticipationBar'
+import MediaContactSheet from '../components/MediaContactSheet'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -36,7 +37,7 @@ interface Project {
   liveUrl: string | null
   technicalDecisions: string | null
   challenges: string[] | null
-  media: { url: string; type: string }[] | null
+  media: { url: string; type: string; caption?: string | null }[] | null
   participationFrontend: number | null
   participationBackend: number | null
   participationDesign: number | null
@@ -147,12 +148,11 @@ export default function ProjectDetail() {
 
       {/* HERO SECTION */}
       <section style={{
-        padding: isMobile ? '20px 6vw 40px' : '20px 8vw 60px',
+        padding: isMobile ? '20px 6vw 40px' : '20px 8vw',
         display: isCompact ? 'flex' : 'grid',
         flexDirection: isCompact ? 'column' : undefined,
         gridTemplateColumns: isCompact ? undefined : '1fr 280px',
         gap: isCompact ? 32 : 48,
-        borderBottom: '0.5px solid var(--border)',
       }}>
         {/* LEFT COLUMN */}
         <motion.div
@@ -257,30 +257,26 @@ export default function ProjectDetail() {
       </section>
 
       {/* MEDIA SECTION */}
-      {project.media && project.media.length > 0 ? (
-        <section style={{ padding: isMobile ? '24px 6vw' : '40px 8vw', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
-          {project.media.map((m, i) =>
-            m.type === 'video' ? (
-              <iframe key={i} src={m.url} style={{ width: '100%', height: 280, border: '0.5px solid var(--border)', borderRadius: 4 }} />
-            ) : (
-              <img key={i} src={m.url} alt="" style={{ width: '100%', height: 'auto', border: '0.5px solid var(--border)', borderRadius: 4, display: 'block' }} />
-            )
-          )}
-        </section>
-      ) : (
-        <div style={{
-          margin: isMobile ? '24px 6vw' : '40px 8vw',
-          height: 400,
-          background: 'var(--bg-surface)',
-          border: '0.5px solid var(--border)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: 4,
-        }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)' }}>
-            {t('[ media coming soon ]', '[ media próximamente ]')}
-          </span>
-        </div>
-      )}
+      <section style={{ padding: isMobile ? '32px 6vw' : '48px 8vw' }}>
+        <SectionLabel color="teal" style={{ letterSpacing: 2, marginBottom: 16 }}>
+          media
+        </SectionLabel>
+        {project.media && project.media.length > 0 ? (
+          <MediaContactSheet media={project.media} isMobile={isMobile} />
+        ) : (
+          <div style={{
+            height: 340,
+            background: 'var(--bg-surface)',
+            border: '0.5px solid var(--border)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            borderRadius: 4,
+          }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)' }}>
+              {t('[ media coming soon ]', '[ media próximamente ]')}
+            </span>
+          </div>
+        )}
+      </section>
 
       {/* CONTENT SECTIONS */}
       <div style={{ padding: isMobile ? '0 6vw 40px' : '0 8vw 40px', maxWidth: 880 }}>

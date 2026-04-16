@@ -51,6 +51,14 @@ interface Experience {
   sortOrder: number
 }
 
+interface MediaItem {
+  id: number
+  url: string
+  type: string
+  caption: string | null
+  sortOrder: number
+}
+
 interface Profile {
   name: string
   title: string
@@ -426,7 +434,7 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
                 {editingId === p.id && (
                   <tr>
                     <td colSpan={4} style={{ padding: '16px 0' }}>
-                      <ProjectForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
+                      <ProjectForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} projectId={p.id} authFetch={authFetch} />
                     </td>
                   </tr>
                 )}
@@ -450,13 +458,15 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
 }
 
 function ProjectForm({
-  form, setForm, onSave, onCancel, t,
+  form, setForm, onSave, onCancel, t, projectId, authFetch,
 }: {
   form: typeof emptyProject
   setForm: React.Dispatch<React.SetStateAction<typeof emptyProject>>
   onSave: () => void
   onCancel: () => void
   t: (en: string, es: string) => string
+  projectId?: number
+  authFetch?: AuthFetch
 }) {
   const set = (k: string, v: string | number | boolean) => setForm(f => ({ ...f, [k]: v }))
 
@@ -513,7 +523,250 @@ function ProjectForm({
         <PrimaryButton onClick={onSave}>{t('save', 'guardar')}</PrimaryButton>
         <CancelButton onClick={onCancel}>{t('cancel', 'cancelar')}</CancelButton>
       </FormActions>
+
+      {projectId && authFetch && (
+        <MediaManager projectId={projectId} authFetch={authFetch} t={t} />
+      )}
     </FormCard>
+  )
+}
+
+// --- MEDIA MANAGER ---
+
+const emptyMediaForm = { url: '', type: 'image', caption: '', sortOrder: 0 }
+
+function MediaManager({
+  projectId, authFetch, t,
+}: {
+  projectId: number
+  authFetch: AuthFetch
+  t: (en: string, es: string) => string
+}) {
+  const { toast } = useToast()
+  const [items, setItems] = useState<MediaItem[]>([])
+  const [adding, setAdding] = useState(false)
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [form, setForm] = useState(emptyMediaForm)
+
+  const load = useCallback(() => {
+    authFetch(`${API}/api/v1/media/${projectId}`)
+      .then(r => r.json())
+      .then(d => setItems(d.data ?? []))
+      .catch(() => {})
+  }, [projectId, authFetch])
+
+  useEffect(() => { load() }, [load])
+
+  const saveItem = async () => {
+    try {
+      const body = JSON.stringify({ ...form, projectId })
+      if (editingId) {
+        await authFetch(`${API}/api/v1/media/${editingId}`, { method: 'PATCH', body })
+      } else {
+        await authFetch(`${API}/api/v1/media`, { method: 'POST', body })
+      }
+      toast(t(editingId ? 'media updated.' : 'media added.', editingId ? 'media actualizado.' : 'media agregado.'))
+      setEditingId(null)
+      setAdding(false)
+      setForm(emptyMediaForm)
+      load()
+    } catch {
+      toast(t('failed to save media.', 'error al guardar media.'), 'error')
+    }
+  }
+
+  const removeItem = async (id: number) => {
+    if (!confirm('Delete this media item?')) return
+    try {
+      await authFetch(`${API}/api/v1/media/${id}`, { method: 'DELETE' })
+      toast(t('media deleted.', 'media eliminado.'))
+      load()
+    } catch {
+      toast(t('failed to delete media.', 'error al eliminar media.'), 'error')
+    }
+  }
+
+  const startEdit = (m: MediaItem) => {
+    setAdding(false)
+    setEditingId(m.id)
+    setForm({ url: m.url, type: m.type, caption: m.caption ?? '', sortOrder: m.sortOrder })
+  }
+
+  const cancelForm = () => {
+    setEditingId(null)
+    setAdding(false)
+    setForm(emptyMediaForm)
+  }
+
+  const set = (k: string, v: string | number) => setForm(f => ({ ...f, [k]: v }))
+
+  return (
+    <div style={{ marginTop: 24 }}>
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: 10,
+        letterSpacing: 2,
+        color: 'var(--text-muted)',
+        textTransform: 'uppercase',
+        paddingBottom: 12,
+        borderBottom: '0.5px solid var(--border)',
+        marginBottom: 16,
+      }}>
+        media
+      </div>
+
+      {items.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {items.map(m => (
+            <React.Fragment key={m.id}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '8px 0',
+                borderBottom: '0.5px solid var(--border)',
+              }}>
+                {/* Thumbnail */}
+                <div style={{
+                  width: 64,
+                  height: 44,
+                  flexShrink: 0,
+                  border: '0.5px solid var(--border)',
+                  borderRadius: 3,
+                  overflow: 'hidden',
+                  background: 'var(--bg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  {m.type === 'video' ? (
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--text-muted)' }}>▶</span>
+                  ) : (
+                    <img src={m.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  )}
+                </div>
+
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 11,
+                    color: 'var(--text-secondary)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}>
+                    {m.url}
+                  </div>
+                  {m.caption && (
+                    <div style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 10,
+                      color: 'var(--text-muted)',
+                      marginTop: 2,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}>
+                      {m.caption}
+                    </div>
+                  )}
+                </div>
+
+                {/* Sort */}
+                <div style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 10,
+                  color: 'var(--text-muted)',
+                  flexShrink: 0,
+                }}>
+                  #{m.sortOrder}
+                </div>
+
+                {/* Actions */}
+                <div style={{ flexShrink: 0 }}>
+                  <EditAction onClick={() => startEdit(m)}>{t('edit', 'editar')}</EditAction>
+                  <DeleteAction onClick={() => removeItem(m.id)}>{t('delete', 'eliminar')}</DeleteAction>
+                </div>
+              </div>
+
+              {editingId === m.id && (
+                <div style={{ padding: '12px 0' }}>
+                  <MediaForm form={form} set={set} onSave={saveItem} onCancel={cancelForm} t={t} />
+                </div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      )}
+
+      {adding && (
+        <div style={{ marginTop: items.length > 0 ? 12 : 0 }}>
+          <MediaForm form={form} set={set} onSave={saveItem} onCancel={cancelForm} t={t} />
+        </div>
+      )}
+
+      {!adding && !editingId && (
+        <AddButton onClick={() => { setEditingId(null); setForm(emptyMediaForm); setAdding(true) }}>
+          {t('+ add media', '+ agregar media')}
+        </AddButton>
+      )}
+    </div>
+  )
+}
+
+function MediaForm({
+  form, set, onSave, onCancel, t,
+}: {
+  form: typeof emptyMediaForm
+  set: (k: string, v: string | number) => void
+  onSave: () => void
+  onCancel: () => void
+  t: (en: string, es: string) => string
+}) {
+  return (
+    <div style={{
+      background: 'var(--bg)',
+      border: '0.5px solid var(--border)',
+      borderRadius: 4,
+      padding: 16,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 12,
+    }}>
+      <AdminInput
+        label="URL"
+        value={form.url}
+        onChange={v => set('url', v)}
+        placeholder="https://..."
+        className="admin-form-card__grid--full"
+      />
+      <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 100px', gap: 12 }}>
+        <AdminSelect
+          label={t('Type', 'Tipo')}
+          value={form.type}
+          onChange={v => set('type', v)}
+          options={[{ value: 'image', label: 'image' }, { value: 'video', label: 'video' }]}
+        />
+        <AdminInput
+          label={t('Caption', 'Leyenda')}
+          value={form.caption}
+          onChange={v => set('caption', v)}
+          placeholder={t('optional', 'opcional')}
+        />
+        <AdminInput
+          label={t('Order', 'Orden')}
+          type="number"
+          min={0}
+          value={form.sortOrder}
+          onChange={v => set('sortOrder', v)}
+        />
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+        <PrimaryButton onClick={onSave}>{t('save', 'guardar')}</PrimaryButton>
+        <CancelButton onClick={onCancel}>{t('cancel', 'cancelar')}</CancelButton>
+      </div>
+    </div>
   )
 }
 

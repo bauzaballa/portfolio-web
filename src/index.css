@@ -36,6 +36,8 @@
   --text-lg: 22px;    /* subtítulos */
 }
 
+.media-strip::-webkit-scrollbar { display: none; }
+
 * {
   margin: 0;
   padding: 0;
