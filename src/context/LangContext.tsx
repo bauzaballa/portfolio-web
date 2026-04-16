@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo } from 'react'
+import { createContext, useContext, useState, useMemo, useEffect } from 'react'
 
 export type Lang = 'en' | 'es'
 
@@ -27,6 +27,10 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     return next
   })
   const t = (en: string, es: string) => lang === 'es' ? es : en
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
 
   const value = useMemo(() => ({ lang, toggle, t }), [lang])
   return (
