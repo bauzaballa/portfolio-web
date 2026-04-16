@@ -94,22 +94,23 @@ export default function Nav() {
         <nav style={{
           position: 'fixed', top: 0, left: 0, right: 0,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '20px 8vw',
+          padding: '20px clamp(60px, 8vw, 140px)',
           borderBottom: '0.5px solid var(--border)',
           background: 'var(--bg)',
           zIndex: 100,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <span
+            <button
               onClick={() => navigate('/home')}
               style={{
+                background: 'none', border: 'none', padding: 0,
                 fontFamily: 'var(--font-mono)', fontSize: 12,
                 color: 'var(--text-secondary)', letterSpacing: 2,
                 fontWeight: 600, cursor: 'pointer',
               }}
             >
               BZ — {new Date().getFullYear()}
-            </span>
+            </button>
             <LikeButton />
           </div>
 
@@ -117,18 +118,19 @@ export default function Nav() {
             {NAV_LINKS.map(link => {
               const isActive = location.pathname === link.path
               return (
-                <span
+                <button
                   key={link.path}
                   onClick={() => navigate(link.path)}
                   style={{
-                    fontFamily: 'var(--font-mono)', fontSize: 11,
+                    background: 'none', border: 'none', padding: 0,
+                    fontFamily: 'var(--font-mono)', fontSize: 14,
                     letterSpacing: 1, cursor: 'pointer',
                     color: isActive ? 'var(--accent-teal)' : 'var(--text-secondary)',
                     fontWeight: isActive ? 600 : 400,
                   }}
                 >
                   {link.label}
-                </span>
+                </button>
               )
             })}
 
@@ -391,7 +393,7 @@ export default function Nav() {
                       background: 'var(--bg-surface)',
                       border: '0.5px solid var(--border)',
                       color: 'var(--accent-teal)',
-                      fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: 1,
+                      fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: 1,
                       padding: '6px 14px', borderRadius: 3, cursor: 'pointer',
                     }}
                   >
@@ -409,7 +411,7 @@ export default function Nav() {
                       background: 'var(--bg-surface)',
                       border: '0.5px solid var(--border)',
                       color: 'var(--accent-teal)',
-                      fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: 1,
+                      fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: 1,
                       padding: '6px 14px', borderRadius: 3, cursor: 'pointer',
                     }}
                   >
