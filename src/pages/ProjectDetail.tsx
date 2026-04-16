@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useLang } from '../context/LangContext'
+import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -41,6 +42,7 @@ export default function ProjectDetail() {
   const navigate = useNavigate()
   const { lang, t } = useLang()
 
+  const { isMobile, isCompact } = useBreakpoint()
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -71,11 +73,11 @@ export default function ProjectDetail() {
     return (
       <div>
         <Nav />
-        <div style={{ padding: '120px 8vw 40px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ padding: isMobile ? '80px 6vw 40px' : '120px 8vw 40px', display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ height: 14, width: 80, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
-          <div style={{ height: 48, width: 400, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
-          <div style={{ height: 16, width: 560, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
-          <div style={{ height: 16, width: 480, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
+          <div style={{ height: 48, width: '100%', maxWidth: 400, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
+          <div style={{ height: 16, width: '100%', maxWidth: 560, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
+          <div style={{ height: 16, width: '100%', maxWidth: 480, background: 'var(--bg-surface)', borderRadius: 2, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
           <div style={{ height: 280, width: '100%', background: 'var(--bg-surface)', borderRadius: 2, marginTop: 32, animation: 'detailPulse 1.2s ease-in-out infinite' }} />
         </div>
         <style>{`@keyframes detailPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
@@ -127,7 +129,7 @@ export default function ProjectDetail() {
       <Nav />
 
       {/* BACK BUTTON */}
-      <div style={{ padding: '100px 8vw 0' }}>
+      <div style={{ padding: isMobile ? '72px 6vw 0' : '100px 8vw 0' }}>
         <span
           onClick={() => navigate(-1)}
           style={{
@@ -141,10 +143,11 @@ export default function ProjectDetail() {
 
       {/* HERO SECTION */}
       <section style={{
-        padding: '20px 8vw 60px',
-        display: 'grid',
-        gridTemplateColumns: '1fr 280px',
-        gap: 48,
+        padding: isMobile ? '20px 6vw 40px' : '20px 8vw 60px',
+        display: isCompact ? 'flex' : 'grid',
+        flexDirection: isCompact ? 'column' : undefined,
+        gridTemplateColumns: isCompact ? undefined : '1fr 280px',
+        gap: isCompact ? 32 : 48,
         borderBottom: '0.5px solid var(--border)',
       }}>
         {/* LEFT COLUMN */}
@@ -202,7 +205,7 @@ export default function ProjectDetail() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          style={{ position: 'sticky', top: 100, alignSelf: 'start' }}
+          style={isCompact ? {} : { position: 'sticky', top: 100, alignSelf: 'start' }}
         >
           <div style={{
             background: 'var(--bg-surface)',
@@ -286,7 +289,7 @@ export default function ProjectDetail() {
 
       {/* MEDIA SECTION */}
       {project.media && project.media.length > 0 ? (
-        <section style={{ padding: '40px 8vw', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+        <section style={{ padding: isMobile ? '24px 6vw' : '40px 8vw', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
           {project.media.map((m, i) =>
             m.type === 'video' ? (
               <iframe key={i} src={m.url} style={{ width: '100%', height: 280, border: '0.5px solid var(--border)', borderRadius: 4 }} />
@@ -297,7 +300,7 @@ export default function ProjectDetail() {
         </section>
       ) : (
         <div style={{
-          margin: '40px 8vw',
+          margin: isMobile ? '24px 6vw' : '40px 8vw',
           height: 400,
           background: 'var(--bg-surface)',
           border: '0.5px solid var(--border)',
@@ -311,7 +314,7 @@ export default function ProjectDetail() {
       )}
 
       {/* CONTENT SECTIONS */}
-      <div style={{ padding: '0 8vw 40px', maxWidth: 680 }}>
+      <div style={{ padding: isMobile ? '0 6vw 40px' : '0 8vw 40px', maxWidth: 680 }}>
         {project.technicalDecisions && (
           <div style={{ marginBottom: 48 }}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLang } from '../context/LangContext'
+import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
 import ProjectRow from '../components/ProjectRow'
 
@@ -42,6 +43,7 @@ function filterProjects(projects: Project[], filter: Filter): Project[] {
 export default function Projects() {
   const navigate = useNavigate()
   const { lang, t } = useLang()
+  const { isMobile } = useBreakpoint()
 
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
@@ -76,13 +78,14 @@ export default function Projects() {
 
       {/* PAGE HEADER */}
       <section style={{
-        padding: '120px 8vw 40px',
+        padding: isMobile ? '80px 6vw 24px' : '120px 8vw 40px',
         borderBottom: '0.5px solid var(--border)',
         display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-end',
+        alignItems: isMobile ? 'flex-start' : 'flex-end',
         flexWrap: 'wrap',
-        gap: 32,
+        gap: isMobile ? 20 : 32,
       }}>
         <div>
           <div style={{
@@ -111,7 +114,7 @@ export default function Projects() {
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {FILTERS.map(f => {
             const active = filter === f
             return (
@@ -121,7 +124,7 @@ export default function Projects() {
                 style={{
                   fontFamily: 'var(--font-mono)', fontSize: 11,
                   letterSpacing: 1,
-                  padding: '4px 12px',
+                  padding: isMobile ? '8px 14px' : '4px 12px',
                   borderRadius: 3,
                   cursor: 'pointer',
                   background: active ? 'rgba(61,107,98,0.15)' : 'transparent',
@@ -137,7 +140,7 @@ export default function Projects() {
       </section>
 
       {/* PROJECT LIST */}
-      <section style={{ padding: '0 8vw 80px' }}>
+      <section style={{ padding: isMobile ? '0 6vw 48px' : '0 8vw 80px' }}>
         {loading && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 24 }}>
             {[0, 1, 2].map(i => (

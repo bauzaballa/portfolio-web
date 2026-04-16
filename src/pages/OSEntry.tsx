@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
+import { useBreakpoint } from '../hooks/useBreakpoint'
 import ThemeToggle from '../components/ThemeToggle'
 
 function Clock() {
@@ -21,7 +22,7 @@ function Clock() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
-      style={{ textAlign: 'center', marginBottom: '4rem' }}
+      style={{ textAlign: 'center', marginBottom: '2.5rem' }}
     >
       <div style={{
         fontFamily: 'var(--font-serif)',
@@ -306,6 +307,7 @@ export default function OSEntry() {
   const [users, setUsers] = useState<{ username: string }[]>([])
   const navigate = useNavigate()
   const { login } = useAuth()
+  const { isMobile } = useBreakpoint()
 
   useEffect(() => {
     fetch(import.meta.env.VITE_API_URL + '/api/v1/auth/users')
@@ -328,7 +330,7 @@ export default function OSEntry() {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: '100dvh',
       background: 'var(--bg)',
       display: 'flex',
       flexDirection: 'column',
@@ -336,6 +338,7 @@ export default function OSEntry() {
       justifyContent: 'center',
       position: 'relative',
       overflow: 'hidden',
+      padding: isMobile ? '0 6vw' : 0,
     }}>
       <motion.div
         initial={{ opacity: 0 }}
@@ -368,8 +371,10 @@ export default function OSEntry() {
             <Clock />
             <div style={{
               display: 'flex',
-              gap: '3rem',
+              gap: isMobile ? '1.5rem' : '3rem',
               alignItems: 'center',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
             }}>
               <UserCard
                 name="Guest"

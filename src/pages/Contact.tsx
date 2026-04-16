@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useLang } from '../context/LangContext'
+import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -18,6 +19,7 @@ interface Profile {
 
 export default function Contact() {
   const { lang, t } = useLang()
+  const { isMobile } = useBreakpoint()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -72,7 +74,7 @@ export default function Contact() {
       <div style={{
         maxWidth: 600,
         margin: '0 auto',
-        padding: '140px 8vw 80px',
+        padding: isMobile ? '80px 6vw 48px' : '140px 8vw 80px',
       }}>
         {/* Header block */}
         <motion.div
@@ -193,6 +195,9 @@ function LinkRow({ label, value, href, delay, isLast }: LinkRowProps) {
           textDecoration: 'none',
           cursor: 'pointer',
           transition: 'color 0.15s ease',
+          overflowWrap: 'break-word' as const,
+          wordBreak: 'break-all' as const,
+          textAlign: 'right' as const,
         }}
       >
         {value}

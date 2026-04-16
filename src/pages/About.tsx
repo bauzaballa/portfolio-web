@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
 import { useLang } from '../context/LangContext'
+import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -20,6 +21,7 @@ interface Profile {
 export default function About() {
   const { theme } = useTheme()
   const { lang, t } = useLang()
+  const { isMobile, isCompact } = useBreakpoint()
 
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -68,11 +70,12 @@ export default function About() {
 
       {/* HERO SECTION */}
       <section style={{
-        padding: '120px 8vw 80px',
+        padding: isMobile ? '80px 6vw 48px' : '120px 8vw 80px',
         borderBottom: '0.5px solid var(--border)',
-        display: 'grid',
-        gridTemplateColumns: '1fr 340px',
-        gap: 80,
+        display: isCompact ? 'flex' : 'grid',
+        flexDirection: isCompact ? 'column-reverse' : undefined,
+        gridTemplateColumns: isCompact ? undefined : '1fr 340px',
+        gap: isCompact ? 40 : 80,
         alignItems: 'start',
       }}>
         {/* Left column */}
@@ -122,7 +125,10 @@ export default function About() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.9, delay: 0.15, ease: 'easeOut' }}
           style={{
-            width: 340, height: 440,
+            width: isCompact ? '100%' : 340,
+            maxWidth: isCompact ? 340 : undefined,
+            aspectRatio: isCompact ? '3 / 3.5' : undefined,
+            height: isCompact ? undefined : 440,
             border: '0.5px solid var(--border)',
             borderRadius: 2,
             overflow: 'hidden',
@@ -147,11 +153,11 @@ export default function About() {
 
       {/* DETAILS SECTION */}
       <section style={{
-        padding: '60px 8vw',
+        padding: isMobile ? '40px 6vw' : '60px 8vw',
         borderBottom: '0.5px solid var(--border)',
         display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: 40,
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+        gap: isMobile ? 28 : 40,
       }}>
         {/* Location */}
         <div>
@@ -231,7 +237,7 @@ export default function About() {
       </section>
 
       {/* ANALOG PHOTOS SECTION */}
-      <section style={{ padding: '60px 8vw', borderBottom: '0.5px solid var(--border)' }}>
+      <section style={{ padding: isMobile ? '40px 6vw' : '60px 8vw', borderBottom: '0.5px solid var(--border)' }}>
         <div>
           <div style={{
             fontFamily: 'var(--font-serif)', fontSize: 28,
@@ -250,9 +256,9 @@ export default function About() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 16,
-          marginTop: 40,
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+          gap: isMobile ? 12 : 16,
+          marginTop: isMobile ? 24 : 40,
         }}>
           {(['Portra 400', 'Gold 200', 'Vision 250D'] as const).map(film => (
             <PhotoCell key={film} film={film} />

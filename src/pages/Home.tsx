@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
 import { useLang } from '../context/LangContext'
+import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
 import ProjectRow from '../components/ProjectRow'
 
@@ -27,6 +28,7 @@ interface SkillGroup {
 export default function Home() {
   const { theme } = useTheme()
   const { lang, t } = useLang()
+  const { isMobile, isCompact } = useBreakpoint()
   const navigate = useNavigate()
 
   const [projects, setProjects] = useState<Project[]>([])
@@ -86,10 +88,10 @@ export default function Home() {
 
       {/* SECTION 1: HERO */}
       <section style={{
-        minHeight: '100vh',
+        minHeight: '100dvh',
         display: 'flex',
         alignItems: 'center',
-        padding: '0 8vw',
+        padding: isMobile ? '0 6vw' : '0 8vw',
       }}>
         <div>
           {/* Label — blurred by scrim */}
@@ -146,7 +148,7 @@ export default function Home() {
                 style={{
                   background: 'var(--accent-teal)', color: '#fff',
                   border: 'none', fontFamily: 'var(--font-mono)',
-                  fontSize: 12, letterSpacing: 1, padding: '10px 24px',
+                  fontSize: 12, letterSpacing: 1, padding: isMobile ? '14px 28px' : '10px 24px',
                   borderRadius: 3, cursor: 'pointer',
                 }}
               >
@@ -159,7 +161,7 @@ export default function Home() {
                   border: '0.5px solid var(--border)',
                   color: 'var(--text-secondary)',
                   fontFamily: 'var(--font-mono)',
-                  fontSize: 12, letterSpacing: 1, padding: '10px 24px',
+                  fontSize: 12, letterSpacing: 1, padding: isMobile ? '14px 28px' : '10px 24px',
                   borderRadius: 3, cursor: 'pointer',
                 }}
               >
@@ -171,7 +173,7 @@ export default function Home() {
       </section>
 
       {/* SECTION 2: FEATURED PROJECTS */}
-      <section style={{ padding: '80px 8vw' }}>
+      <section style={{ padding: isMobile ? '48px 6vw' : '80px 8vw' }}>
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
           marginBottom: 32,
@@ -224,11 +226,14 @@ export default function Home() {
 
       {/* SECTION 3: ABOUT SNIPPET */}
       <section style={{
-        padding: '80px 8vw',
+        padding: isMobile ? '48px 6vw' : '80px 8vw',
         borderTop: '0.5px solid var(--border)',
-        display: 'flex', gap: 48, flexWrap: 'wrap',
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: isMobile ? 32 : 48,
+        flexWrap: 'wrap',
       }}>
-        <div style={{ flex: 1, minWidth: 280 }}>
+        <div style={{ flex: 1, minWidth: isMobile ? 0 : 280 }}>
           <div style={{
             fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--accent-teal)', letterSpacing: 3,
@@ -238,7 +243,7 @@ export default function Home() {
           </div>
           {bio && (
             <p style={{
-              fontFamily: 'var(--font-serif)', fontSize: 18,
+              fontFamily: 'var(--font-serif)', fontSize: isMobile ? 16 : 18,
               color: 'var(--text-secondary)', lineHeight: 1.8,
               maxWidth: 540,
             }}>
@@ -257,36 +262,42 @@ export default function Home() {
           </span>
         </div>
 
-        <div style={{
-          width: 300, height: 380,
-          background: 'var(--bg-surface)',
-          border: '0.5px solid var(--border)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexShrink: 0,
-        }}>
-          <span style={{
-            fontFamily: 'var(--font-mono)', fontSize: 12,
-            color: 'var(--text-muted)',
+        {!isMobile && (
+          <div style={{
+            width: 300, height: 380,
+            background: 'var(--bg-surface)',
+            border: '0.5px solid var(--border)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
           }}>
-            {t('[ photo ]', '[ foto ]')}
-          </span>
-        </div>
+            <span style={{
+              fontFamily: 'var(--font-mono)', fontSize: 12,
+              color: 'var(--text-muted)',
+            }}>
+              {t('[ photo ]', '[ foto ]')}
+            </span>
+          </div>
+        )}
       </section>
 
       {/* SECTION 4: SKILLS PREVIEW */}
       <section style={{
-        padding: '80px 8vw',
+        padding: isMobile ? '48px 6vw' : '80px 8vw',
         borderTop: '0.5px solid var(--border)',
       }}>
         {skillGroups.map(g => (
           <div key={g.category} style={{
-            display: 'flex', gap: 24, marginBottom: 20, alignItems: 'baseline',
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: isMobile ? 8 : 24,
+            marginBottom: isMobile ? 24 : 20,
+            alignItems: isMobile ? 'flex-start' : 'baseline',
             flexWrap: 'wrap',
           }}>
             <span style={{
               fontFamily: 'var(--font-mono)', fontSize: 11,
               color: 'var(--accent-teal)', letterSpacing: 2,
-              textTransform: 'uppercase', minWidth: 120,
+              textTransform: 'uppercase', minWidth: isMobile ? 0 : 120,
             }}>
               {g.category}
             </span>

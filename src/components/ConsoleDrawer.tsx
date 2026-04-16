@@ -66,9 +66,10 @@ interface ConsoleDrawerProps {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   navOpen?: boolean
+  hideTrigger?: boolean
 }
 
-export default function ConsoleDrawer({ open, setOpen, navOpen = false }: ConsoleDrawerProps) {
+export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrigger = false }: ConsoleDrawerProps) {
   const { lang, toggle: toggleLang } = useLang()
   const { logout, isAdmin } = useAuth()
   const { unlocked, unlock, lock } = usePreview()
@@ -302,7 +303,7 @@ export default function ConsoleDrawer({ open, setOpen, navOpen = false }: Consol
 
       {/* ─── Trigger button ─────────────────────────────────────────────────── */}
       <AnimatePresence>
-        {(!isMobile || !open) && !navOpen && (
+        {(!isMobile || !open) && !navOpen && !hideTrigger && (
           <motion.button
             key="trigger"
             initial={false}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useLang } from '../context/LangContext'
+import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -33,6 +34,7 @@ interface EducationItem {
 export default function Experience() {
   const navigate = useNavigate()
   const { lang, t } = useLang()
+  const { isMobile } = useBreakpoint()
 
   const [experience, setExperience] = useState<ExperienceItem[]>([])
   const [education, setEducation] = useState<EducationItem[]>([])
@@ -72,7 +74,7 @@ export default function Experience() {
 
       {/* PAGE HEADER */}
       <section style={{
-        padding: '120px 8vw 40px',
+        padding: isMobile ? '80px 6vw 32px' : '120px 8vw 40px',
         borderBottom: '0.5px solid var(--border)',
       }}>
         <div style={{
@@ -94,7 +96,7 @@ export default function Experience() {
       </section>
 
       {/* EXPERIENCE TIMELINE */}
-      <section style={{ padding: '60px 8vw', maxWidth: 800 }}>
+      <section style={{ padding: isMobile ? '40px 6vw' : '60px 8vw', maxWidth: 800 }}>
         {loading && <SkeletonRows />}
 
         {error && (
@@ -112,29 +114,45 @@ export default function Experience() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-              style={{
+              style={isMobile ? {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              } : {
                 display: 'grid',
                 gridTemplateColumns: '120px 1fr',
                 gap: 32,
               }}
             >
               {/* Date column */}
-              <div style={{
-                textAlign: 'right',
-                fontFamily: 'var(--font-mono)', fontSize: 12,
-                color: 'var(--text-muted)',
-                lineHeight: 1.8,
-                paddingTop: 4,
-              }}>
-                <div>{new Date(item.startDate).getFullYear()}</div>
-                <div>—</div>
-                <div>{item.isCurrent ? t('present', 'presente') : item.endDate ? new Date(item.endDate).getFullYear() : ''}</div>
-              </div>
+              {isMobile ? (
+                <div style={{
+                  fontFamily: 'var(--font-mono)', fontSize: 12,
+                  color: 'var(--text-muted)',
+                  display: 'flex', gap: 6,
+                }}>
+                  <span>{new Date(item.startDate).getFullYear()}</span>
+                  <span>—</span>
+                  <span>{item.isCurrent ? t('present', 'presente') : item.endDate ? new Date(item.endDate).getFullYear() : ''}</span>
+                </div>
+              ) : (
+                <div style={{
+                  textAlign: 'right',
+                  fontFamily: 'var(--font-mono)', fontSize: 12,
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.8,
+                  paddingTop: 4,
+                }}>
+                  <div>{new Date(item.startDate).getFullYear()}</div>
+                  <div>—</div>
+                  <div>{item.isCurrent ? t('present', 'presente') : item.endDate ? new Date(item.endDate).getFullYear() : ''}</div>
+                </div>
+              )}
 
               {/* Content column */}
               <div>
                 <div style={{
-                  fontFamily: 'var(--font-serif)', fontSize: 24,
+                  fontFamily: 'var(--font-serif)', fontSize: isMobile ? 20 : 24,
                   color: 'var(--text-primary)', fontWeight: 700,
                 }}>
                   {item.company}
@@ -147,7 +165,7 @@ export default function Experience() {
                   {item.role}
                 </div>
                 <div style={{
-                  fontFamily: 'var(--font-serif)', fontSize: 16,
+                  fontFamily: 'var(--font-serif)', fontSize: isMobile ? 15 : 16,
                   color: 'var(--text-secondary)', lineHeight: 1.8,
                   marginTop: 12, maxWidth: 560,
                 }}>
@@ -184,7 +202,7 @@ export default function Experience() {
             {i < experience.length - 1 && (
               <div style={{
                 borderTop: '0.5px solid var(--border)',
-                margin: '40px 0',
+                margin: isMobile ? '28px 0' : '40px 0',
               }} />
             )}
           </div>
@@ -194,7 +212,7 @@ export default function Experience() {
       {/* EDUCATION SECTION */}
       <section style={{
         borderTop: '0.5px solid var(--border)',
-        padding: '60px 8vw',
+        padding: isMobile ? '40px 6vw' : '60px 8vw',
         maxWidth: 800,
       }}>
         <h2 style={{
@@ -213,30 +231,46 @@ export default function Experience() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-              style={{
+              style={isMobile ? {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              } : {
                 display: 'grid',
                 gridTemplateColumns: '120px 1fr',
                 gap: 32,
               }}
             >
               {/* Date column */}
-              <div style={{
-                textAlign: 'right',
-                fontFamily: 'var(--font-mono)', fontSize: 12,
-                color: 'var(--text-muted)',
-                lineHeight: 1.8,
-                paddingTop: 4,
-              }}>
-                {item.startYear === item.endYear || !item.endYear
-                  ? item.startYear
-                  : <>{item.startYear}<br />—<br />{item.endYear}</>
-                }
-              </div>
+              {isMobile ? (
+                <div style={{
+                  fontFamily: 'var(--font-mono)', fontSize: 12,
+                  color: 'var(--text-muted)',
+                }}>
+                  {item.startYear === item.endYear || !item.endYear
+                    ? item.startYear
+                    : `${item.startYear} — ${item.endYear}`
+                  }
+                </div>
+              ) : (
+                <div style={{
+                  textAlign: 'right',
+                  fontFamily: 'var(--font-mono)', fontSize: 12,
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.8,
+                  paddingTop: 4,
+                }}>
+                  {item.startYear === item.endYear || !item.endYear
+                    ? item.startYear
+                    : <>{item.startYear}<br />—<br />{item.endYear}</>
+                  }
+                </div>
+              )}
 
               {/* Content column */}
               <div>
                 <div style={{
-                  fontFamily: 'var(--font-serif)', fontSize: 20,
+                  fontFamily: 'var(--font-serif)', fontSize: isMobile ? 18 : 20,
                   color: 'var(--text-primary)',
                 }}>
                   {item.institution}
@@ -276,7 +310,7 @@ export default function Experience() {
             {i < education.length - 1 && (
               <div style={{
                 borderTop: '0.5px solid var(--border)',
-                margin: '40px 0',
+                margin: isMobile ? '28px 0' : '40px 0',
               }} />
             )}
           </div>

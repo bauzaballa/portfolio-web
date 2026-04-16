@@ -3,20 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LangContext'
+import { useWindowWidth } from '../hooks/useBreakpoint'
 import ConsoleDrawer from './ConsoleDrawer'
 import ThemeToggle from './ThemeToggle'
 import LangToggle from './LangToggle'
 import LikeButton from './LikeButton'
-
-function useWindowWidth() {
-  const [width, setWidth] = useState(() => window.innerWidth)
-  useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-  return width
-}
 
 export default function Nav() {
   const navigate = useNavigate()
@@ -65,6 +56,22 @@ export default function Nav() {
   useEffect(() => {
     setMobileOpen(false)
   }, [location.pathname])
+
+  // Hide terminal button at bottom of /home on mobile
+  const [atBottom, setAtBottom] = useState(false)
+  useEffect(() => {
+    if (!isMobile || location.pathname !== '/home') {
+      setAtBottom(false)
+      return
+    }
+    const handler = () => {
+      const scrollY = window.scrollY + window.innerHeight
+      const docHeight = document.documentElement.scrollHeight
+      setAtBottom(docHeight - scrollY < 100)
+    }
+    window.addEventListener('scroll', handler, { passive: true })
+    return () => window.removeEventListener('scroll', handler)
+  }, [isMobile, location.pathname])
 
   const NAV_LINKS = [
     { label: t('home', 'inicio'), path: '/home' },
@@ -210,7 +217,7 @@ export default function Nav() {
         height: 56,
         borderBottom: mobileOpen ? 'none' : '0.5px solid var(--border)',
         background: 'var(--bg)',
-        zIndex: 100,
+        zIndex: mobileOpen ? 1001 : 100,
       }}>
         {/* Left: logo + like */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -290,7 +297,7 @@ export default function Nav() {
             style={{
               position: 'fixed', inset: 0,
               background: 'var(--bg)',
-              zIndex: 99,
+              zIndex: 1000,
               display: 'flex', flexDirection: 'column',
               paddingTop: 56,
               overflowY: 'auto',
@@ -379,6 +386,7 @@ export default function Nav() {
                   <button
                     onClick={() => { setMobileOpen(false); setConsoleOpen(true) }}
                     style={{
+                      marginLeft: 'auto',
                       background: 'var(--bg-surface)',
                       border: '0.5px solid var(--border)',
                       color: 'var(--accent-teal)',
@@ -447,7 +455,7 @@ export default function Nav() {
         )}
       </AnimatePresence>
 
-      <ConsoleDrawer open={consoleOpen} setOpen={setConsoleOpen} navOpen={mobileOpen} />
+      <ConsoleDrawer open={consoleOpen} setOpen={setConsoleOpen} navOpen={mobileOpen} hideTrigger={atBottom} />
     </>
   )
 }

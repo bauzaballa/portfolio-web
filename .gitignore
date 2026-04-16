@@ -25,3 +25,10 @@ dist-ssr
 
 .env
 CLAUDE.md
+
+# Superpowers plugin artifacts
+.superpowers/
+docs/superpowers/
+
+# Scratch / temp files
+scratch/

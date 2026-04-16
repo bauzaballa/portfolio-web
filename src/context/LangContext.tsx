@@ -14,9 +14,18 @@ const LangContext = createContext<LangContextType>({
   t: (en) => en,
 })
 
+const STORAGE_KEY = 'portfolio_lang'
+
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLang] = useState<Lang>('en')
-  const toggle = () => setLang(l => l === 'en' ? 'es' : 'en')
+  const [lang, setLang] = useState<Lang>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY) as Lang | null
+    return saved === 'es' ? 'es' : 'en'
+  })
+  const toggle = () => setLang(l => {
+    const next = l === 'en' ? 'es' : 'en'
+    localStorage.setItem(STORAGE_KEY, next)
+    return next
+  })
   const t = (en: string, es: string) => lang === 'es' ? es : en
 
   const value = useMemo(() => ({ lang, toggle, t }), [lang])
