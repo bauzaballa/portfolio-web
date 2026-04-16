@@ -60,7 +60,7 @@ export default function Contact() {
       <Nav />
 
       <div style={{
-        maxWidth: 600,
+        maxWidth: 760,
         margin: '0 auto',
         padding: isMobile ? '80px 6vw 48px' : '140px 8vw 80px',
       }}>
@@ -191,7 +191,7 @@ function LoadingSkeleton() {
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Nav />
       <div style={{
-        maxWidth: 600,
+        maxWidth: 760,
         margin: '0 auto',
         padding: '140px 8vw 80px',
       }}>

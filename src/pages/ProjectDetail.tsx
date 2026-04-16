@@ -283,7 +283,7 @@ export default function ProjectDetail() {
       )}
 
       {/* CONTENT SECTIONS */}
-      <div style={{ padding: isMobile ? '0 6vw 40px' : '0 8vw 40px', maxWidth: 680 }}>
+      <div style={{ padding: isMobile ? '0 6vw 40px' : '0 8vw 40px', maxWidth: 880 }}>
         {project.technicalDecisions && (
           <div style={{ marginBottom: 48 }}>
             <SectionLabel color="teal" style={{ letterSpacing: 2, marginBottom: 12 }}>

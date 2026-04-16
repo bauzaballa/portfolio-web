@@ -83,7 +83,7 @@ export default function Experience() {
       />
 
       {/* EXPERIENCE TIMELINE */}
-      <section style={{ padding: isMobile ? '40px 6vw' : '60px 8vw', maxWidth: 800 }}>
+      <section style={{ padding: isMobile ? '40px 6vw' : '60px 8vw', maxWidth: 1060 }}>
         {loading && <SkeletonLoader rows={3} />}
 
         {error && (
@@ -185,7 +185,7 @@ export default function Experience() {
       <section style={{
         borderTop: '0.5px solid var(--border)',
         padding: isMobile ? '40px 6vw' : '60px 8vw',
-        maxWidth: 800,
+        maxWidth: 1060,
       }}>
         <h2 style={{
           fontFamily: 'var(--font-serif)', fontSize: 32,
