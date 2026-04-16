@@ -206,8 +206,8 @@ export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrig
     }
   }
 
-  // ─── Shared: output area + input row ───────────────────────────────────────
-  const OutputArea = () => (
+  // ─── Shared JSX fragments ──────────────────────────────────────────────────
+  const outputArea = (
     <div style={{
       flex: 1, overflowY: 'auto', padding: '12px 16px',
       display: 'flex', flexDirection: 'column', gap: 4,
@@ -242,7 +242,7 @@ export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrig
     </div>
   )
 
-  const InputRow = ({ autoFocus = false }: { autoFocus?: boolean }) => (
+  const inputRow = (
     <div style={{
       borderTop: '0.5px solid var(--border)',
       padding: '10px 16px',
@@ -253,7 +253,6 @@ export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrig
       <input
         ref={inputRef}
         className="console-input"
-        autoFocus={autoFocus}
         value={input}
         onChange={e => setInput(e.target.value)}
         onKeyDown={e => {
@@ -272,7 +271,7 @@ export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrig
     </div>
   )
 
-  const PanelHeader = ({ showClose = false }: { showClose?: boolean }) => (
+  const panelHeader = (showClose: boolean) => (
     <div style={{
       background: 'var(--bg-surface)',
       padding: '12px 20px',
@@ -375,9 +374,9 @@ export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrig
                   }} />
                 </div>
 
-                <PanelHeader showClose={true} />
-                <OutputArea />
-                <InputRow autoFocus={false} />
+                {panelHeader(true)}
+                {outputArea}
+                {inputRow}
               </motion.aside>
             )}
 
@@ -399,9 +398,9 @@ export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrig
                   zIndex: 150,
                 }}
               >
-                <PanelHeader showClose={true} />
-                <OutputArea />
-                <InputRow autoFocus={false} />
+                {panelHeader(true)}
+                {outputArea}
+                {inputRow}
               </motion.aside>
             )}
 
@@ -423,9 +422,9 @@ export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrig
                   zIndex: 150,
                 }}
               >
-                <PanelHeader showClose={false} />
-                <OutputArea />
-                <InputRow autoFocus={true} />
+                {panelHeader(false)}
+                {outputArea}
+                {inputRow}
               </motion.aside>
             )}
           </>
