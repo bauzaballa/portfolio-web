@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LangContext'
@@ -107,35 +107,14 @@ export default function Admin() {
 
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar">
-        <div className="admin-sidebar__brand">
-          <div className="admin-sidebar__label">admin</div>
-          <div className="admin-sidebar__title">portfolio.bz</div>
-        </div>
-
-        <nav>
-          {NAV_ITEMS.map(item => (
-            <div
-              key={item}
-              onClick={() => setSection(item)}
-              className={`admin-sidebar__nav-item ${section === item ? 'admin-sidebar__nav-item--active' : ''}`}
-            >
-              {navLabel(item)}
-            </div>
-          ))}
-        </nav>
-
-        <div className="admin-sidebar__footer">
-          <div className="admin-sidebar__link" onClick={() => navigate('/home')}>
-            {t('< view site', '< ver sitio')}
-          </div>
-          <div style={{ padding: '16px 20px' }}>
-            <button className="admin-sidebar__logout" onClick={() => { logout(); navigate('/entry') }}>
-              {t('logout', 'salir')}
-            </button>
-          </div>
-        </div>
-      </aside>
+      <AdminHeader
+        section={section}
+        setSection={setSection}
+        navLabel={navLabel}
+        onNavigate={navigate}
+        onLogout={() => { logout(); navigate('/entry') }}
+        t={t}
+      />
 
       <main className="admin-main">
         {section === 'overview' && <OverviewSection authFetch={authFetch} onNavigate={setSection} />}
@@ -145,6 +124,78 @@ export default function Admin() {
         {section === 'profile' && <ProfileSection authFetch={authFetch} />}
       </main>
     </div>
+  )
+}
+
+// --- ADMIN HEADER ---
+
+function AdminHeader({
+  section, setSection, navLabel, onNavigate, onLogout, t,
+}: {
+  section: Section
+  setSection: (s: Section) => void
+  navLabel: (s: Section) => string
+  onNavigate: (path: string) => void
+  onLogout: () => void
+  t: (en: string, es: string) => string
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  return (
+    <header className="admin-header">
+      <div className="admin-header__brand">
+        <span className="admin-header__label">admin</span>
+        <span className="admin-header__title">portfolio.bz</span>
+      </div>
+
+      <div className="admin-header__nav" ref={ref}>
+        <button
+          className={`admin-nav-trigger${open ? ' admin-nav-trigger--open' : ''}`}
+          onClick={() => setOpen(v => !v)}
+        >
+          {navLabel(section)}
+          <span className="admin-nav-trigger__chevron">▼</span>
+        </button>
+        {open && (
+          <div className="admin-nav-dropdown">
+            {NAV_ITEMS.map(item => (
+              <button
+                key={item}
+                className={`admin-nav-dropdown__item${section === item ? ' admin-nav-dropdown__item--active' : ''}`}
+                onClick={() => { setSection(item); setOpen(false) }}
+              >
+                {navLabel(item)}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="admin-header__actions">
+        <button
+          className="admin-header__btn admin-header__btn--site"
+          onClick={() => onNavigate('/home')}
+        >
+          {t('< site', '< sitio')}
+        </button>
+        <button
+          className="admin-header__btn admin-header__btn--logout"
+          onClick={onLogout}
+        >
+          {t('logout', 'salir')}
+        </button>
+      </div>
+    </header>
   )
 }
 
@@ -203,7 +254,7 @@ function OverviewSection({ authFetch, onNavigate }: { authFetch: AuthFetch; onNa
     <div>
       <SectionHeader title={t('overview', 'resumen')} subtitle="DASHBOARD" />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+      <div className="admin-stat-grid">
         {cards.map(c => (
           <div key={c.label} className="admin-stat-card">
             <div className="admin-stat-card__label">{c.label}</div>
@@ -314,46 +365,48 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
     <div>
       <SectionHeader title={t('projects', 'proyectos')} subtitle="MANAGE PROJECTS" />
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>{t('title', 'titulo')}</th>
-            <th>{t('type', 'tipo')}</th>
-            <th style={{ textAlign: 'center' }}>featured</th>
-            <th>{t('actions', 'acciones')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {projects.map(p => (
-            <React.Fragment key={p.id}>
-              <tr>
-                <td className="admin-table__name">{p.title}</td>
-                <td>
-                  <span className={`admin-badge ${p.type === 'work' ? 'admin-badge--teal' : 'admin-badge--warm'}`}>
-                    {p.type}
-                  </span>
-                </td>
-                <td style={{ textAlign: 'center' }} onClick={() => toggleFeatured(p)}>
-                  <span className={`admin-star ${p.isFeatured ? 'admin-star--active' : 'admin-star--inactive'}`}>
-                    {p.isFeatured ? '\u2605' : '\u2606'}
-                  </span>
-                </td>
-                <td style={{ textAlign: 'right' }}>
-                  <EditAction onClick={() => startEdit(p)}>{t('edit', 'editar')}</EditAction>
-                  <DeleteAction onClick={() => remove(p.id)}>{t('delete', 'eliminar')}</DeleteAction>
-                </td>
-              </tr>
-              {editingId === p.id && (
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>{t('title', 'titulo')}</th>
+              <th>{t('type', 'tipo')}</th>
+              <th style={{ textAlign: 'center' }}>featured</th>
+              <th>{t('actions', 'acciones')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {projects.map(p => (
+              <React.Fragment key={p.id}>
                 <tr>
-                  <td colSpan={4} style={{ padding: '16px 0' }}>
-                    <ProjectForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
+                  <td className="admin-table__name">{p.title}</td>
+                  <td>
+                    <span className={`admin-badge ${p.type === 'work' ? 'admin-badge--teal' : 'admin-badge--warm'}`}>
+                      {p.type}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: 'center' }} onClick={() => toggleFeatured(p)}>
+                    <span className={`admin-star ${p.isFeatured ? 'admin-star--active' : 'admin-star--inactive'}`}>
+                      {p.isFeatured ? '\u2605' : '\u2606'}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <EditAction onClick={() => startEdit(p)}>{t('edit', 'editar')}</EditAction>
+                    <DeleteAction onClick={() => remove(p.id)}>{t('delete', 'eliminar')}</DeleteAction>
                   </td>
                 </tr>
-              )}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+                {editingId === p.id && (
+                  <tr>
+                    <td colSpan={4} style={{ padding: '16px 0' }}>
+                      <ProjectForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {adding && (
         <div style={{ marginTop: 16 }}>
@@ -487,44 +540,46 @@ function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
     <div>
       <SectionHeader title={t('skills', 'habilidades')} subtitle="MANAGE SKILLS" />
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>{t('name', 'nombre')}</th>
-            <th>{t('category', 'categoria')}</th>
-            <th>{t('level', 'nivel')}</th>
-            <th>{t('actions', 'acciones')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {skills.map(s => (
-            <React.Fragment key={s.id}>
-              <tr>
-                <td className="admin-table__name">{s.name}</td>
-                <td className="admin-table__meta">{s.category}</td>
-                <td>
-                  <div className="admin-skill-dots">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <span key={i} className={`admin-skill-dot ${i < s.level ? 'admin-skill-dot--filled' : 'admin-skill-dot--empty'}`} />
-                    ))}
-                  </div>
-                </td>
-                <td style={{ textAlign: 'right' }}>
-                  <EditAction onClick={() => startEdit(s)}>{t('edit', 'editar')}</EditAction>
-                  <DeleteAction onClick={() => remove(s.id)}>{t('delete', 'eliminar')}</DeleteAction>
-                </td>
-              </tr>
-              {editingId === s.id && (
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>{t('name', 'nombre')}</th>
+              <th>{t('category', 'categoria')}</th>
+              <th>{t('level', 'nivel')}</th>
+              <th>{t('actions', 'acciones')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {skills.map(s => (
+              <React.Fragment key={s.id}>
                 <tr>
-                  <td colSpan={4} style={{ padding: '16px 0' }}>
-                    <SkillForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
+                  <td className="admin-table__name">{s.name}</td>
+                  <td className="admin-table__meta">{s.category}</td>
+                  <td>
+                    <div className="admin-skill-dots">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <span key={i} className={`admin-skill-dot ${i < s.level ? 'admin-skill-dot--filled' : 'admin-skill-dot--empty'}`} />
+                      ))}
+                    </div>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <EditAction onClick={() => startEdit(s)}>{t('edit', 'editar')}</EditAction>
+                    <DeleteAction onClick={() => remove(s.id)}>{t('delete', 'eliminar')}</DeleteAction>
                   </td>
                 </tr>
-              )}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+                {editingId === s.id && (
+                  <tr>
+                    <td colSpan={4} style={{ padding: '16px 0' }}>
+                      <SkillForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {adding && (
         <div style={{ marginTop: 16 }}>
@@ -641,40 +696,42 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
     <div>
       <SectionHeader title={t('experience', 'experiencia')} subtitle="MANAGE POSITIONS" />
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>{t('company', 'empresa')}</th>
-            <th>{t('role', 'rol')}</th>
-            <th>{t('period', 'periodo')}</th>
-            <th>{t('actions', 'acciones')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map(e => (
-            <React.Fragment key={e.id}>
-              <tr>
-                <td className="admin-table__name">{e.company}</td>
-                <td className="admin-table__meta" style={{ fontSize: 12 }}>{e.role}</td>
-                <td className="admin-table__meta" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                  {formatPeriod(e)}
-                </td>
-                <td style={{ textAlign: 'right' }}>
-                  <EditAction onClick={() => startEdit(e)}>{t('edit', 'editar')}</EditAction>
-                  <DeleteAction onClick={() => remove(e.id)}>{t('delete', 'eliminar')}</DeleteAction>
-                </td>
-              </tr>
-              {editingId === e.id && (
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>{t('company', 'empresa')}</th>
+              <th>{t('role', 'rol')}</th>
+              <th>{t('period', 'periodo')}</th>
+              <th>{t('actions', 'acciones')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map(e => (
+              <React.Fragment key={e.id}>
                 <tr>
-                  <td colSpan={4} style={{ padding: '16px 0' }}>
-                    <ExperienceForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
+                  <td className="admin-table__name">{e.company}</td>
+                  <td className="admin-table__meta" style={{ fontSize: 12 }}>{e.role}</td>
+                  <td className="admin-table__meta" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                    {formatPeriod(e)}
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <EditAction onClick={() => startEdit(e)}>{t('edit', 'editar')}</EditAction>
+                    <DeleteAction onClick={() => remove(e.id)}>{t('delete', 'eliminar')}</DeleteAction>
                   </td>
                 </tr>
-              )}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+                {editingId === e.id && (
+                  <tr>
+                    <td colSpan={4} style={{ padding: '16px 0' }}>
+                      <ExperienceForm form={form} setForm={setForm} onSave={save} onCancel={cancelForm} t={t} />
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {adding && (
         <div style={{ marginTop: 16 }}>

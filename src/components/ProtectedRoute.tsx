@@ -2,9 +2,20 @@ import { Navigate } from 'react-router-dom'
 import { usePreview } from '../context/PreviewContext'
 import { useAuth } from '../context/AuthContext'
 
-export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
+interface Props {
+  children: React.ReactNode
+  adminOnly?: boolean
+}
+
+export default function ProtectedRoute({ children, adminOnly = false }: Props) {
   const { unlocked } = usePreview()
-  const { isAdmin } = useAuth()
+  const { isAdmin, loading } = useAuth()
+
+  if (loading) return null
+
+  if (adminOnly) {
+    return isAdmin ? <>{children}</> : <Navigate to="/entry" replace />
+  }
 
   if (!unlocked && !isAdmin) {
     return <Navigate to="/" replace />
