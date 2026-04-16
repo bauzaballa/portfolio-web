@@ -28,7 +28,7 @@ interface SkillGroup {
 export default function Home() {
   const { theme } = useTheme()
   const { lang, t } = useLang()
-  const { isMobile, isCompact } = useBreakpoint()
+  const { isMobile } = useBreakpoint()
   const navigate = useNavigate()
 
   const [projects, setProjects] = useState<Project[]>([])

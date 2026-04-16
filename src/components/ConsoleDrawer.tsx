@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Dispatch, SetStateAction } from 'react'
+import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useLang } from '../context/LangContext'
