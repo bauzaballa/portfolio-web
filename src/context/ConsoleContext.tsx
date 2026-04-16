@@ -1,8 +1,8 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, type Dispatch, type SetStateAction } from 'react'
 
 const ConsoleContext = createContext<{
   consoleOpen: boolean
-  setConsoleOpen: (v: boolean) => void
+  setConsoleOpen: Dispatch<SetStateAction<boolean>>
 }>({ consoleOpen: false, setConsoleOpen: () => {} })
 
 export function ConsoleProvider({ children }: { children: React.ReactNode }) {
