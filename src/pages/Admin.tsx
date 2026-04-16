@@ -88,12 +88,11 @@ export default function Admin() {
   }, [isAdmin, loading, navigate])
 
   const authFetch = useCallback(async (url: string, opts?: RequestInit) => {
-    const currentToken = localStorage.getItem('portfolio_token')
     const res = await fetch(url, {
       ...opts,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        ...(currentToken ? { Authorization: `Bearer ${currentToken}` } : {}),
         ...opts?.headers,
       },
     })

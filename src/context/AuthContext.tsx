@@ -1,43 +1,41 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
 interface AuthContextType {
-  token: string | null
-  login: (token: string) => void
-  logout: () => void
+  login: () => void
+  logout: () => Promise<void>
   isAdmin: boolean
   loading: boolean
 }
 
 const AuthContext = createContext<AuthContextType>({
-  token: null,
   login: () => {},
-  logout: () => {},
+  logout: async () => {},
   isAdmin: false,
   loading: true,
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const stored = localStorage.getItem('portfolio_token')
-    if (stored) setToken(stored)
-    setLoading(false)
+    fetch(`${API}/api/v1/auth/me`, { credentials: 'include' })
+      .then(res => setIsAdmin(res.ok))
+      .catch(() => setIsAdmin(false))
+      .finally(() => setLoading(false))
   }, [])
 
-  const login = (t: string) => {
-    localStorage.setItem('portfolio_token', t)
-    setToken(t)
-  }
+  const login = () => setIsAdmin(true)
 
-  const logout = () => {
-    localStorage.removeItem('portfolio_token')
-    setToken(null)
+  const logout = async () => {
+    await fetch(`${API}/api/v1/auth/logout`, { method: 'POST', credentials: 'include' })
+    setIsAdmin(false)
   }
 
   return (
-    <AuthContext.Provider value={{ token, login, logout, isAdmin: !!token, loading }}>
+    <AuthContext.Provider value={{ login, logout, isAdmin, loading }}>
       {children}
     </AuthContext.Provider>
   )

@@ -147,7 +147,7 @@ const errorMessages = [
 function PasswordForm({ username, onCancel, onSuccess }: {
   username: string
   onCancel: () => void
-  onSuccess: (token: string) => void
+  onSuccess: () => void
 }) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -167,13 +167,13 @@ function PasswordForm({ username, onCancel, onSuccess }: {
     try {
       const res = await fetch(import.meta.env.VITE_API_URL + '/api/v1/auth/login', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       })
 
       if (res.ok) {
-        const data = await res.json()
-        onSuccess(data.data.token)
+        onSuccess()
       } else {
         const attempt = attempts + 1
         setAttempts(attempt)
@@ -302,29 +302,19 @@ function PasswordForm({ username, onCancel, onSuccess }: {
   )
 }
 
+const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME || 'bautista'
+
 export default function OSEntry() {
   const [selected, setSelected] = useState<string | null>(null)
-  const [users, setUsers] = useState<{ username: string }[]>([])
   const navigate = useNavigate()
   const { login } = useAuth()
   const { isMobile } = useBreakpoint()
 
-  useEffect(() => {
-    fetch(import.meta.env.VITE_API_URL + '/api/v1/auth/users')
-      .then(res => res.json())
-      .then(data => {
-        if (data?.data) {
-          setUsers(data.data)
-        }
-      })
-      .catch(console.error)
-  }, [])
-
   const handleGuestClick = () => navigate('/home')
   const handleUserClick = (username: string) => setSelected(username)
 
-  const handleLoginSuccess = (token: string) => {
-    login(token)
+  const handleLoginSuccess = () => {
+    login()
     navigate('/admin')
   }
 
@@ -381,29 +371,26 @@ export default function OSEntry() {
                 avatar={<GuestAvatar />}
                 onClick={handleGuestClick}
               />
-              {users.map((user) => (
-                <UserCard
-                  key={user.username}
-                  name={user.username}
-                  avatar={
-                    <div style={{
-                      width: 72, height: 72,
-                      borderRadius: '50%',
-                      overflow: 'hidden',
-                      border: '1.5px solid rgba(196,176,144,0.3)',
-                    }}>
-                      <img
-                        src="/bau.jpg"
-                        alt=""
-                        loading="lazy"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
-                      />
-                    </div>
-                  }
-                  onClick={() => handleUserClick(user.username)}
-                  isAdmin={true}
-                />
-              ))}
+              <UserCard
+                name={ADMIN_USERNAME}
+                avatar={
+                  <div style={{
+                    width: 72, height: 72,
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    border: '1.5px solid rgba(196,176,144,0.3)',
+                  }}>
+                    <img
+                      src="/bau.jpg"
+                      alt=""
+                      loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+                    />
+                  </div>
+                }
+                onClick={() => handleUserClick(ADMIN_USERNAME)}
+                isAdmin={true}
+              />
             </div>
           </motion.div>
         ) : (
