@@ -224,16 +224,17 @@ export default function Nav() {
       }}>
         {/* Left: logo + like */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <span
+          <button
             onClick={() => handleNavigate('/home')}
             style={{
+              background: 'none', border: 'none', padding: 0,
               fontFamily: 'var(--font-mono)', fontSize: 12,
               color: 'var(--text-secondary)', letterSpacing: 2,
               fontWeight: 600, cursor: 'pointer',
             }}
           >
             BZ — {new Date().getFullYear()}
-          </span>
+          </button>
           <LikeButton />
         </div>
 

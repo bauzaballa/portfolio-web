@@ -74,7 +74,7 @@ export default function Contact() {
 
           <h1 style={{
             fontFamily: 'var(--font-serif)',
-            fontSize: 'clamp(40px, 6vw, 72px)',
+            fontSize: 'clamp(40px, 6vw, 96px)',
             color: 'var(--text-primary)',
             fontWeight: 700,
             lineHeight: 1,
