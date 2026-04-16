@@ -9,10 +9,12 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 import Admin from './pages/Admin'
 import { LikeProvider } from './context/LikeContext'
+import { ConsoleProvider } from './context/ConsoleContext'
 import ProtectedRoute from './components/ProtectedRoute'
 
 export default function App() {
   return (
+    <ConsoleProvider>
     <LikeProvider>
     <Routes>
       <Route path="/" element={<ComingSoon />} />
@@ -26,5 +28,6 @@ export default function App() {
       <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
     </Routes>
     </LikeProvider>
+    </ConsoleProvider>
   )
 }

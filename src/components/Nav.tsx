@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LangContext'
 import { useWindowWidth } from '../hooks/useBreakpoint'
+import { useConsole } from '../context/ConsoleContext'
 import ConsoleDrawer from './ConsoleDrawer'
 import ThemeToggle from './ThemeToggle'
 import LangToggle from './LangToggle'
@@ -16,7 +17,7 @@ export default function Nav() {
   const { t } = useLang()
   const [adminMenuOpen, setAdminMenuOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [consoleOpen, setConsoleOpen] = useState(false)
+  const { consoleOpen, setConsoleOpen } = useConsole()
   const adminMenuRef = useRef<HTMLDivElement>(null)
   const width = useWindowWidth()
 

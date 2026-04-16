@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
 import { useLang } from '../context/LangContext'
 import { useBreakpoint } from '../hooks/useBreakpoint'
+import { useConsole } from '../context/ConsoleContext'
 import Nav from '../components/Nav'
 import ProjectRow from '../components/ProjectRow'
 
@@ -29,6 +30,7 @@ export default function Home() {
   const { theme } = useTheme()
   const { lang, t } = useLang()
   const { isMobile } = useBreakpoint()
+  const { consoleOpen } = useConsole()
   const navigate = useNavigate()
 
   const [projects, setProjects] = useState<Project[]>([])
@@ -109,20 +111,23 @@ export default function Home() {
             </div>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(52px, 8vw, 96px)',
-              fontWeight: 700, lineHeight: 1.05,
-              color: theme === 'dark' ? 'var(--text-primary)' : 'var(--accent-warm)',
-              marginBottom: 12,
-            }}
-          >
-            Bautista Zaballa.
-          </motion.h1>
+          {/* Name — above scrim only when terminal is open */}
+          <div style={consoleOpen ? { position: 'relative', zIndex: 145 } : undefined}>
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'clamp(52px, 8vw, 96px)',
+                fontWeight: 700, lineHeight: 1.05,
+                color: theme === 'dark' ? 'var(--text-primary)' : 'var(--accent-warm)',
+                marginBottom: 12,
+              }}
+            >
+              Bautista Zaballa.
+            </motion.h1>
+          </div>
 
           {/* Tagline + buttons — blurred by scrim */}
           <motion.div
