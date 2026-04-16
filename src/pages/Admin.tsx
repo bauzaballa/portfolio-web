@@ -5,6 +5,7 @@ import { useLang } from '../context/LangContext'
 import { AdminInput, AdminSelect, AdminTextarea, AdminToggle } from '../components/admin/FormField'
 import { FormCard, FormGrid, FormGroupLabel, FormDivider, FormActions } from '../components/admin/FormCard'
 import { EditAction, DeleteAction, PrimaryButton, CancelButton, AddButton } from '../components/admin/AdminActions'
+import { useToast } from '../context/ToastContext'
 import './Admin.css'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -71,6 +72,7 @@ export default function Admin() {
   const { isAdmin, logout, loading } = useAuth()
   const navigate = useNavigate()
   const { t } = useLang()
+  const { toast } = useToast()
   const [section, setSection] = useState<Section>('overview')
 
   const navLabel = (item: Section): string => ({
@@ -96,6 +98,7 @@ export default function Admin() {
       },
     })
     if (res.status === 401) {
+      toast(t('session expired.', 'sesion expirada.'), 'error')
       logout()
       navigate('/entry')
       throw new Error('unauthorized')
@@ -214,6 +217,7 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle: string })
 
 function OverviewSection({ authFetch, onNavigate }: { authFetch: AuthFetch; onNavigate: (s: Section) => void }) {
   const { lang, t } = useLang()
+  const { toast } = useToast()
   const [counts, setCounts] = useState({ projects: 0, skills: 0, positions: 0, education: 0 })
   const [recent, setRecent] = useState<Project[]>([])
 
@@ -240,7 +244,7 @@ function OverviewSection({ authFetch, onNavigate }: { authFetch: AuthFetch; onNa
         )
         setRecent(sorted.slice(0, 3))
       }
-    }).catch(() => {})
+    }).catch(() => toast(t('failed to load data.', 'error al cargar datos.'), 'error'))
   }, [authFetch, lang])
 
   const cards = [
@@ -294,6 +298,7 @@ const emptyProject = {
 
 function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
   const { lang, t } = useLang()
+  const { toast } = useToast()
   const [projects, setProjects] = useState<Project[]>([])
   const [editingId, setEditingId] = useState<number | null>(null)
   const [adding, setAdding] = useState(false)
@@ -302,42 +307,60 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
   const load = useCallback(() => {
     authFetch(`${API}/api/v1/projects?lang=${lang}`).then(r => r.json()).then(d => {
       setProjects(d.data ?? d)
-    }).catch(() => {})
+    }).catch(() => toast(t('failed to load projects.', 'error al cargar proyectos.'), 'error'))
   }, [authFetch, lang])
 
   useEffect(() => { load() }, [load])
 
   const save = async () => {
-    const payload = {
-      ...form,
-      repoUrls: form.repoUrls
-        ? form.repoUrls.split(',').map((s: string) => s.trim()).filter(Boolean)
-        : [],
+    try {
+      const payload = {
+        ...form,
+        repoUrls: form.repoUrls
+          ? form.repoUrls.split(',').map((s: string) => s.trim()).filter(Boolean)
+          : [],
+      }
+      const body = JSON.stringify(payload)
+      if (editingId) {
+        await authFetch(`${API}/api/v1/projects/${editingId}`, { method: 'PATCH', body })
+      } else {
+        await authFetch(`${API}/api/v1/projects`, { method: 'POST', body })
+      }
+      toast(t(editingId ? 'project updated.' : 'project created.', editingId ? 'proyecto actualizado.' : 'proyecto creado.'))
+      setEditingId(null)
+      setAdding(false)
+      setForm(emptyProject)
+      load()
+    } catch {
+      toast(t('failed to save project.', 'error al guardar proyecto.'), 'error')
     }
-    const body = JSON.stringify(payload)
-    if (editingId) {
-      await authFetch(`${API}/api/v1/projects/${editingId}`, { method: 'PATCH', body })
-    } else {
-      await authFetch(`${API}/api/v1/projects`, { method: 'POST', body })
-    }
-    setEditingId(null)
-    setAdding(false)
-    setForm(emptyProject)
-    load()
   }
 
   const toggleFeatured = async (p: Project) => {
-    await authFetch(`${API}/api/v1/projects/${p.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ isFeatured: !p.isFeatured }),
-    })
-    load()
+    try {
+      await authFetch(`${API}/api/v1/projects/${p.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ isFeatured: !p.isFeatured }),
+      })
+      toast(t(
+        p.isFeatured ? 'removed from featured.' : 'marked as featured.',
+        p.isFeatured ? 'quitado de destacados.' : 'marcado como destacado.',
+      ))
+      load()
+    } catch {
+      toast(t('failed to update project.', 'error al actualizar proyecto.'), 'error')
+    }
   }
 
   const remove = async (id: number) => {
     if (!confirm('Delete this project?')) return
-    await authFetch(`${API}/api/v1/projects/${id}`, { method: 'DELETE' })
-    load()
+    try {
+      await authFetch(`${API}/api/v1/projects/${id}`, { method: 'DELETE' })
+      toast(t('project deleted.', 'proyecto eliminado.'))
+      load()
+    } catch {
+      toast(t('failed to delete project.', 'error al eliminar proyecto.'), 'error')
+    }
   }
 
   const startEdit = (p: Project) => {
@@ -502,6 +525,7 @@ const SKILL_CATEGORIES = ['frontend', 'backend', 'database', 'devops', 'design',
 
 function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
   const { lang, t } = useLang()
+  const { toast } = useToast()
   const [skills, setSkills] = useState<SkillItem[]>([])
   const [editingId, setEditingId] = useState<number | null>(null)
   const [adding, setAdding] = useState(false)
@@ -510,28 +534,38 @@ function SkillsSection({ authFetch }: { authFetch: AuthFetch }) {
   const load = useCallback(() => {
     authFetch(`${API}/api/v1/skills?lang=${lang}`).then(r => r.json()).then(d => {
       setSkills(d.data ?? d)
-    }).catch(() => {})
+    }).catch(() => toast(t('failed to load skills.', 'error al cargar habilidades.'), 'error'))
   }, [authFetch, lang])
 
   useEffect(() => { load() }, [load])
 
   const save = async () => {
-    const body = JSON.stringify(form)
-    if (editingId) {
-      await authFetch(`${API}/api/v1/skills/${editingId}`, { method: 'PATCH', body })
-    } else {
-      await authFetch(`${API}/api/v1/skills`, { method: 'POST', body })
+    try {
+      const body = JSON.stringify(form)
+      if (editingId) {
+        await authFetch(`${API}/api/v1/skills/${editingId}`, { method: 'PATCH', body })
+      } else {
+        await authFetch(`${API}/api/v1/skills`, { method: 'POST', body })
+      }
+      toast(t(editingId ? 'skill updated.' : 'skill created.', editingId ? 'habilidad actualizada.' : 'habilidad creada.'))
+      setEditingId(null)
+      setAdding(false)
+      setForm(emptySkill)
+      load()
+    } catch {
+      toast(t('failed to save skill.', 'error al guardar habilidad.'), 'error')
     }
-    setEditingId(null)
-    setAdding(false)
-    setForm(emptySkill)
-    load()
   }
 
   const remove = async (id: number) => {
     if (!confirm('Delete this skill?')) return
-    await authFetch(`${API}/api/v1/skills/${id}`, { method: 'DELETE' })
-    load()
+    try {
+      await authFetch(`${API}/api/v1/skills/${id}`, { method: 'DELETE' })
+      toast(t('skill deleted.', 'habilidad eliminada.'))
+      load()
+    } catch {
+      toast(t('failed to delete skill.', 'error al eliminar habilidad.'), 'error')
+    }
   }
 
   const startEdit = (s: SkillItem) => {
@@ -643,6 +677,7 @@ const emptyExperience = {
 
 function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
   const { lang, t } = useLang()
+  const { toast } = useToast()
   const [items, setItems] = useState<Experience[]>([])
   const [editingId, setEditingId] = useState<number | null>(null)
   const [adding, setAdding] = useState(false)
@@ -651,33 +686,43 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
   const load = useCallback(() => {
     authFetch(`${API}/api/v1/experience?lang=${lang}`).then(r => r.json()).then(d => {
       setItems(d.data ?? d)
-    }).catch(() => {})
+    }).catch(() => toast(t('failed to load positions.', 'error al cargar puestos.'), 'error'))
   }, [authFetch, lang])
 
   useEffect(() => { load() }, [load])
 
   const save = async () => {
-    const payload = {
-      ...form,
-      endDate: form.isCurrent ? null : form.endDate,
-      stack: form.stack.split(',').map(s => s.trim()).filter(Boolean),
+    try {
+      const payload = {
+        ...form,
+        endDate: form.isCurrent ? null : form.endDate,
+        stack: form.stack.split(',').map(s => s.trim()).filter(Boolean),
+      }
+      const body = JSON.stringify(payload)
+      if (editingId) {
+        await authFetch(`${API}/api/v1/experience/${editingId}`, { method: 'PATCH', body })
+      } else {
+        await authFetch(`${API}/api/v1/experience`, { method: 'POST', body })
+      }
+      toast(t(editingId ? 'position updated.' : 'position created.', editingId ? 'puesto actualizado.' : 'puesto creado.'))
+      setEditingId(null)
+      setAdding(false)
+      setForm(emptyExperience)
+      load()
+    } catch {
+      toast(t('failed to save position.', 'error al guardar puesto.'), 'error')
     }
-    const body = JSON.stringify(payload)
-    if (editingId) {
-      await authFetch(`${API}/api/v1/experience/${editingId}`, { method: 'PATCH', body })
-    } else {
-      await authFetch(`${API}/api/v1/experience`, { method: 'POST', body })
-    }
-    setEditingId(null)
-    setAdding(false)
-    setForm(emptyExperience)
-    load()
   }
 
   const remove = async (id: number) => {
     if (!confirm('Delete this position?')) return
-    await authFetch(`${API}/api/v1/experience/${id}`, { method: 'DELETE' })
-    load()
+    try {
+      await authFetch(`${API}/api/v1/experience/${id}`, { method: 'DELETE' })
+      toast(t('position deleted.', 'puesto eliminado.'))
+      load()
+    } catch {
+      toast(t('failed to delete position.', 'error al eliminar puesto.'), 'error')
+    }
   }
 
   const startEdit = (e: Experience) => {
@@ -807,25 +852,28 @@ const emptyProfile: Profile = {
 
 function ProfileSection({ authFetch }: { authFetch: AuthFetch }) {
   const { lang, t } = useLang()
+  const { toast } = useToast()
   const [form, setForm] = useState<Profile>(emptyProfile)
-  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     authFetch(`${API}/api/v1/profile?lang=${lang}`).then(r => r.json()).then(d => {
       const data = d.data ?? d
       setForm({ ...emptyProfile, ...data })
-    }).catch(() => {})
+    }).catch(() => toast(t('failed to load profile.', 'error al cargar perfil.'), 'error'))
   }, [authFetch, lang])
 
   const set = (k: keyof Profile, v: string) => setForm(f => ({ ...f, [k]: v }))
 
   const save = async () => {
-    await authFetch(`${API}/api/v1/profile`, {
-      method: 'PATCH',
-      body: JSON.stringify(form),
-    })
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    try {
+      await authFetch(`${API}/api/v1/profile`, {
+        method: 'PATCH',
+        body: JSON.stringify(form),
+      })
+      toast(t('profile saved.', 'perfil guardado.'))
+    } catch {
+      toast(t('failed to save profile.', 'error al guardar perfil.'), 'error')
+    }
   }
 
   return (
@@ -859,7 +907,6 @@ function ProfileSection({ authFetch }: { authFetch: AuthFetch }) {
 
         <FormActions>
           <PrimaryButton onClick={save}>{t('save', 'guardar')}</PrimaryButton>
-          {saved && <span className="admin-saved">{t('saved.', 'guardado.')}</span>}
         </FormActions>
       </FormCard>
     </div>

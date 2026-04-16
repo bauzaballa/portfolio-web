@@ -10,10 +10,12 @@ import Contact from './pages/Contact'
 import Admin from './pages/Admin'
 import { LikeProvider } from './context/LikeContext'
 import { ConsoleProvider } from './context/ConsoleContext'
+import { ToastProvider } from './context/ToastContext'
 import ProtectedRoute from './components/ProtectedRoute'
 
 export default function App() {
   return (
+    <ToastProvider>
     <ConsoleProvider>
     <LikeProvider>
     <Routes>
@@ -29,5 +31,6 @@ export default function App() {
     </Routes>
     </LikeProvider>
     </ConsoleProvider>
+    </ToastProvider>
   )
 }
