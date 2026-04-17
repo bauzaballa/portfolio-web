@@ -126,7 +126,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
               style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: 'clamp(52px, 8vw, 160px)',
+                fontSize: 'clamp(52px, 7vw, 160px)',
                 fontWeight: 700, lineHeight: 1.05,
                 color: theme === 'dark' ? 'var(--text-primary)' : 'var(--accent-warm)',
                 marginBottom: 12,
