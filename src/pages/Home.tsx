@@ -132,7 +132,7 @@ export default function Home() {
                 marginBottom: 12,
               }}
             >
-              {profile?.name}.
+              {profile?.name ?? ''}.
             </motion.h1>
           </div>
 
