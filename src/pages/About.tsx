@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
 import { useLang } from '../context/LangContext'
+import { useProfile } from '../context/ProfileContext'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import Nav from '../components/Nav'
 import SectionLabel from '../components/SectionLabel'
@@ -25,6 +26,7 @@ interface Profile {
 export default function About() {
   const { theme } = useTheme()
   const { lang, t } = useLang()
+  const { profile: contextProfile } = useProfile()
   const { isMobile, isCompact } = useBreakpoint()
 
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -138,8 +140,8 @@ export default function About() {
           }}
         >
           <img
-            src="/bau.jpg"
-            alt="Bautista Zaballa"
+            src={contextProfile?.photoUrl ?? '/bau.jpg'}
+            alt={contextProfile?.name ?? ''}
             loading="lazy"
             style={{
               width: '100%',

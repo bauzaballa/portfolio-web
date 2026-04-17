@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LangContext'
+import { useProfile } from '../context/ProfileContext'
 import { useWindowWidth } from '../hooks/useBreakpoint'
 import { useConsole } from '../context/ConsoleContext'
 import ConsoleDrawer from './ConsoleDrawer'
@@ -15,6 +16,7 @@ export default function Nav() {
   const location = useLocation()
   const { isAdmin, logout } = useAuth()
   const { t } = useLang()
+  const { profile } = useProfile()
   const [adminMenuOpen, setAdminMenuOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const { consoleOpen, setConsoleOpen } = useConsole()
@@ -147,8 +149,8 @@ export default function Nav() {
                   }}
                 >
                   <img
-                    src="/bau.jpg"
-                    alt="Bautista Zaballa"
+                    src={profile?.photoUrl ?? '/bau.jpg'}
+                    alt={profile?.name ?? ''}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
                   />
                 </button>

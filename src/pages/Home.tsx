@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
 import { useLang } from '../context/LangContext'
+import { useProfile } from '../context/ProfileContext'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import { useConsole } from '../context/ConsoleContext'
 import Nav from '../components/Nav'
@@ -34,6 +35,7 @@ interface SkillGroup {
 export default function Home() {
   const { theme } = useTheme()
   const { lang, t } = useLang()
+  const { profile } = useProfile()
   const { isMobile } = useBreakpoint()
   const { consoleOpen } = useConsole()
   const navigate = useNavigate()
@@ -112,7 +114,7 @@ export default function Home() {
               color: 'var(--accent-teal)', letterSpacing: 3,
               textTransform: 'uppercase', marginBottom: 20, fontWeight: 600,
             }}>
-              {t('La Plata, AR', 'La Plata, AR')}
+              {profile?.location ?? ''}
             </div>
           </motion.div>
 
@@ -130,7 +132,7 @@ export default function Home() {
                 marginBottom: 12,
               }}
             >
-              Bautista Zaballa.
+              {profile?.name}.
             </motion.h1>
           </div>
 
@@ -295,7 +297,7 @@ export default function Home() {
             fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--text-muted)',
           }}>
-            bauzaballa@gmail.com
+            {profile?.email ?? ''}
           </span>
           <span style={{
             fontFamily: 'var(--font-mono)', fontSize: 11,
