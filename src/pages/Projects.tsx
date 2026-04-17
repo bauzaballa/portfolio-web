@@ -29,16 +29,21 @@ interface Project {
   skills?: Skill[]
 }
 
-type Filter = 'ALL' | 'FULLSTACK' | 'PERSONAL'
+const FILTER_LABELS: Record<string, { en: string; es: string }> = {
+  all:      { en: 'ALL',      es: 'TODO'     },
+  work:     { en: 'WORK',     es: 'TRABAJO'  },
+  personal: { en: 'PERSONAL', es: 'PERSONAL' },
+}
 
-const FILTERS: Filter[] = ['ALL', 'FULLSTACK', 'PERSONAL']
+function filterLabel(type: string, lang: string): string {
+  const entry = FILTER_LABELS[type]
+  if (entry) return lang === 'es' ? entry.es : entry.en
+  return type.toUpperCase()
+}
 
-function filterProjects(projects: Project[], filter: Filter): Project[] {
-  switch (filter) {
-    case 'ALL': return projects
-    case 'FULLSTACK': return projects.filter(p => p.type === 'work')
-    case 'PERSONAL': return projects.filter(p => p.type === 'personal')
-  }
+function filterProjects(projects: Project[], filter: string): Project[] {
+  if (filter === 'all') return projects
+  return projects.filter(p => p.type === filter)
 }
 
 export default function Projects() {
@@ -49,7 +54,7 @@ export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [filter, setFilter] = useState<Filter>('ALL')
+  const [filter, setFilter] = useState<string>('all')
   const [animKey, setAnimKey] = useState(0)
   const cache = useRef<Record<string, any>>({})
 
@@ -100,7 +105,7 @@ export default function Projects() {
             </div>
           )}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {FILTERS.map(f => {
+            {['all', ...Array.from(new Set(projects.map(p => p.type)))].map(f => {
               const active = filter === f
               return (
                 <button
@@ -117,7 +122,7 @@ export default function Projects() {
                     color: active ? 'var(--accent-teal)' : 'var(--text-muted)',
                   }}
                 >
-                  {f === 'ALL' ? t('ALL', 'TODO') : f}
+                  {filterLabel(f, lang)}
                 </button>
               )
             })}
