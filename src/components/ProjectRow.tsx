@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { useBreakpoint } from '../hooks/useBreakpoint'
+import { useLang } from '../context/LangContext'
 import SkillChip from './SkillChip'
 import ParticipationBar from './ParticipationBar'
+
+const TYPE_LABELS: Record<string, { en: string; es: string }> = {
+  work:     { en: 'WORK',     es: 'TRABAJO'  },
+  personal: { en: 'PERSONAL', es: 'PERSONAL' },
+}
 
 interface Project {
   slug: string
@@ -20,7 +26,9 @@ export default function ProjectRow({ project, index, onClick }: {
   onClick: () => void
 }) {
   const [hovered, setHovered] = useState(false)
+  const { lang } = useLang()
   const { isMobile, isCompact } = useBreakpoint()
+  const typeLabel = (TYPE_LABELS[project.type]?.[lang] ?? project.type).toUpperCase()
   const isSolo = project.participationFrontend === 100 && project.participationBackend === 100
   const barColor = isSolo ? 'var(--accent-warm)' : 'var(--accent-teal)'
 
@@ -54,7 +62,7 @@ export default function ProjectRow({ project, index, onClick }: {
             color: 'var(--accent-teal)', textTransform: 'uppercase',
             letterSpacing: 1,
           }}>
-            {project.type}
+            {typeLabel}
           </span>
         </div>
 
@@ -122,7 +130,7 @@ export default function ProjectRow({ project, index, onClick }: {
           color: 'var(--accent-teal)', textTransform: 'uppercase',
           letterSpacing: 1,
         }}>
-          {project.type}
+          {typeLabel}
         </span>
         <div style={{
           fontFamily: 'var(--font-serif)', fontSize: 20,
