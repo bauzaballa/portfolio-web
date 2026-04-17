@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
+import { useProfile } from '../context/ProfileContext'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import ThemeToggle from '../components/ThemeToggle'
 
@@ -149,6 +150,7 @@ function PasswordForm({ username, onCancel, onSuccess }: {
   onCancel: () => void
   onSuccess: () => void
 }) {
+  const { profile } = useProfile()
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [attempts, setAttempts] = useState(0)
@@ -240,8 +242,8 @@ function PasswordForm({ username, onCancel, onSuccess }: {
         flexShrink: 0,
       }}>
         <img
-          src="/bau.jpg"
-          alt="Bautista Zaballa"
+          src={profile?.photoUrl ?? '/bau.jpg'}
+          alt={profile?.name ?? ''}
           loading="lazy"
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
         />
@@ -302,12 +304,13 @@ function PasswordForm({ username, onCancel, onSuccess }: {
   )
 }
 
-const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME || 'bautista'
+const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME ?? ''
 
 export default function OSEntry() {
   const [selected, setSelected] = useState<string | null>(null)
   const navigate = useNavigate()
   const { login } = useAuth()
+  const { profile } = useProfile()
   const { isMobile } = useBreakpoint()
 
   const handleGuestClick = () => navigate('/home')
@@ -381,7 +384,7 @@ export default function OSEntry() {
                     border: '1.5px solid rgba(196,176,144,0.3)',
                   }}>
                     <img
-                      src="/bau.jpg"
+                      src={profile?.photoUrl ?? '/bau.jpg'}
                       alt=""
                       loading="lazy"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
