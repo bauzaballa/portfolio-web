@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import { LangProvider } from './context/LangContext'
 import { AuthProvider } from './context/AuthContext'
 import { PreviewProvider } from './context/PreviewContext'
+import { ProfileProvider } from './context/ProfileContext'
 import './index.css'
 import App from './App'
 
@@ -14,9 +15,11 @@ createRoot(document.getElementById('root')!).render(
       <PreviewProvider>
         <ThemeProvider>
           <LangProvider>
-            <AuthProvider>
-              <App />
-            </AuthProvider>
+            <ProfileProvider>
+              <AuthProvider>
+                <App />
+              </AuthProvider>
+            </ProfileProvider>
           </LangProvider>
         </ThemeProvider>
       </PreviewProvider>
