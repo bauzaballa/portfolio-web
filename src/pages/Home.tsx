@@ -126,7 +126,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
               style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: 'clamp(52px, 8vw, 128px)',
+                fontSize: 'clamp(52px, 8vw, 160px)',
                 fontWeight: 700, lineHeight: 1.05,
                 color: theme === 'dark' ? 'var(--text-primary)' : 'var(--accent-warm)',
                 marginBottom: 12,
@@ -144,7 +144,7 @@ export default function Home() {
           >
             <p style={{
               fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(18px, 2vw, 22px)',
+              fontSize: 'clamp(18px, 1.6vw, 26px)',
               color: 'var(--text-secondary)',
               fontStyle: 'italic',
             }}>
@@ -243,7 +243,7 @@ export default function Home() {
 
         {!isMobile && (
           <div style={{
-            width: 300, height: 380,
+            width: 340, height: 420,
             background: 'var(--bg-surface)',
             border: '0.5px solid var(--border)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
