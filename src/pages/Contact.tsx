@@ -12,7 +12,7 @@ export default function Contact() {
   const { profile } = useProfile()
 
   const links = [
-    { label: t('email', 'email'), value: profile?.email ?? '', href: `mailto:${profile?.email}` },
+    { label: t('email', 'email'), value: profile?.email ?? '', href: profile?.email ? `mailto:${profile.email}` : '#' },
     { label: t('github', 'github'), value: profile?.githubUrl?.split('/').pop() ?? '', href: profile?.githubUrl ?? '#' },
     { label: t('linkedin', 'linkedin'), value: profile?.linkedinUrl?.split('/').pop() ?? '', href: profile?.linkedinUrl ?? '#' },
   ]

@@ -304,14 +304,13 @@ function PasswordForm({ username, onCancel, onSuccess }: {
   )
 }
 
-const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME ?? ''
-
 export default function OSEntry() {
   const [selected, setSelected] = useState<string | null>(null)
   const navigate = useNavigate()
   const { login } = useAuth()
   const { profile } = useProfile()
   const { isMobile } = useBreakpoint()
+  const adminUsername = import.meta.env.VITE_adminUsername || profile?.name || ''
 
   const handleGuestClick = () => navigate('/home')
   const handleUserClick = (username: string) => setSelected(username)
@@ -375,7 +374,7 @@ export default function OSEntry() {
                 onClick={handleGuestClick}
               />
               <UserCard
-                name={ADMIN_USERNAME}
+                name={adminUsername}
                 avatar={
                   <div style={{
                     width: 72, height: 72,
@@ -391,7 +390,7 @@ export default function OSEntry() {
                     />
                   </div>
                 }
-                onClick={() => handleUserClick(ADMIN_USERNAME)}
+                onClick={() => handleUserClick(adminUsername)}
                 isAdmin={true}
               />
             </div>
