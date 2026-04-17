@@ -177,7 +177,7 @@ export default function About() {
         {/* Contact */}
         <div>
           <SectionLabel style={{ letterSpacing: 2, marginBottom: 12 }}>{t('contact', 'contacto')}</SectionLabel>
-          <a href={`mailto:${profile?.email}`} style={{
+          <a href={profile?.email ? `mailto:${profile.email}` : '#'} style={{
             display: 'block',
             fontFamily: 'var(--font-mono)', fontSize: 13,
             color: 'var(--accent-teal)',
