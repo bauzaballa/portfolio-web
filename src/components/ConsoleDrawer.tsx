@@ -107,6 +107,14 @@ export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrig
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [entries])
 
+  // Auto-focus input when drawer opens
+  useEffect(() => {
+    if (open) {
+      const t = setTimeout(() => inputRef.current?.focus(), 50)
+      return () => clearTimeout(t)
+    }
+  }, [open])
+
   // Lock body scroll when open on mobile/tablet
   useEffect(() => {
     if (!isDesktop) {
