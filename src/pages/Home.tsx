@@ -193,7 +193,7 @@ export default function Home() {
           }}>
             {t('selected work', 'trabajos seleccionados')}
           </h2>
-          <TextLink onClick={() => navigate('/projects')}>
+          <TextLink onClick={() => navigate('/projects')} style={{ whiteSpace: 'nowrap' }}>
             {t('view all ->', 'ver todos ->')}
           </TextLink>
         </div>
