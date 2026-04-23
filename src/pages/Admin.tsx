@@ -11,7 +11,7 @@ import './Admin.css'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
-type Section = 'overview' | 'projects' | 'experience' | 'skills' | 'profile'
+type Section = 'overview' | 'projects' | 'experience' | 'skills' | 'profile' | 'resumes'
 
 interface Project {
   id: number
@@ -74,6 +74,17 @@ interface MediaItem {
   sortOrder: number
 }
 
+interface ResumeItem {
+  id: number
+  label: string
+  description: string | null
+  fileUrl: string
+  previewUrl: string | null
+  format: string
+  fileSize: number | null
+  sortOrder: number
+}
+
 interface Profile {
   name: string
   title: string
@@ -90,7 +101,7 @@ interface Profile {
   photoUrl: string
 }
 
-const NAV_ITEMS: Section[] = ['overview', 'projects', 'experience', 'skills', 'profile']
+const NAV_ITEMS: Section[] = ['overview', 'projects', 'experience', 'skills', 'profile', 'resumes']
 
 type AuthFetch = (url: string, opts?: RequestInit) => Promise<Response>
 
@@ -107,6 +118,7 @@ export default function Admin() {
     experience: t('experience', 'experiencia'),
     skills: t('skills', 'habilidades'),
     profile: t('profile', 'perfil'),
+    resumes: t('resumes', 'curriculums'),
   }[item])
 
   useEffect(() => {
@@ -150,6 +162,7 @@ export default function Admin() {
         {section === 'experience' && <ExperienceSection authFetch={authFetch} />}
         {section === 'skills' && <SkillsSection authFetch={authFetch} />}
         {section === 'profile' && <ProfileSection authFetch={authFetch} />}
+        {section === 'resumes' && <ResumesSection authFetch={authFetch} />}
       </main>
     </div>
   )
@@ -1449,5 +1462,246 @@ function ProfileSection({ authFetch }: { authFetch: AuthFetch }) {
         </FormActions>
       </FormCard>
     </div>
+  )
+}
+
+// --- RESUMES ---
+
+const emptyResumeForm = {
+  label: '',
+  description: '',
+  fileUrl: '',
+  previewUrl: '',
+  format: 'pdf',
+  fileSize: 0,
+  sortOrder: 0,
+}
+
+const RESUME_FORMATS = ['pdf', 'docx', 'md', 'txt', 'other']
+
+function detectFormat(filename: string): string {
+  const ext = filename.split('.').pop()?.toLowerCase() ?? ''
+  return RESUME_FORMATS.includes(ext) ? ext : 'other'
+}
+
+function ResumesSection({ authFetch }: { authFetch: AuthFetch }) {
+  const { t } = useLang()
+  const { toast } = useToast()
+  const [items, setItems] = useState<ResumeItem[]>([])
+  const [adding, setAdding] = useState(false)
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [form, setForm] = useState(emptyResumeForm)
+
+  const load = useCallback(() => {
+    authFetch(`${API}/api/v1/resumes`)
+      .then(r => r.json())
+      .then(d => setItems(d.data ?? []))
+      .catch(() => toast(t('failed to load resumes.', 'error al cargar curriculums.'), 'error'))
+  }, [authFetch, t, toast])
+
+  useEffect(() => { load() }, [load])
+
+  const save = async () => {
+    try {
+      const body = JSON.stringify(form)
+      if (editingId) {
+        await authFetch(`${API}/api/v1/resumes/${editingId}`, { method: 'PATCH', body })
+      } else {
+        await authFetch(`${API}/api/v1/resumes`, { method: 'POST', body })
+      }
+      toast(t(editingId ? 'resume updated.' : 'resume added.', editingId ? 'curriculum actualizado.' : 'curriculum agregado.'))
+      setEditingId(null)
+      setAdding(false)
+      setForm(emptyResumeForm)
+      load()
+    } catch {
+      toast(t('failed to save resume.', 'error al guardar curriculum.'), 'error')
+    }
+  }
+
+  const remove = async (id: number) => {
+    if (!confirm('Delete this resume?')) return
+    try {
+      await authFetch(`${API}/api/v1/resumes/${id}`, { method: 'DELETE' })
+      toast(t('resume deleted.', 'curriculum eliminado.'))
+      load()
+    } catch {
+      toast(t('failed to delete resume.', 'error al eliminar curriculum.'), 'error')
+    }
+  }
+
+  const startEdit = (r: ResumeItem) => {
+    setAdding(false)
+    setEditingId(r.id)
+    setForm({
+      label: r.label,
+      description: r.description ?? '',
+      fileUrl: r.fileUrl,
+      previewUrl: r.previewUrl ?? '',
+      format: r.format,
+      fileSize: r.fileSize ?? 0,
+      sortOrder: r.sortOrder,
+    })
+  }
+
+  const cancel = () => { setEditingId(null); setAdding(false); setForm(emptyResumeForm) }
+  const set = (k: string, v: string | number) => setForm(f => ({ ...f, [k]: v }))
+
+  return (
+    <div>
+      <SectionHeader title={t('resumes', 'curriculums')} subtitle="MANAGE RESUMES" />
+
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>{t('label', 'etiqueta')}</th>
+              <th>{t('format', 'formato')}</th>
+              <th>{t('size', 'tamaño')}</th>
+              <th>{t('order', 'orden')}</th>
+              <th>{t('actions', 'acciones')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map(r => (
+              <React.Fragment key={r.id}>
+                <tr>
+                  <td>
+                    <div style={{ fontFamily: 'var(--font-serif)' }}>{r.label}</div>
+                    {r.description && (
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                        {r.description}
+                      </div>
+                    )}
+                  </td>
+                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}>{r.format.toUpperCase()}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}>
+                    {r.fileSize ? `${Math.round(r.fileSize / 1024)} KB` : '-'}
+                  </td>
+                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}>#{r.sortOrder}</td>
+                  <td>
+                    <EditAction onClick={() => startEdit(r)}>{t('edit', 'editar')}</EditAction>
+                    <DeleteAction onClick={() => remove(r.id)}>{t('delete', 'eliminar')}</DeleteAction>
+                  </td>
+                </tr>
+                {editingId === r.id && (
+                  <tr>
+                    <td colSpan={5}>
+                      <ResumeForm form={form} set={set} onSave={save} onCancel={cancel} t={t} />
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {adding && <ResumeForm form={form} set={set} onSave={save} onCancel={cancel} t={t} />}
+
+      {!adding && !editingId && (
+        <AddButton onClick={() => { setEditingId(null); setForm(emptyResumeForm); setAdding(true) }}>
+          {t('+ add resume', '+ agregar curriculum')}
+        </AddButton>
+      )}
+    </div>
+  )
+}
+
+function ResumeForm({
+  form, set, onSave, onCancel, t,
+}: {
+  form: typeof emptyResumeForm
+  set: (k: string, v: string | number) => void
+  onSave: () => void
+  onCancel: () => void
+  t: (en: string, es: string) => string
+}) {
+  const [uploading, setUploading] = React.useState(false)
+  const fileRef = React.useRef<HTMLInputElement>(null)
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const data = new FormData()
+      data.append('file', file)
+      data.append('upload_preset', 'portfolio')
+      const res = await fetch('https://api.cloudinary.com/v1_1/djepapcu1/upload', { method: 'POST', body: data })
+      const json = await res.json()
+      const url = json.secure_url as string
+      const format = detectFormat(file.name)
+      set('fileUrl', url)
+      set('format', format)
+      set('fileSize', file.size)
+      if (format === 'pdf') {
+        set('previewUrl', url.replace(/\.pdf$/i, '.jpg'))
+      } else {
+        set('previewUrl', '')
+      }
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <FormCard>
+      <FormGrid>
+        <AdminInput label={t('Label', 'Etiqueta')} value={form.label} onChange={v => set('label', String(v))} placeholder="Full CV" />
+        <AdminInput label={t('Description', 'Descripción')} value={form.description} onChange={v => set('description', String(v))} placeholder={t('optional', 'opcional')} />
+      </FormGrid>
+
+      <FormDivider />
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <input ref={fileRef} type="file" accept=".pdf,.docx,.md,.txt" onChange={handleFile} style={{ display: 'none' }} />
+        <button
+          className="admin-btn admin-btn--primary"
+          disabled={uploading}
+          onClick={() => fileRef.current?.click()}
+        >
+          {uploading ? t('uploading...', 'subiendo...') : t('choose file', 'elegir archivo')}
+        </button>
+        {form.fileUrl && (
+          <a href={form.fileUrl} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-teal)' }}>
+            {form.fileUrl.split('/').pop()}
+          </a>
+        )}
+      </div>
+
+      <FormGrid>
+        <AdminInput label="File URL" value={form.fileUrl} onChange={v => set('fileUrl', String(v))} placeholder="https://..." />
+        <AdminInput label={t('Preview URL', 'URL previsualización')} value={form.previewUrl} onChange={v => set('previewUrl', String(v))} placeholder={t('optional', 'opcional')} />
+      </FormGrid>
+
+      <FormGrid>
+        <AdminSelect
+          label={t('Format', 'Formato')}
+          value={form.format}
+          onChange={v => set('format', v)}
+          options={RESUME_FORMATS.map(f => ({ value: f, label: f }))}
+        />
+        <AdminInput
+          label={t('Size (bytes)', 'Tamaño (bytes)')}
+          type="number"
+          min={0}
+          value={form.fileSize}
+          onChange={v => set('fileSize', Number(v))}
+        />
+        <AdminInput
+          label={t('Order', 'Orden')}
+          type="number"
+          min={0}
+          value={form.sortOrder}
+          onChange={v => set('sortOrder', Number(v))}
+        />
+      </FormGrid>
+
+      <FormActions>
+        <PrimaryButton onClick={onSave}>{t('save', 'guardar')}</PrimaryButton>
+        <CancelButton onClick={onCancel}>{t('cancel', 'cancelar')}</CancelButton>
+      </FormActions>
+    </FormCard>
   )
 }

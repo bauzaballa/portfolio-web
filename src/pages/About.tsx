@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+import { createPortal } from 'react-dom'
 import { useTheme } from '../context/ThemeContext'
 import { useLang } from '../context/LangContext'
 import { useProfile } from '../context/ProfileContext'
@@ -23,6 +24,24 @@ interface Profile {
   linkedinUrl?: string
 }
 
+interface Resume {
+  id: number
+  label: string
+  description: string | null
+  fileUrl: string
+  previewUrl: string | null
+  format: string
+  fileSize: number | null
+  sortOrder: number
+}
+
+function formatBytes(bytes: number | null): string {
+  if (!bytes) return ''
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
 export default function About() {
   const { theme } = useTheme()
   const { lang, t } = useLang()
@@ -30,6 +49,7 @@ export default function About() {
   const { isMobile, isCompact } = useBreakpoint()
 
   const [profile, setProfile] = useState<Profile | null>(null)
+  const [resumes, setResumes] = useState<Resume[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const cache = useRef<Record<string, any>>({})
@@ -51,6 +71,13 @@ export default function About() {
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [lang])
+
+  useEffect(() => {
+    fetch(`${API}/api/v1/resumes`)
+      .then(r => r.json())
+      .then(data => setResumes(data.data ?? []))
+      .catch(() => {})
+  }, [])
 
   if (loading) {
     return (
@@ -208,64 +235,219 @@ export default function About() {
         </div>
       </section>
 
-      {/* ANALOG PHOTOS SECTION */}
-      <section style={{ padding: isMobile ? '40px 6vw' : '60px 8vw', borderBottom: '0.5px solid var(--border)' }}>
-        <div>
-          <div style={{
-            fontFamily: 'var(--font-serif)', fontSize: 28,
-            color: 'var(--text-primary)',
-          }}>
-            {t('analog.', 'analógico.')}
+      {/* RESUMES SECTION */}
+      {resumes.length > 0 && (
+        <section style={{ padding: isMobile ? '40px 6vw' : '60px 8vw', borderBottom: '0.5px solid var(--border)' }}>
+          <div>
+            <div style={{
+              fontFamily: 'var(--font-serif)', fontSize: 28,
+              color: 'var(--text-primary)',
+            }}>
+              {t('resumes.', 'curriculums.')}
+            </div>
+            <div style={{
+              fontFamily: 'var(--font-serif)', fontSize: 18,
+              color: 'var(--text-secondary)', fontStyle: 'italic',
+              marginTop: 4,
+            }}>
+              {t('pick a format.', 'elegí un formato.')}
+            </div>
           </div>
-          <div style={{
-            fontFamily: 'var(--font-serif)', fontSize: 18,
-            color: 'var(--text-secondary)', fontStyle: 'italic',
-            marginTop: 4,
-          }}>
-            {t('some frames.', 'algunos fotogramas.')}
-          </div>
-        </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-          gap: isMobile ? 12 : 16,
-          marginTop: isMobile ? 24 : 40,
-        }}>
-          {(['Portra 400', 'Gold 200', 'Vision 250D'] as const).map(film => (
-            <PhotoCell key={film} film={film} />
-          ))}
-        </div>
-      </section>
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: isMobile ? 16 : 24,
+            marginTop: isMobile ? 24 : 40,
+          }}>
+            {resumes.map(r => (
+              <ResumeCell key={r.id} resume={r} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
 
-function PhotoCell({ film }: { film: string }) {
+function ResumeCell({ resume }: { resume: Resume }) {
   const [hovered, setHovered] = useState(false)
+  const [open, setOpen] = useState(false)
+  const { t } = useLang()
+  const isPdf = resume.format.toLowerCase() === 'pdf'
 
   return (
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        aspectRatio: '3 / 4',
-        background: 'var(--bg-surface)',
-        border: `0.5px solid ${hovered ? 'var(--accent-teal)' : 'var(--border)'}`,
-        borderRadius: 2,
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        transition: 'border-color 0.2s ease',
-        cursor: 'default',
+        flexDirection: 'column',
+        gap: 10,
+        width: 300,
       }}
     >
-      <span style={{
-        fontFamily: 'var(--font-mono)', fontSize: 11,
-        color: 'var(--text-muted)',
-      }}>
-        {film}
-      </span>
+      <div
+        onClick={() => isPdf && setOpen(true)}
+        style={{
+          height: 400,
+          aspectRatio: '3 / 4',
+          background: 'var(--bg-surface)',
+          border: `0.5px solid ${hovered ? 'var(--accent-teal)' : 'var(--border)'}`,
+          borderRadius: 2,
+          overflow: 'hidden',
+          position: 'relative',
+          transition: 'border-color 0.2s ease',
+          cursor: isPdf ? 'zoom-in' : 'default',
+        }}>
+        {resume.previewUrl ? (
+          <img
+            src={resume.previewUrl}
+            alt={resume.label}
+            loading="lazy"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center top',
+              display: 'block',
+            }}
+          />
+        ) : (
+          <div style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: 'var(--font-mono)',
+            fontSize: 32,
+            color: 'var(--text-muted)',
+            letterSpacing: 2,
+          }}>
+            {resume.format.toUpperCase()}
+          </div>
+        )}
+        <div style={{
+          position: 'absolute',
+          top: 8, left: 8,
+          padding: '2px 6px',
+          background: 'var(--bg)',
+          border: '0.5px solid var(--border)',
+          fontFamily: 'var(--font-mono)',
+          fontSize: 10,
+          color: 'var(--text-secondary)',
+          letterSpacing: 1,
+        }}>
+          {resume.format.toUpperCase()}
+        </div>
+      </div>
+
+      <div>
+        <div style={{
+          fontFamily: 'var(--font-serif)', fontSize: 16,
+          color: 'var(--text-primary)',
+        }}>
+          {resume.label}
+        </div>
+        {resume.description && (
+          <div style={{
+            fontFamily: 'var(--font-serif)', fontSize: 13,
+            color: 'var(--text-secondary)', fontStyle: 'italic',
+            marginTop: 2,
+          }}>
+            {resume.description}
+          </div>
+        )}
+        {resume.fileSize && (
+          <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: 10,
+            color: 'var(--text-muted)', letterSpacing: 1,
+            marginTop: 6,
+          }}>
+            {formatBytes(resume.fileSize)}
+          </div>
+        )}
+      </div>
+
+      <a
+        href={resume.fileUrl}
+        download
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          fontFamily: 'var(--font-mono)', fontSize: 12,
+          color: 'var(--accent-teal)',
+          textDecoration: 'none',
+          marginTop: 2,
+        }}
+      >
+        {t('download ->', 'descargar ->')}
+      </a>
+
+      <AnimatePresence>
+        {open && <ResumeLightbox resume={resume} onClose={() => setOpen(false)} />}
+      </AnimatePresence>
     </div>
+  )
+}
+
+function ResumeLightbox({ resume, onClose }: { resume: Resume; onClose: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  return createPortal(
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        background: 'rgba(0,0,0,0.92)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}
+    >
+      <button
+        onClick={onClose}
+        style={{
+          position: 'absolute', top: 20, right: 24,
+          background: 'none', border: 'none', cursor: 'pointer',
+          color: 'rgba(255,255,255,0.6)', fontSize: 24, lineHeight: 1,
+          fontFamily: 'var(--font-mono)',
+        }}
+      >
+        x
+      </button>
+
+      <iframe
+        src={resume.fileUrl}
+        title={resume.label}
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: 'min(90vw, 900px)',
+          height: '90vh',
+          border: '0.5px solid rgba(255,255,255,0.15)',
+          borderRadius: 2,
+          background: 'var(--bg)',
+        }}
+      />
+
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          position: 'absolute', bottom: 24,
+          fontFamily: 'var(--font-mono)', fontSize: 11,
+          color: 'rgba(255,255,255,0.45)',
+        }}
+      >
+        {resume.label}
+      </div>
+    </motion.div>,
+    document.body
   )
 }
