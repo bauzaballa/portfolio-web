@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+import { createPortal } from 'react-dom'
 import { useTheme } from '../context/ThemeContext'
 import { useLang } from '../context/LangContext'
 import { useProfile } from '../context/ProfileContext'
@@ -254,9 +255,9 @@ export default function About() {
           </div>
 
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : `repeat(${Math.min(resumes.length, 4)}, 1fr)`,
-            gap: isMobile ? 12 : 16,
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: isMobile ? 16 : 24,
             marginTop: isMobile ? 24 : 40,
           }}>
             {resumes.map(r => (
@@ -271,7 +272,9 @@ export default function About() {
 
 function ResumeCell({ resume }: { resume: Resume }) {
   const [hovered, setHovered] = useState(false)
+  const [open, setOpen] = useState(false)
   const { t } = useLang()
+  const isPdf = resume.format.toLowerCase() === 'pdf'
 
   return (
     <div
@@ -281,17 +284,22 @@ function ResumeCell({ resume }: { resume: Resume }) {
         display: 'flex',
         flexDirection: 'column',
         gap: 10,
+        width: 300,
       }}
     >
-      <div style={{
-        aspectRatio: '3 / 4',
-        background: 'var(--bg-surface)',
-        border: `0.5px solid ${hovered ? 'var(--accent-teal)' : 'var(--border)'}`,
-        borderRadius: 2,
-        overflow: 'hidden',
-        position: 'relative',
-        transition: 'border-color 0.2s ease',
-      }}>
+      <div
+        onClick={() => isPdf && setOpen(true)}
+        style={{
+          height: 400,
+          aspectRatio: '3 / 4',
+          background: 'var(--bg-surface)',
+          border: `0.5px solid ${hovered ? 'var(--accent-teal)' : 'var(--border)'}`,
+          borderRadius: 2,
+          overflow: 'hidden',
+          position: 'relative',
+          transition: 'border-color 0.2s ease',
+          cursor: isPdf ? 'zoom-in' : 'default',
+        }}>
         {resume.previewUrl ? (
           <img
             src={resume.previewUrl}
@@ -376,6 +384,70 @@ function ResumeCell({ resume }: { resume: Resume }) {
       >
         {t('download ->', 'descargar ->')}
       </a>
+
+      <AnimatePresence>
+        {open && <ResumeLightbox resume={resume} onClose={() => setOpen(false)} />}
+      </AnimatePresence>
     </div>
+  )
+}
+
+function ResumeLightbox({ resume, onClose }: { resume: Resume; onClose: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  return createPortal(
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        background: 'rgba(0,0,0,0.92)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}
+    >
+      <button
+        onClick={onClose}
+        style={{
+          position: 'absolute', top: 20, right: 24,
+          background: 'none', border: 'none', cursor: 'pointer',
+          color: 'rgba(255,255,255,0.6)', fontSize: 24, lineHeight: 1,
+          fontFamily: 'var(--font-mono)',
+        }}
+      >
+        x
+      </button>
+
+      <iframe
+        src={resume.fileUrl}
+        title={resume.label}
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: 'min(90vw, 900px)',
+          height: '90vh',
+          border: '0.5px solid rgba(255,255,255,0.15)',
+          borderRadius: 2,
+          background: 'var(--bg)',
+        }}
+      />
+
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          position: 'absolute', bottom: 24,
+          fontFamily: 'var(--font-mono)', fontSize: 11,
+          color: 'rgba(255,255,255,0.45)',
+        }}
+      >
+        {resume.label}
+      </div>
+    </motion.div>,
+    document.body
   )
 }
