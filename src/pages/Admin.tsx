@@ -2,9 +2,10 @@ import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LangContext'
-import { AdminInput, AdminSelect, AdminTextarea, AdminToggle } from '../components/admin/FormField'
+import { AdminInput, AdminSelect, AdminToggle, BilingualInput, BilingualTextarea } from '../components/admin/FormField'
 import { FormCard, FormGrid, FormGroupLabel, FormDivider, FormActions } from '../components/admin/FormCard'
 import { EditAction, DeleteAction, PrimaryButton, CancelButton, AddButton } from '../components/admin/AdminActions'
+import ThemeToggle from '../components/ThemeToggle'
 import { useToast } from '../context/ToastContext'
 import './Admin.css'
 
@@ -16,14 +17,26 @@ interface Project {
   id: number
   slug: string
   title: string
+  titleEs: string | null
   descriptionShort: string
+  descriptionShortEs: string | null
+  descriptionLong: string | null
+  descriptionLongEs: string | null
+  technicalDecisions: string | null
+  technicalDecisionsEs: string | null
+  challenges: string[] | null
+  challengesEs: string[] | null
   type: string
   visibility: string
   company: string | null
   role: string | null
+  roleEs: string | null
+  teamSize: number | null
   participationFrontend: number | null
   participationBackend: number | null
   participationDesign: number | null
+  periodStart: string | null
+  periodEnd: string | null
   isFeatured: boolean
   repoUrls: string[] | null
   liveUrl: string | null
@@ -43,10 +56,12 @@ interface Experience {
   id: number
   company: string
   role: string
+  roleEs: string | null
   startDate: string
   endDate: string | null
   isCurrent: boolean
   description: string
+  descriptionEs: string | null
   stack: string[]
   sortOrder: number
 }
@@ -62,8 +77,11 @@ interface MediaItem {
 interface Profile {
   name: string
   title: string
+  titleEs: string
   bioShort: string
+  bioShortEs: string
   bioLong: string
+  bioLongEs: string
   location: string
   email: string
   phone: string
@@ -192,6 +210,9 @@ function AdminHeader({
       </div>
 
       <div className="admin-header__actions">
+        <div className="admin-header__theme">
+          <ThemeToggle />
+        </div>
         <button
           className="admin-header__btn admin-header__btn--site"
           onClick={() => onNavigate('/home')}
@@ -297,14 +318,21 @@ function OverviewSection({ authFetch, onNavigate }: { authFetch: AuthFetch; onNa
 // --- PROJECTS ---
 
 const emptyProject = {
-  title: '', slug: '', descriptionShort: '', type: 'work',
-  visibility: 'public', company: '', role: '',
+  title: '', titleEs: '', slug: '',
+  descriptionShort: '', descriptionShortEs: '',
+  descriptionLong: '', descriptionLongEs: '',
+  technicalDecisions: '', technicalDecisionsEs: '',
+  challenges: '', challengesEs: '',
+  type: 'work', visibility: 'public',
+  company: '', role: '', roleEs: '',
+  teamSize: 0,
   participationFrontend: 0, participationBackend: 0, participationDesign: 0,
+  periodStart: '', periodEnd: '',
   isFeatured: false, repoUrls: '', liveUrl: '', sortOrder: 0,
 }
 
 function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
-  const { lang, t } = useLang()
+  const { t } = useLang()
   const { toast } = useToast()
   const [projects, setProjects] = useState<Project[]>([])
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -312,20 +340,48 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
   const [form, setForm] = useState(emptyProject)
 
   const load = useCallback(() => {
-    authFetch(`${API}/api/v1/projects?lang=${lang}`).then(r => r.json()).then(d => {
+    authFetch(`${API}/api/v1/projects`).then(r => r.json()).then(d => {
       setProjects(d.data ?? d)
     }).catch(() => toast(t('failed to load projects.', 'error al cargar proyectos.'), 'error'))
-  }, [authFetch, lang])
+  }, [authFetch])
 
   useEffect(() => { load() }, [load])
 
   const save = async () => {
     try {
+      const splitLines = (s: string) =>
+        s.split('\n').map(line => line.trim()).filter(Boolean)
+      const emptyToNull = (s: string) => (s.trim() === '' ? null : s)
+
       const payload = {
-        ...form,
+        title: form.title,
+        titleEs: emptyToNull(form.titleEs),
+        slug: form.slug,
+        descriptionShort: form.descriptionShort,
+        descriptionShortEs: emptyToNull(form.descriptionShortEs),
+        descriptionLong: emptyToNull(form.descriptionLong),
+        descriptionLongEs: emptyToNull(form.descriptionLongEs),
+        technicalDecisions: emptyToNull(form.technicalDecisions),
+        technicalDecisionsEs: emptyToNull(form.technicalDecisionsEs),
+        challenges: form.challenges ? splitLines(form.challenges) : [],
+        challengesEs: form.challengesEs ? splitLines(form.challengesEs) : [],
+        type: form.type,
+        visibility: form.visibility,
+        company: form.company || null,
+        role: form.role || null,
+        roleEs: emptyToNull(form.roleEs),
+        teamSize: form.teamSize || null,
+        participationFrontend: form.participationFrontend,
+        participationBackend: form.participationBackend,
+        participationDesign: form.participationDesign,
+        periodStart: form.periodStart || null,
+        periodEnd: form.periodEnd || null,
+        isFeatured: form.isFeatured,
         repoUrls: form.repoUrls
           ? form.repoUrls.split(',').map((s: string) => s.trim()).filter(Boolean)
           : [],
+        liveUrl: form.liveUrl || null,
+        sortOrder: form.sortOrder,
       }
       const body = JSON.stringify(payload)
       if (editingId) {
@@ -374,14 +430,32 @@ function ProjectsSection({ authFetch }: { authFetch: AuthFetch }) {
     setAdding(false)
     setEditingId(p.id)
     setForm({
-      title: p.title, slug: p.slug, descriptionShort: p.descriptionShort,
-      type: p.type, visibility: p.visibility, company: p.company ?? '',
+      title: p.title,
+      titleEs: p.titleEs ?? '',
+      slug: p.slug,
+      descriptionShort: p.descriptionShort,
+      descriptionShortEs: p.descriptionShortEs ?? '',
+      descriptionLong: p.descriptionLong ?? '',
+      descriptionLongEs: p.descriptionLongEs ?? '',
+      technicalDecisions: p.technicalDecisions ?? '',
+      technicalDecisionsEs: p.technicalDecisionsEs ?? '',
+      challenges: p.challenges ? p.challenges.join('\n') : '',
+      challengesEs: p.challengesEs ? p.challengesEs.join('\n') : '',
+      type: p.type,
+      visibility: p.visibility,
+      company: p.company ?? '',
       role: p.role ?? '',
+      roleEs: p.roleEs ?? '',
+      teamSize: p.teamSize ?? 0,
       participationFrontend: p.participationFrontend ?? 0,
       participationBackend: p.participationBackend ?? 0,
       participationDesign: p.participationDesign ?? 0,
-      isFeatured: p.isFeatured, repoUrls: p.repoUrls ? p.repoUrls.join(', ') : '',
-      liveUrl: p.liveUrl ?? '', sortOrder: p.sortOrder,
+      periodStart: p.periodStart ?? '',
+      periodEnd: p.periodEnd ?? '',
+      isFeatured: p.isFeatured,
+      repoUrls: p.repoUrls ? p.repoUrls.join(', ') : '',
+      liveUrl: p.liveUrl ?? '',
+      sortOrder: p.sortOrder,
     })
   }
 
@@ -474,9 +548,23 @@ function ProjectForm({
     <FormCard>
       <FormGroupLabel>{t('General', 'General')}</FormGroupLabel>
       <FormGrid>
-        <AdminInput label={t('Title', 'Titulo')} value={form.title} onChange={v => set('title', v)} />
+        <BilingualInput
+          labelEn="Title (EN)"
+          labelEs="Titulo (ES)"
+          valueEn={form.title}
+          valueEs={form.titleEs}
+          onChangeEn={v => set('title', v)}
+          onChangeEs={v => set('titleEs', v)}
+        />
         <AdminInput label="Slug" value={form.slug} onChange={v => set('slug', v)} />
-        <AdminInput label={t('Description', 'Descripcion')} value={form.descriptionShort} onChange={v => set('descriptionShort', v)} className="admin-form-card__grid--full" />
+        <BilingualInput
+          labelEn="Description (EN)"
+          labelEs="Descripcion (ES)"
+          valueEn={form.descriptionShort}
+          valueEs={form.descriptionShortEs}
+          onChangeEn={v => set('descriptionShort', v)}
+          onChangeEs={v => set('descriptionShortEs', v)}
+        />
         <AdminSelect
           label={t('Type', 'Tipo')}
           value={form.type}
@@ -499,7 +587,22 @@ function ProjectForm({
       <FormGroupLabel>{t('Team', 'Equipo')}</FormGroupLabel>
       <FormGrid>
         <AdminInput label={t('Company', 'Empresa')} value={form.company} onChange={v => set('company', v)} />
-        <AdminInput label={t('Role', 'Rol')} value={form.role} onChange={v => set('role', v)} />
+        <BilingualInput
+          labelEn="Role (EN)"
+          labelEs="Rol (ES)"
+          valueEn={form.role}
+          valueEs={form.roleEs}
+          onChangeEn={v => set('role', v)}
+          onChangeEs={v => set('roleEs', v)}
+        />
+        <AdminInput label={t('Team Size', 'Tamano equipo')} type="number" min={0} value={form.teamSize} onChange={v => set('teamSize', v)} />
+      </FormGrid>
+
+      <FormDivider />
+      <FormGroupLabel>{t('Period', 'Periodo')}</FormGroupLabel>
+      <FormGrid>
+        <AdminInput label={t('Start Date', 'Fecha inicio')} value={form.periodStart} onChange={v => set('periodStart', v)} placeholder="YYYY-MM-DD" />
+        <AdminInput label={t('End Date', 'Fecha fin')} value={form.periodEnd} onChange={v => set('periodEnd', v)} placeholder="YYYY-MM-DD" />
       </FormGrid>
 
       <FormDivider />
@@ -509,6 +612,38 @@ function ProjectForm({
         <AdminInput label="Backend %" type="number" min={0} max={100} value={form.participationBackend} onChange={v => set('participationBackend', v)} />
         <AdminInput label="Design %" type="number" min={0} max={100} value={form.participationDesign} onChange={v => set('participationDesign', v)} />
         <AdminInput label={t('Sort Order', 'Orden')} type="number" value={form.sortOrder} onChange={v => set('sortOrder', v)} />
+      </FormGrid>
+
+      <FormDivider />
+      <FormGroupLabel>{t('Long-form', 'Texto largo')}</FormGroupLabel>
+      <FormGrid>
+        <BilingualTextarea
+          labelEn="Long Description (EN)"
+          labelEs="Descripcion larga (ES)"
+          valueEn={form.descriptionLong}
+          valueEs={form.descriptionLongEs}
+          onChangeEn={v => set('descriptionLong', v)}
+          onChangeEs={v => set('descriptionLongEs', v)}
+          rows={4}
+        />
+        <BilingualTextarea
+          labelEn="Technical Decisions (EN)"
+          labelEs="Decisiones tecnicas (ES)"
+          valueEn={form.technicalDecisions}
+          valueEs={form.technicalDecisionsEs}
+          onChangeEn={v => set('technicalDecisions', v)}
+          onChangeEs={v => set('technicalDecisionsEs', v)}
+          rows={4}
+        />
+        <BilingualTextarea
+          labelEn="Challenges (EN, one per line)"
+          labelEs="Desafios (ES, uno por linea)"
+          valueEn={form.challenges}
+          valueEs={form.challengesEs}
+          onChangeEn={v => set('challenges', v)}
+          onChangeEs={v => set('challengesEs', v)}
+          rows={4}
+        />
       </FormGrid>
 
       <FormDivider />
@@ -923,12 +1058,15 @@ function SkillForm({
 // --- EXPERIENCE ---
 
 const emptyExperience = {
-  company: '', role: '', startDate: '', endDate: '',
-  isCurrent: false, description: '', stack: '', sortOrder: 0,
+  company: '', role: '', roleEs: '',
+  startDate: '', endDate: '',
+  isCurrent: false,
+  description: '', descriptionEs: '',
+  stack: '', sortOrder: 0,
 }
 
 function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
-  const { lang, t } = useLang()
+  const { t } = useLang()
   const { toast } = useToast()
   const [items, setItems] = useState<Experience[]>([])
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -936,19 +1074,27 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
   const [form, setForm] = useState(emptyExperience)
 
   const load = useCallback(() => {
-    authFetch(`${API}/api/v1/experience?lang=${lang}`).then(r => r.json()).then(d => {
+    authFetch(`${API}/api/v1/experience`).then(r => r.json()).then(d => {
       setItems(d.data ?? d)
     }).catch(() => toast(t('failed to load positions.', 'error al cargar puestos.'), 'error'))
-  }, [authFetch, lang])
+  }, [authFetch])
 
   useEffect(() => { load() }, [load])
 
   const save = async () => {
     try {
+      const emptyToNull = (s: string) => (s.trim() === '' ? null : s)
       const payload = {
-        ...form,
-        endDate: form.isCurrent ? null : form.endDate,
+        company: form.company,
+        role: form.role,
+        roleEs: emptyToNull(form.roleEs),
+        startDate: form.startDate,
+        endDate: form.isCurrent ? null : (form.endDate || null),
+        isCurrent: form.isCurrent,
+        description: form.description,
+        descriptionEs: emptyToNull(form.descriptionEs),
         stack: form.stack.split(',').map(s => s.trim()).filter(Boolean),
+        sortOrder: form.sortOrder,
       }
       const body = JSON.stringify(payload)
       if (editingId) {
@@ -981,9 +1127,16 @@ function ExperienceSection({ authFetch }: { authFetch: AuthFetch }) {
     setAdding(false)
     setEditingId(e.id)
     setForm({
-      company: e.company, role: e.role, startDate: e.startDate,
-      endDate: e.endDate ?? '', isCurrent: e.isCurrent,
-      description: e.description, stack: e.stack.join(', '), sortOrder: e.sortOrder,
+      company: e.company,
+      role: e.role,
+      roleEs: e.roleEs ?? '',
+      startDate: e.startDate,
+      endDate: e.endDate ?? '',
+      isCurrent: e.isCurrent,
+      description: e.description,
+      descriptionEs: e.descriptionEs ?? '',
+      stack: e.stack.join(', '),
+      sortOrder: e.sortOrder,
     })
   }
 
@@ -1067,7 +1220,14 @@ function ExperienceForm({
       <FormGroupLabel>{t('Position', 'Puesto')}</FormGroupLabel>
       <FormGrid>
         <AdminInput label={t('Company', 'Empresa')} value={form.company} onChange={v => set('company', v)} />
-        <AdminInput label={t('Role', 'Rol')} value={form.role} onChange={v => set('role', v)} />
+        <BilingualInput
+          labelEn="Role (EN)"
+          labelEs="Rol (ES)"
+          valueEn={form.role}
+          valueEs={form.roleEs}
+          onChangeEn={v => set('role', v)}
+          onChangeEs={v => set('roleEs', v)}
+        />
       </FormGrid>
 
       <FormDivider />
@@ -1082,7 +1242,15 @@ function ExperienceForm({
       <FormDivider />
       <FormGroupLabel>{t('Details', 'Detalles')}</FormGroupLabel>
       <FormGrid>
-        <AdminTextarea label={t('Description', 'Descripcion')} value={form.description} onChange={v => set('description', v)} className="admin-form-card__grid--full" />
+        <BilingualTextarea
+          labelEn="Description (EN)"
+          labelEs="Descripcion (ES)"
+          valueEn={form.description}
+          valueEs={form.descriptionEs}
+          onChangeEn={v => set('description', v)}
+          onChangeEs={v => set('descriptionEs', v)}
+          rows={4}
+        />
         <AdminInput label={t('Stack (comma-separated)', 'Stack (separado por comas)')} value={form.stack} onChange={v => set('stack', v)} className="admin-form-card__grid--full" />
       </FormGrid>
 
@@ -1097,30 +1265,46 @@ function ExperienceForm({
 // --- PROFILE ---
 
 const emptyProfile: Profile = {
-  name: '', title: '', bioShort: '', bioLong: '',
+  name: '',
+  title: '', titleEs: '',
+  bioShort: '', bioShortEs: '',
+  bioLong: '', bioLongEs: '',
   location: '', email: '', phone: '',
   githubUrl: '', linkedinUrl: '', photoUrl: '',
 }
 
 function ProfileSection({ authFetch }: { authFetch: AuthFetch }) {
-  const { lang, t } = useLang()
+  const { t } = useLang()
   const { toast } = useToast()
   const [form, setForm] = useState<Profile>(emptyProfile)
 
   useEffect(() => {
-    authFetch(`${API}/api/v1/profile?lang=${lang}`).then(r => r.json()).then(d => {
+    authFetch(`${API}/api/v1/profile`).then(r => r.json()).then(d => {
       const data = d.data ?? d
-      setForm({ ...emptyProfile, ...data })
+      setForm({
+        ...emptyProfile,
+        ...data,
+        titleEs: data?.titleEs ?? '',
+        bioShortEs: data?.bioShortEs ?? '',
+        bioLongEs: data?.bioLongEs ?? '',
+      })
     }).catch(() => toast(t('failed to load profile.', 'error al cargar perfil.'), 'error'))
-  }, [authFetch, lang])
+  }, [authFetch])
 
   const set = (k: keyof Profile, v: string) => setForm(f => ({ ...f, [k]: v }))
 
   const save = async () => {
     try {
+      const emptyToNull = (s: string) => (s.trim() === '' ? null : s)
+      const payload = {
+        ...form,
+        titleEs: emptyToNull(form.titleEs),
+        bioShortEs: emptyToNull(form.bioShortEs),
+        bioLongEs: emptyToNull(form.bioLongEs),
+      }
       await authFetch(`${API}/api/v1/profile`, {
         method: 'PATCH',
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       })
       toast(t('profile saved.', 'perfil guardado.'))
     } catch {
@@ -1136,9 +1320,31 @@ function ProfileSection({ authFetch }: { authFetch: AuthFetch }) {
         <FormGroupLabel>{t('Identity', 'Identidad')}</FormGroupLabel>
         <FormGrid>
           <AdminInput label={t('Name', 'Nombre')} value={form.name} onChange={v => set('name', String(v))} />
-          <AdminInput label={t('Title', 'Titulo')} value={form.title} onChange={v => set('title', String(v))} />
-          <AdminInput label={t('Short Bio', 'Bio corta')} value={form.bioShort} onChange={v => set('bioShort', String(v))} className="admin-form-card__grid--full" />
-          <AdminTextarea label={t('Long Bio', 'Bio larga')} value={form.bioLong} onChange={v => set('bioLong', v)} rows={4} className="admin-form-card__grid--full" />
+          <BilingualInput
+            labelEn="Title (EN)"
+            labelEs="Titulo (ES)"
+            valueEn={form.title}
+            valueEs={form.titleEs}
+            onChangeEn={v => set('title', v)}
+            onChangeEs={v => set('titleEs', v)}
+          />
+          <BilingualInput
+            labelEn="Short Bio (EN)"
+            labelEs="Bio corta (ES)"
+            valueEn={form.bioShort}
+            valueEs={form.bioShortEs}
+            onChangeEn={v => set('bioShort', v)}
+            onChangeEs={v => set('bioShortEs', v)}
+          />
+          <BilingualTextarea
+            labelEn="Long Bio (EN)"
+            labelEs="Bio larga (ES)"
+            valueEn={form.bioLong}
+            valueEs={form.bioLongEs}
+            onChangeEn={v => set('bioLong', v)}
+            onChangeEs={v => set('bioLongEs', v)}
+            rows={4}
+          />
         </FormGrid>
 
         <FormDivider />

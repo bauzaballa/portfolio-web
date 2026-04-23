@@ -135,3 +135,48 @@ export function AdminToggle({ label, checked, onChange, className = '' }: Toggle
     </div>
   )
 }
+
+interface BilingualInputProps {
+  labelEn: string
+  labelEs: string
+  valueEn: string
+  valueEs: string
+  onChangeEn: (value: string) => void
+  onChangeEs: (value: string) => void
+  placeholder?: string
+  className?: string
+}
+
+export function BilingualInput({
+  labelEn, labelEs, valueEn, valueEs, onChangeEn, onChangeEs, placeholder, className = '',
+}: BilingualInputProps) {
+  return (
+    <div className={`admin-bilingual ${className}`}>
+      <AdminInput label={labelEn} value={valueEn} onChange={v => onChangeEn(String(v))} placeholder={placeholder} />
+      <AdminInput label={labelEs} value={valueEs} onChange={v => onChangeEs(String(v))} placeholder={placeholder} />
+    </div>
+  )
+}
+
+interface BilingualTextareaProps {
+  labelEn: string
+  labelEs: string
+  valueEn: string
+  valueEs: string
+  onChangeEn: (value: string) => void
+  onChangeEs: (value: string) => void
+  placeholder?: string
+  rows?: number
+  className?: string
+}
+
+export function BilingualTextarea({
+  labelEn, labelEs, valueEn, valueEs, onChangeEn, onChangeEs, placeholder, rows, className = '',
+}: BilingualTextareaProps) {
+  return (
+    <div className={`admin-bilingual ${className}`}>
+      <AdminTextarea label={labelEn} value={valueEn} onChange={onChangeEn} placeholder={placeholder} rows={rows} />
+      <AdminTextarea label={labelEs} value={valueEs} onChange={onChangeEs} placeholder={placeholder} rows={rows} />
+    </div>
+  )
+}

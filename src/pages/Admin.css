@@ -688,6 +688,19 @@
   }
 }
 
+.admin-bilingual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 720px) {
+  .admin-bilingual {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .admin-header {
     padding: 0 16px;
@@ -729,4 +742,10 @@
   .admin-table td:last-child {
     padding-right: 0;
   }
+}
+
+.admin-header__theme {
+  display: flex;
+  align-items: center;
+  margin-right: 4px;
 }
