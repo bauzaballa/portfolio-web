@@ -10,6 +10,7 @@ import SectionLabel from '../components/SectionLabel'
 import SkeletonLoader from '../components/SkeletonLoader'
 import ErrorState from '../components/ErrorState'
 import TextLink from '../components/TextLink'
+import PdfPages from '../components/PdfPages'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -33,13 +34,6 @@ interface Resume {
   format: string
   fileSize: number | null
   sortOrder: number
-}
-
-function formatBytes(bytes: number | null): string {
-  if (!bytes) return ''
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 export default function About() {
@@ -359,15 +353,6 @@ function ResumeCell({ resume }: { resume: Resume }) {
             {resume.description}
           </div>
         )}
-        {resume.fileSize && (
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 10,
-            color: 'var(--text-muted)', letterSpacing: 1,
-            marginTop: 6,
-          }}>
-            {formatBytes(resume.fileSize)}
-          </div>
-        )}
       </div>
 
       <a
@@ -393,10 +378,17 @@ function ResumeCell({ resume }: { resume: Resume }) {
 }
 
 function ResumeLightbox({ resume, onClose }: { resume: Resume; onClose: () => void }) {
+  const { isMobile } = useBreakpoint()
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', handler)
+      document.body.style.overflow = prevOverflow
+    }
   }, [onClose])
 
   return createPortal(
@@ -408,7 +400,8 @@ function ResumeLightbox({ resume, onClose }: { resume: Resume; onClose: () => vo
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 1000,
-        background: 'rgba(0,0,0,0.92)',
+        background: 'rgba(0,0,0,0.01)',
+        backdropFilter: 'blur(3px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
     >
@@ -419,23 +412,13 @@ function ResumeLightbox({ resume, onClose }: { resume: Resume; onClose: () => vo
           background: 'none', border: 'none', cursor: 'pointer',
           color: 'rgba(255,255,255,0.6)', fontSize: 24, lineHeight: 1,
           fontFamily: 'var(--font-mono)',
+          zIndex: 1,
         }}
       >
         x
       </button>
 
-      <iframe
-        src={resume.fileUrl}
-        title={resume.label}
-        onClick={e => e.stopPropagation()}
-        style={{
-          width: 'min(90vw, 900px)',
-          height: '90vh',
-          border: '0.5px solid rgba(255,255,255,0.15)',
-          borderRadius: 2,
-          background: 'var(--bg)',
-        }}
-      />
+      <PdfPages url={resume.fileUrl} isMobile={isMobile} />
 
       <div
         onClick={e => e.stopPropagation()}
