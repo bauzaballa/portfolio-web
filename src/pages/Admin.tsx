@@ -735,6 +735,38 @@ function MediaManager({
 
   const set = (k: string, v: string | number) => setForm(f => ({ ...f, [k]: v }))
 
+  const bulkRef = React.useRef<HTMLInputElement>(null)
+  const [bulkUploading, setBulkUploading] = React.useState(false)
+
+  const handleBulkUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    if (!files.length) return
+    setBulkUploading(true)
+    try {
+      const urls = await Promise.all(files.map(async file => {
+        const data = new FormData()
+        data.append('file', file)
+        data.append('upload_preset', 'portfolio')
+        const res = await fetch('https://api.cloudinary.com/v1_1/djepapcu1/upload', { method: 'POST', body: data })
+        const json = await res.json()
+        return json.secure_url as string
+      }))
+      await Promise.all(urls.map(url =>
+        authFetch(`${API}/api/v1/media`, {
+          method: 'POST',
+          body: JSON.stringify({ url, type: 'image', caption: '', sortOrder: 0, projectId }),
+        })
+      ))
+      toast(t(`${urls.length} image(s) uploaded.`, `${urls.length} imagen(es) subida(s).`))
+      load()
+    } catch {
+      toast(t('upload failed.', 'error al subir.'), 'error')
+    } finally {
+      setBulkUploading(false)
+      if (bulkRef.current) bulkRef.current.value = ''
+    }
+  }
+
   return (
     <div style={{ marginTop: 24 }}>
       <div style={{
@@ -842,9 +874,31 @@ function MediaManager({
       )}
 
       {!adding && !editingId && (
-        <AddButton onClick={() => { setEditingId(null); setForm(emptyMediaForm); setAdding(true) }}>
-          {t('+ add media', '+ agregar media')}
-        </AddButton>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginTop: 16 }}>
+          <button
+            className="admin-btn admin-btn--add"
+            style={{ marginTop: 0 }}
+            onClick={() => { setEditingId(null); setForm({ ...emptyMediaForm, type: 'video' }); setAdding(true) }}
+          >
+            {t('+ add video', '+ agregar video')}
+          </button>
+          <input
+            ref={bulkRef}
+            type="file"
+            accept="image/*"
+            multiple
+            style={{ display: 'none' }}
+            onChange={handleBulkUpload}
+          />
+          <button
+            className="admin-btn admin-btn--add"
+            style={{ marginTop: 0 }}
+            disabled={bulkUploading}
+            onClick={() => bulkRef.current?.click()}
+          >
+            {bulkUploading ? t('uploading...', 'subiendo...') : t('+ upload images', '+ subir imagenes')}
+          </button>
+        </div>
       )}
     </div>
   )
@@ -859,6 +913,22 @@ function MediaForm({
   onCancel: () => void
   t: (en: string, es: string) => string
 }) {
+  const [uploading, setUploading] = React.useState(false)
+  const fileRef = React.useRef<HTMLInputElement>(null)
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    const data = new FormData()
+    data.append('file', file)
+    data.append('upload_preset', 'portfolio')
+    const res = await fetch('https://api.cloudinary.com/v1_1/djepapcu1/upload', { method: 'POST', body: data })
+    const json = await res.json()
+    set('url', json.secure_url)
+    setUploading(false)
+  }
+
   return (
     <div style={{
       background: 'var(--bg)',
@@ -869,6 +939,17 @@ function MediaForm({
       flexDirection: 'column',
       gap: 12,
     }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <input ref={fileRef} type="file" accept="image/*,video/*" onChange={handleFile} style={{ display: 'none' }} />
+        <button
+          className="admin-btn admin-btn--primary"
+          disabled={uploading}
+          onClick={() => fileRef.current?.click()}
+        >
+          {uploading ? t('uploading...', 'subiendo...') : t('choose file', 'elegir archivo')}
+        </button>
+        {form.url && <img src={form.url} alt="" style={{ height: 36, width: 'auto', objectFit: 'cover', borderRadius: 2, border: '0.5px solid var(--border)' }} />}
+      </div>
       <AdminInput
         label="URL"
         value={form.url}
