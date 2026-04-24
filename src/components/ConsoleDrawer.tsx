@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useLang } from '../context/LangContext'
 import { useAuth } from '../context/AuthContext'
-import { usePreview } from '../context/PreviewContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -25,9 +24,6 @@ const COMMANDS: Record<string, string> = {
   'exit': '',
   'clear': '',
   'help': '',
-  'unlock-portfolio': '',
-  'lock-portfolio': '',
-  'status': '',
 }
 
 const FETCH_COMMANDS = ['get-projects', 'get-profile', 'get-skills', 'get-experience', 'get-education']
@@ -43,14 +39,12 @@ const FETCH_LABELS: Record<string, { en: string; es: string }> = {
 const HELP_EN = `get-projects    get-profile     get-skills
 get-experience  get-education
 lang-en         lang-es
-logout          clear           exit
-status`
+logout          clear           exit`
 
 const HELP_ES = `get-projects    get-profile     get-skills
 get-experience  get-education
 lang-en         lang-es
-logout          clear           salir
-status`
+logout          clear           salir`
 
 function useWindowWidth() {
   const [width, setWidth] = useState(() => window.innerWidth)
@@ -72,7 +66,6 @@ interface ConsoleDrawerProps {
 export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrigger = false }: ConsoleDrawerProps) {
   const { lang, toggle: toggleLang } = useLang()
   const { logout, isAdmin } = useAuth()
-  const { unlocked, unlock, lock } = usePreview()
   const navigate = useNavigate()
   const [input, setInput] = useState('')
   const [entries, setEntries] = useState<ConsoleEntry[]>([
@@ -129,23 +122,6 @@ export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrig
       setEntries(e => [...e, { ...entry, id: Date.now() + Math.random() }])
 
     next({ type: 'input', content: cmd })
-
-    if (trimmed === 'unlock-portfolio') {
-      unlock()
-      next({ type: 'output', content: 'portfolio unlocked. navigate to /home' })
-      return
-    }
-
-    if (trimmed === 'lock-portfolio') {
-      lock()
-      next({ type: 'output', content: 'portfolio locked.' })
-      return
-    }
-
-    if (trimmed === 'status') {
-      next({ type: 'output', content: `preview: ${unlocked ? 'unlocked' : 'locked'}` })
-      return
-    }
 
     if (trimmed === 'lang-es' || trimmed === 'lang-en') {
       const target = trimmed === 'lang-es' ? 'es' : 'en'

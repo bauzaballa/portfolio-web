@@ -1,5 +1,4 @@
 import { Navigate } from 'react-router-dom'
-import { usePreview } from '../context/PreviewContext'
 import { useAuth } from '../context/AuthContext'
 
 interface Props {
@@ -8,17 +7,12 @@ interface Props {
 }
 
 export default function ProtectedRoute({ children, adminOnly = false }: Props) {
-  const { unlocked } = usePreview()
   const { isAdmin, loading } = useAuth()
 
   if (loading) return null
 
   if (adminOnly) {
     return isAdmin ? <>{children}</> : <Navigate to="/entry" replace />
-  }
-
-  if (!unlocked && !isAdmin) {
-    return <Navigate to="/" replace />
   }
 
   return <>{children}</>
