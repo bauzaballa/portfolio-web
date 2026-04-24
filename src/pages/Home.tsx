@@ -10,7 +10,6 @@ import Nav from '../components/Nav'
 import ProjectRow from '../components/ProjectRow'
 import SkillChip from '../components/SkillChip'
 import SkeletonLoader from '../components/SkeletonLoader'
-import SectionLabel from '../components/SectionLabel'
 import TextLink from '../components/TextLink'
 import Divider from '../components/Divider'
 
@@ -44,7 +43,6 @@ export default function Home() {
   const [projectsLoading, setProjectsLoading] = useState(true)
   const [projectsError, setProjectsError] = useState(false)
 
-  const [bio, setBio] = useState('')
   const [skillGroups, setSkillGroups] = useState<SkillGroup[]>([])
   const cache = useRef<Record<string, any>>({})
 
@@ -63,19 +61,6 @@ export default function Home() {
         })
         .catch(() => setProjectsError(true))
         .finally(() => setProjectsLoading(false))
-    }
-
-    const profileKey = `profile_${lang}`
-    if (cache.current[profileKey]) {
-      setBio(cache.current[profileKey])
-    } else {
-      fetch(`${API}/api/v1/profile?lang=${lang}`)
-        .then(r => r.json())
-        .then(d => {
-          cache.current[profileKey] = d.data.bioLong
-          setBio(d.data.bioLong)
-        })
-        .catch(() => {})
     }
 
     fetch(`${API}/api/v1/skills`)
