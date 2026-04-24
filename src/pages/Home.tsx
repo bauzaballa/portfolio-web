@@ -10,7 +10,6 @@ import Nav from '../components/Nav'
 import ProjectRow from '../components/ProjectRow'
 import SkillChip from '../components/SkillChip'
 import SkeletonLoader from '../components/SkeletonLoader'
-import SectionLabel from '../components/SectionLabel'
 import TextLink from '../components/TextLink'
 import Divider from '../components/Divider'
 
@@ -44,7 +43,6 @@ export default function Home() {
   const [projectsLoading, setProjectsLoading] = useState(true)
   const [projectsError, setProjectsError] = useState(false)
 
-  const [bio, setBio] = useState('')
   const [skillGroups, setSkillGroups] = useState<SkillGroup[]>([])
   const cache = useRef<Record<string, any>>({})
 
@@ -63,19 +61,6 @@ export default function Home() {
         })
         .catch(() => setProjectsError(true))
         .finally(() => setProjectsLoading(false))
-    }
-
-    const profileKey = `profile_${lang}`
-    if (cache.current[profileKey]) {
-      setBio(cache.current[profileKey])
-    } else {
-      fetch(`${API}/api/v1/profile?lang=${lang}`)
-        .then(r => r.json())
-        .then(d => {
-          cache.current[profileKey] = d.data.bioLong
-          setBio(d.data.bioLong)
-        })
-        .catch(() => {})
     }
 
     fetch(`${API}/api/v1/skills`)
@@ -214,52 +199,7 @@ export default function Home() {
         ))}
       </section>
 
-      {/* SECTION 3: ABOUT SNIPPET */}
-      <section style={{
-        padding: isMobile ? '48px 6vw' : '80px 8vw',
-        borderTop: '0.5px solid var(--border)',
-        display: 'flex',
-        flexDirection: isMobile ? 'column' : 'row',
-        gap: isMobile ? 32 : 48,
-        flexWrap: 'wrap',
-      }}>
-        <div style={{ flex: 1, minWidth: isMobile ? 0 : 280 }}>
-          <SectionLabel color="teal" style={{ marginBottom: 20 }}>
-            {t('about', 'sobre mí')}
-          </SectionLabel>
-          {bio && (
-            <p style={{
-              fontFamily: 'var(--font-serif)', fontSize: isMobile ? 16 : 18,
-              color: 'var(--text-secondary)', lineHeight: 1.8,
-              maxWidth: 540,
-            }}>
-              {bio}
-            </p>
-          )}
-          <TextLink onClick={() => navigate('/about')} style={{ display: 'inline-block', marginTop: 24 }}>
-            {t('read more ->', 'leer más ->')}
-          </TextLink>
-        </div>
-
-        {!isMobile && (
-          <div style={{
-            width: 340, height: 420,
-            background: 'var(--bg-surface)',
-            border: '0.5px solid var(--border)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <span style={{
-              fontFamily: 'var(--font-mono)', fontSize: 12,
-              color: 'var(--text-muted)',
-            }}>
-              {t('[ photo ]', '[ foto ]')}
-            </span>
-          </div>
-        )}
-      </section>
-
-      {/* SECTION 4: SKILLS PREVIEW */}
+      {/* SECTION 3: SKILLS PREVIEW */}
       <section style={{
         padding: isMobile ? '48px 6vw' : '80px 8vw',
         borderTop: '0.5px solid var(--border)',
