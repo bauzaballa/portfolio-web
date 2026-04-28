@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { useProfile } from '../context/ProfileContext'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import ThemeToggle from '../components/ThemeToggle'
+import LangPicker from '../components/LangPicker'
 
 function Clock() {
   const [now, setNow] = useState(new Date())
@@ -361,6 +362,7 @@ export default function OSEntry() {
             }}
           >
             <Clock />
+            <LangPicker variant="entry" />
             <div style={{
               display: 'flex',
               gap: isMobile ? '1.5rem' : '3rem',
@@ -418,7 +420,7 @@ export default function OSEntry() {
           letterSpacing: '0.1em',
         }}
       >
-        guest mode available
+        guest mode · modo invitado
       </motion.div>
     </div>
   )
