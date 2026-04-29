@@ -362,7 +362,6 @@ export default function OSEntry() {
             }}
           >
             <Clock />
-            <LangPicker variant="entry" />
             <div style={{
               display: 'flex',
               gap: isMobile ? '1.5rem' : '3rem',
@@ -396,6 +395,7 @@ export default function OSEntry() {
                 isAdmin={true}
               />
             </div>
+            <LangPicker variant="entry" />
           </motion.div>
         ) : (
           <PasswordForm

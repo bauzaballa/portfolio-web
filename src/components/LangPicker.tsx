@@ -34,7 +34,7 @@ export default function LangPicker({ variant = 'nav' }: Props) {
           flexDirection: 'column',
           alignItems: 'center',
           gap: '0.5rem',
-          marginBottom: '2rem',
+          marginTop: '2.5rem',
         }}
       >
         <div style={{
