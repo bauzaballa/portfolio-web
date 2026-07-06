@@ -1,6 +1,7 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import OSEntry from './pages/OSEntry'
 import Home from './pages/Home'
+import NotFound from './pages/NotFound'
 import Projects from './pages/Projects'
 import ProjectDetail from './pages/ProjectDetail'
 import Experience from './pages/Experience'
@@ -26,6 +27,11 @@ export default function App() {
       <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
       <Route path="/contact" element={<ProtectedRoute><Contact /></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
+      {/* Backwards-compat redirects for the old routes */}
+      <Route path="/home" element={<Navigate to="/" replace />} />
+      <Route path="/entry" element={<Navigate to="/login" replace />} />
+      {/* 404 fallback */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
     </LikeProvider>
     </ConsoleProvider>

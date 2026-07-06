@@ -64,3 +64,21 @@ body::before {
   background-size: 256px 256px;
   background-repeat: repeat;
 }
+
+/* 404 back-home action — visible keyboard focus + subtle hover */
+.nf-action {
+  transition: opacity 0.2s ease;
+}
+.nf-action:hover {
+  opacity: 0.85;
+}
+.nf-action:focus-visible {
+  outline: 2px solid var(--accent-teal);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nf-action {
+    transition: none;
+  }
+}
