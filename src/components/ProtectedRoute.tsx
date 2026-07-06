@@ -12,7 +12,7 @@ export default function ProtectedRoute({ children, adminOnly = false }: Props) {
   if (loading) return null
 
   if (adminOnly) {
-    return isAdmin ? <>{children}</> : <Navigate to="/entry" replace />
+    return isAdmin ? <>{children}</> : <Navigate to="/login" replace />
   }
 
   return <>{children}</>

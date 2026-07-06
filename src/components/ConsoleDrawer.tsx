@@ -158,7 +158,7 @@ export default function ConsoleDrawer({ open, setOpen, navOpen = false, hideTrig
         return
       }
       logout()
-      navigate('/entry')
+      navigate('/login')
       next({ type: 'success', content: lang === 'es' ? 'sesión cerrada.' : 'logged out.' })
       return
     }

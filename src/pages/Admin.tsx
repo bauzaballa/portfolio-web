@@ -122,7 +122,7 @@ export default function Admin() {
   }[item])
 
   useEffect(() => {
-    if (!loading && !isAdmin) navigate('/entry')
+    if (!loading && !isAdmin) navigate('/login')
   }, [isAdmin, loading, navigate])
 
   const authFetch = useCallback(async (url: string, opts?: RequestInit) => {
@@ -137,7 +137,7 @@ export default function Admin() {
     if (res.status === 401) {
       toast(t('session expired.', 'sesion expirada.'), 'error')
       logout()
-      navigate('/entry')
+      navigate('/login')
       throw new Error('unauthorized')
     }
     return res
@@ -152,7 +152,7 @@ export default function Admin() {
         setSection={setSection}
         navLabel={navLabel}
         onNavigate={navigate}
-        onLogout={() => { logout(); navigate('/entry') }}
+        onLogout={() => { logout(); navigate('/login') }}
         t={t}
       />
 
@@ -228,7 +228,7 @@ function AdminHeader({
         </div>
         <button
           className="admin-header__btn admin-header__btn--site"
-          onClick={() => onNavigate('/home')}
+          onClick={() => onNavigate('/')}
         >
           {t('< site', '< sitio')}
         </button>

@@ -60,10 +60,10 @@ export default function Nav() {
     setMobileOpen(false)
   }, [location.pathname])
 
-  // Hide terminal button at bottom of /home on mobile
+  // Hide terminal button at bottom of / (home) on mobile
   const [atBottom, setAtBottom] = useState(false)
   useEffect(() => {
-    if (!isMobile || location.pathname !== '/home') {
+    if (!isMobile || location.pathname !== '/') {
       setAtBottom(false)
       return
     }
@@ -77,7 +77,7 @@ export default function Nav() {
   }, [isMobile, location.pathname])
 
   const NAV_LINKS = [
-    { label: t('home', 'inicio'), path: '/home' },
+    { label: t('home', 'inicio'), path: '/' },
     { label: t('work', 'trabajos'), path: '/projects' },
     { label: t('experience', 'experiencia'), path: '/experience' },
     { label: t('about', 'sobre mí'), path: '/about' },
@@ -103,7 +103,7 @@ export default function Nav() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <button
-              onClick={() => navigate('/home')}
+              onClick={() => navigate('/')}
               style={{
                 background: 'none', border: 'none', padding: 0,
                 fontFamily: 'var(--font-mono)', fontSize: 12,
@@ -184,7 +184,7 @@ export default function Nav() {
                       </button>
                       <div style={{ height: '0.5px', background: 'var(--border)', margin: '0.3rem 0' }} />
                       <button
-                        onClick={() => { setAdminMenuOpen(false); logout(); navigate('/entry') }}
+                        onClick={() => { setAdminMenuOpen(false); logout(); navigate('/login') }}
                         style={{
                           display: 'block', width: '100%', textAlign: 'left',
                           padding: '0.4rem 0.8rem',
@@ -227,7 +227,7 @@ export default function Nav() {
         {/* Left: logo + like */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <button
-            onClick={() => handleNavigate('/home')}
+            onClick={() => handleNavigate('/')}
             style={{
               background: 'none', border: 'none', padding: 0,
               fontFamily: 'var(--font-mono)', fontSize: 12,
@@ -444,7 +444,7 @@ export default function Nav() {
                     /
                   </span>
                   <button
-                    onClick={() => { logout(); navigate('/entry'); setMobileOpen(false) }}
+                    onClick={() => { logout(); navigate('/login'); setMobileOpen(false) }}
                     style={{
                       fontFamily: 'var(--font-mono)', fontSize: 11,
                       color: 'var(--text-muted)', letterSpacing: 1,

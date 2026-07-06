@@ -18,9 +18,8 @@ export default function App() {
     <ConsoleProvider>
     <LikeProvider>
     <Routes>
-      <Route path="/" element={<OSEntry />} />
-      <Route path="/entry" element={<OSEntry />} />
-      <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/login" element={<OSEntry />} />
       <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
       <Route path="/projects/:slug" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
       <Route path="/experience" element={<ProtectedRoute><Experience /></ProtectedRoute>} />

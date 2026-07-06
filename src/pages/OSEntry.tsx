@@ -313,7 +313,7 @@ export default function OSEntry() {
   const { isMobile } = useBreakpoint()
   const adminUsername = import.meta.env.VITE_ADMIN_USERNAME || profile?.name || ''
 
-  const handleGuestClick = () => navigate('/home')
+  const handleGuestClick = () => navigate('/')
   const handleUserClick = (username: string) => setSelected(username)
 
   const handleLoginSuccess = () => {
